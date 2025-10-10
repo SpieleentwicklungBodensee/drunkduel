@@ -48,17 +48,20 @@ DIR_LEFT = 3
 DIR_RIGHT = 2
 DIR_UP = 1
 DIR_DOWN = 0
+FIRE = 5
 
 PLAYER_1_KEYS = {DIR_LEFT: pygame.K_LEFT,
                  DIR_RIGHT: pygame.K_RIGHT,
                  DIR_UP: pygame.K_UP,
-                 DIR_DOWN: pygame.K_DOWN
+                 DIR_DOWN: pygame.K_DOWN,
+                 FIRE: pygame.K_RCTRL,
                  }
 
 PLAYER_2_KEYS = {DIR_LEFT: pygame.K_a,
                  DIR_RIGHT: pygame.K_d,
                  DIR_UP: pygame.K_w,
-                 DIR_DOWN: pygame.K_s
+                 DIR_DOWN: pygame.K_s,
+                 FIRE: pygame.K_TAB,
                  }
 
 
@@ -181,6 +184,7 @@ class Player(Object):
         self.facedir = DIR_DOWN
 
         self.score = 0
+        self.showGun = False
 
     def moveLeft(self):
         self.xdir = -1
@@ -218,11 +222,18 @@ class Player(Object):
         if self.ydir > 0:
             self.ydir = 0
 
+    def shoot(self):
+        self.showGun = True
+
+    def stopShooting(self):
+        self.showGun = False
+
     def update(self):
         self.xpos += self.xdir * self.speed
         self.ypos += self.ydir * self.speed
 
-        self.sprite.select(self.facedir)
+        spriteAnim = self.facedir + 4 if self.showGun else 0
+        self.sprite.select(spriteAnim)
 
         if self.xdir == 0 and self.ydir == 0:
             self.sprite.stop()
@@ -299,6 +310,9 @@ class GameScreen(Screen):
                 elif e.key == keys[DIR_DOWN]:
                     self.players[i].moveDown()
 
+                elif e.key == keys[FIRE]:
+                    self.players[i].shoot()
+
         elif e.type == pygame.KEYUP:
             for i, keys in enumerate([PLAYER_1_KEYS, PLAYER_2_KEYS]):
                 if e.key == keys[DIR_LEFT]:
@@ -309,6 +323,9 @@ class GameScreen(Screen):
                     self.players[i].stopUp()
                 elif e.key == keys[DIR_DOWN]:
                     self.players[i].stopDown()
+
+                elif e.key == keys[FIRE]:
+                    self.players[i].stopShooting()
 
     def update(self):
         for player in self.players:
