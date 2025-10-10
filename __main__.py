@@ -110,7 +110,7 @@ class AnimSprite:
         self.animations = animations
 
         self.anim = 0
-        self.speed = 8
+        self.speed = 6
         self.startTime = 0
         self.lastPhase = 0
 
