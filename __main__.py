@@ -232,7 +232,7 @@ class Player(Object):
         self.xpos += self.xdir * self.speed
         self.ypos += self.ydir * self.speed
 
-        spriteAnim = self.facedir + 4 if self.showGun else 0
+        spriteAnim = self.facedir + (4 if self.showGun else 0)
         self.sprite.select(spriteAnim)
 
         if self.xdir == 0 and self.ydir == 0:
