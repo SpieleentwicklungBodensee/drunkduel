@@ -75,7 +75,7 @@ class Sprite:
         self.surface = pygame.image.load(filename)
 
     def draw(self, output, x, y):
-        output.blit(self.surface, self.x, self.y)
+        output.blit(self.surface, (x, y))
 
 
 class AnimSprite:
@@ -204,7 +204,7 @@ else:
 print('\n')
 print('loading gfx...')
 
-TILES = {'Y': Sprite('gfx/desert1.png'),
+TILES = {'Y': Sprite('gfx/desert.png'),
          '|': Sprite('gfx/river.png'),
          ' ': None,
          }
@@ -251,7 +251,7 @@ class Level:
         for y in range(self.height):
             for x in range(self.width):
                 tile = self.getTile(x, y)
-                if tile in self.tiles:
+                if tile in self.tiles and self.tiles[tile] is not None:
                     self.tiles[tile].draw(output, x * TILE_WIDTH, y * TILE_HEIGHT)
 
 level = Level(mapdata, TILES)
