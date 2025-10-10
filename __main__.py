@@ -44,38 +44,6 @@ if DEFAULT_BRIGHTNESS is None:
 
 BRIGHTNESS = DEFAULT_BRIGHTNESS
 
-# init ------------------------
-
-print('welcome to drunk duel')
-print('---------------------')
-print()
-print('rendermode: %s' % RENDER_MODE)
-print()
-
-
-pygame.joystick.init()
-numJoysticks = pygame.joystick.get_count()
-
-joysticks = []
-
-if numJoysticks == 0:
-    print('no joysticks found')
-else:
-    print('joysticks found:')
-
-    for i in range(numJoysticks):
-        joystick = pygame.joystick.Joystick(i)
-        joysticks.append(joystick)
-
-        print('-', joystick.get_name())
-
-print()
-print('\n\n')
-
-if numJoysticks == 0:
-    print('press space to continue')
-else:
-    print('press space or button')
 
 # global ----------------------
 
@@ -84,7 +52,6 @@ ledwall.setBrightnessValue(BRIGHTNESS)
 
 clock = pygame.time.Clock()
 tick = 0
-
 
 def switchState(state):
     global currentScreen
@@ -96,6 +63,71 @@ def switchState(state):
         currentScreen = gameScreen
 
     ledwall.cls()
+
+
+# sprites and objects ---------
+
+class Sprite:
+    def __init__(self, filename):
+        self.surface = pygame.image.load(filename)
+
+    def draw(self, output, x, y):
+        output.blit(self.surface, self.x, self.y)
+
+
+class AnimSprite:
+    def __init__(self, animations=None):
+        # 2d array of animations with phases
+        # e.g.:
+        #
+        # [[walk left 1, walk left 2],
+        #  [walk right 1, walk right 2],
+        #  ...]
+        #
+        self.animations = animations
+
+        self.anim = 0
+        self.speed = 16
+        self.startTime = 0
+        self.lastPhase = 0
+
+        self.running = False
+
+    def draw(self, output, x, y):
+        if self.running:
+            phase = ((tick - self.startTime) // self.speed) % len(self.anim)
+            self.lastPhase = phase
+        else:
+            phase = self.lastPhase
+
+        sprite = self.animations[self.anim][phase]
+        sprite.draw(output, x, y)
+
+    def start(self, reset=True):
+        self.running = True
+        if reset:
+            self.startTime = tick
+
+    def stop(self, reset=True):
+        self.running = False
+        if reset:
+            self.lastPhase = 0
+
+
+class Object:
+    def __init__(self, xpos, ypos, sprite):
+        self.xpos = xpos
+        self.ypos = ypos
+        self.sprite = sprite
+
+    def draw(self, output):
+        self.sprite.draw(output, self.xpos, self.ypos)
+
+
+class Player(Object):
+    def __init__(self, xpos, ypos, sprite):
+        super().__init__(xpos, ypos, sprite)
+        self.score = 0
 
 
 # screens ---------------------
@@ -140,6 +172,42 @@ class GameScreen(Screen):
 
     def event(self, e):
         pass
+
+
+# init ------------------------
+
+print('welcome to drunk duel')
+print('---------------------')
+print()
+print('rendermode: %s' % RENDER_MODE)
+print()
+
+pygame.joystick.init()
+numJoysticks = pygame.joystick.get_count()
+
+joysticks = []
+
+if numJoysticks == 0:
+    print('no joysticks found')
+else:
+    print('joysticks found:')
+
+    for i in range(numJoysticks):
+        joystick = pygame.joystick.Joystick(i)
+        joysticks.append(joystick)
+
+        print('-', joystick.get_name())
+
+print('\n')
+print('loading gfx...')
+print('loading sfx...')
+
+print('\n\n')
+
+if numJoysticks == 0:
+    print('press space to continue')
+else:
+    print('press space or button')
 
 
 # main loop -------------------
