@@ -71,8 +71,11 @@ TILE_HEIGHT = 16
 # sprites and objects ---------
 
 class Sprite:
-    def __init__(self, filename):
-        self.surface = pygame.image.load(filename)
+    def __init__(self, filenameOrSurface):
+        if type(filenameOrSurface) is str:
+            self.surface = pygame.image.load(filenameOrSurface)
+        else:
+            self.surface = filenameOrSurface
 
     def draw(self, output, x, y):
         output.blit(self.surface, (x, y))
@@ -90,7 +93,7 @@ class AnimSprite:
         self.animations = animations
 
         self.anim = 0
-        self.speed = 16
+        self.speed = 8
         self.startTime = 0
         self.lastPhase = 0
 
@@ -98,7 +101,7 @@ class AnimSprite:
 
     def draw(self, output, x, y):
         if self.running:
-            phase = ((tick - self.startTime) // self.speed) % len(self.anim)
+            phase = ((tick - self.startTime) // self.speed) % len(self.animations[0])
             self.lastPhase = phase
         else:
             phase = self.lastPhase
@@ -115,6 +118,26 @@ class AnimSprite:
         self.running = False
         if reset:
             self.lastPhase = 0
+
+
+def createAnimatedSprite(filename, width=16, height=16):
+    animations = []
+    sprite = pygame.image.load(filename)
+
+    for anim in range(sprite.get_height() // height):
+        phases = []
+        for phase in range(sprite.get_width() // width):
+            blitx = 0 - phase * width
+            blity = 0 - anim * height
+
+            slice_ = pygame.Surface((width, height))
+            slice_.blit(sprite, (blitx, blity))
+
+            phases.append(Sprite(slice_))
+
+        animations.append(phases)
+
+    return AnimSprite(animations)
 
 
 class Object:
@@ -173,6 +196,8 @@ class GameScreen(Screen):
     def draw(self):
         level.draw(output)
 
+        MAN_SPRITE.draw(output, 16, 16)
+
     def event(self, e):
         pass
 
@@ -208,6 +233,9 @@ TILES = {'Y': Sprite('gfx/desert.png'),
          '|': Sprite('gfx/river.png'),
          ' ': None,
          }
+
+MAN_SPRITE = createAnimatedSprite('gfx/player1.png')
+MAN_SPRITE.start()
 
 print('loading sfx...')
 
