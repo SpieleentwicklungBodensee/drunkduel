@@ -359,7 +359,7 @@ else:
 print('\n')
 print('loading gfx...')
 
-TILES = {'Y': Sprite('gfx/desert.png'),
+TILES = {'Y': Sprite('gfx/desert3.png'),
          '|': createAnimatedSprite('gfx/water1.png'),
          '#': Sprite('gfx/fence1.png'),
          ' ': None,
