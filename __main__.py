@@ -348,7 +348,7 @@ TILES = {'Y': Sprite('gfx/desert.png'),
          }
 
 PLAYER_1_SPRITE = createAnimatedSprite('gfx/player1.png')
-PLAYER_2_SPRITE = createAnimatedSprite('gfx/player1.png')
+PLAYER_2_SPRITE = createAnimatedSprite('gfx/player2.png')
 
 print('loading sfx...')
 
