@@ -88,6 +88,13 @@ TILE_WIDTH = 16
 TILE_HEIGHT = 16
 
 
+def spawnBullet(x, y, xdir):
+    bullet = Bullet(x, y)
+    bullet.xdir = xdir
+
+    gameScreen.addObject(bullet)
+
+
 # sprites and objects ---------
 
 class Sprite:
@@ -173,6 +180,17 @@ class Object:
         self.sprite.draw(output, self.xpos, self.ypos)
 
 
+class Bullet(Object):
+    def __init__(self, xpos, ypos):
+        super().__init__(xpos, ypos, BULLET_SPRITE)
+
+        self.xdir = 0
+        self.speed = 4
+
+    def update(self):
+        self.xpos += self.xdir * self.speed
+
+
 class Player(Object):
     def __init__(self, xpos, ypos, sprite):
         super().__init__(xpos, ypos, sprite)
@@ -184,6 +202,7 @@ class Player(Object):
         self.facedir = DIR_DOWN
 
         self.score = 0
+        self.ammo = 4
         self.showGun = False
 
     def moveLeft(self):
@@ -224,6 +243,17 @@ class Player(Object):
 
     def shoot(self):
         self.showGun = True
+        self.ammo -= 1
+
+        if self.xpos < 128:
+            bulletxdir = 1
+            self.facedir = DIR_RIGHT
+        else:
+            bulletxdir = -1
+            self.facedir = DIR_LEFT
+
+        spawnBullet(self.xpos, self.ypos, bulletxdir)
+
 
     def stopShooting(self):
         self.showGun = False
@@ -285,6 +315,7 @@ class GameScreen(Screen):
         super().__init__()
 
         self.players = []
+        self.objects = []
 
         player1 = Player(2 * TILE_WIDTH, 2 * TILE_HEIGHT, PLAYER_1_SPRITE)
         player2 = Player(13 * TILE_WIDTH, 13 * TILE_HEIGHT, PLAYER_2_SPRITE)
@@ -297,6 +328,9 @@ class GameScreen(Screen):
 
         for player in self.players:
             player.draw(output)
+
+        for obj in self.objects:
+            obj.draw(output)
 
     def event(self, e):
         if e.type == pygame.KEYDOWN:
@@ -330,6 +364,12 @@ class GameScreen(Screen):
     def update(self):
         for player in self.players:
             player.update()
+
+        for obj in self.objects:
+            obj.update()
+
+    def addObject(self, obj):
+        self.objects.append(obj)
 
 
 # init ------------------------
@@ -367,6 +407,8 @@ TILES = {'Y': Sprite('gfx/desert3.png'),
 
 PLAYER_1_SPRITE = createAnimatedSprite('gfx/player1.png')
 PLAYER_2_SPRITE = createAnimatedSprite('gfx/player2.png')
+
+BULLET_SPRITE = Sprite('gfx/bullet.png')
 
 print('loading sfx...')
 
