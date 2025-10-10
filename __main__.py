@@ -44,6 +44,11 @@ if DEFAULT_BRIGHTNESS is None:
 
 BRIGHTNESS = DEFAULT_BRIGHTNESS
 
+DIR_LEFT = 3
+DIR_RIGHT = 2
+DIR_UP = 1
+DIR_DOWN = 0
+
 
 # global ----------------------
 
@@ -153,7 +158,9 @@ class Object:
 class Player(Object):
     def __init__(self, xpos, ypos, sprite):
         super().__init__(xpos, ypos, sprite)
+
         self.score = 0
+        self.facedir = DIR_DOWN
 
 
 # screens ---------------------
@@ -193,10 +200,22 @@ class TitleScreen(Screen):
 
 
 class GameScreen(Screen):
+    def __init__(self):
+        super().__init__()
+
+        self.players = []
+
+        player1 = Player(2 * TILE_WIDTH, 2 * TILE_HEIGHT, MAN_SPRITE)
+        player2 = Player(13 * TILE_WIDTH, 13 * TILE_HEIGHT, MAN_SPRITE)
+
+        self.players.append(player1)
+        self.players.append(player2)
+
     def draw(self):
         level.draw(output)
 
-        MAN_SPRITE.draw(output, 16, 16)
+        for player in self.players:
+            player.draw(output)
 
     def event(self, e):
         pass
@@ -235,7 +254,6 @@ TILES = {'Y': Sprite('gfx/desert.png'),
          }
 
 MAN_SPRITE = createAnimatedSprite('gfx/player1.png')
-MAN_SPRITE.start()
 
 print('loading sfx...')
 
