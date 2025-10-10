@@ -64,6 +64,9 @@ def switchState(state):
 
     ledwall.cls()
 
+TILE_WIDTH = 16
+TILE_HEIGHT = 16
+
 
 # sprites and objects ---------
 
@@ -168,7 +171,7 @@ class TitleScreen(Screen):
 
 class GameScreen(Screen):
     def draw(self):
-        ledwall.centerText('- GAME SCREEN -', y=10)
+        level.draw(output)
 
     def event(self, e):
         pass
@@ -200,6 +203,12 @@ else:
 
 print('\n')
 print('loading gfx...')
+
+TILES = {'Y': Sprite('gfx/desert1.png'),
+         '|': Sprite('gfx/river.png'),
+         ' ': None,
+         }
+
 print('loading sfx...')
 
 print('\n\n')
@@ -208,6 +217,44 @@ if numJoysticks == 0:
     print('press space to continue')
 else:
     print('press space or button')
+
+
+# level -----------------------
+
+mapdata = ['       ||       ',
+           '       ||   Y   ',
+           '    Y  ||       ',
+           '       ||       ',
+           '       || Y     ',
+           '       ||       ',
+           '      Y||       ',
+           '       ||    Y  ',
+           '  Y    ||       ',
+           '       ||       ',
+           ]
+
+class Level:
+    def __init__(self, mapdata, tiles):
+        self.mapdata = mapdata
+        self.tiles = tiles
+
+        self.width = len(self.mapdata[0])
+        self.height = len(self.mapdata)
+
+    def setTile(self, x, y, tile):
+        self.mapdata[y] = self.mapdata[y][:x] + tile + self.mapdata[y][x+1:]
+
+    def getTile(self, x, y):
+        return self.mapdata[y][x]
+
+    def draw(self, output):
+        for y in range(self.height):
+            for x in range(self.width):
+                tile = self.getTile(x, y)
+                if tile in self.tiles:
+                    self.tiles[tile].draw(output, x * TILE_WIDTH, y * TILE_HEIGHT)
+
+level = Level(mapdata, TILES)
 
 
 # main loop -------------------
