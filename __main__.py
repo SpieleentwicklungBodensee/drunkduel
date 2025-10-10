@@ -360,7 +360,7 @@ print('\n')
 print('loading gfx...')
 
 TILES = {'Y': Sprite('gfx/desert.png'),
-         '|': Sprite('gfx/river.png'),
+         '|': createAnimatedSprite('gfx/water1.png'),
          '#': Sprite('gfx/fence1.png'),
          ' ': None,
          }
@@ -431,6 +431,10 @@ class Level:
                     self.tiles[tile].draw(output, x * TILE_WIDTH, y * TILE_HEIGHT)
 
 level = Level(mapdata, TILES)
+
+# animate water
+TILES['|'].speed = 12
+TILES['|'].start()
 
 
 # main loop -------------------
