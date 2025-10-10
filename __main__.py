@@ -1,4 +1,5 @@
 import pygame
+import argparse
 
 import ledwall
 print = ledwall.print
@@ -13,17 +14,29 @@ except ImportError:
 if not 'RENDER_MODE' in dir():
     # 'led' = for led wall output
     # 'plain' = for pc/laptop or testing
-    # 'sim' = led simulation for uli (deprecated)
-    # 'arcade' = for toolbox arcade cabinet
-    # 'square' = for square displays
     RENDER_MODE = 'plain'
 
 if not 'DEFAULT_BRIGHTNESS' in dir():
-    if RENDER_MODE == 'led':
-        BRIGHTNESS = -4
-    else:
-        BRIGHTNESS = 0
+    DEFAULT_BRIGHTNESS = None
 
+
+# read settings from command line
+
+parser = argparse.ArgumentParser(prog='Drunk Duel')
+parser.add_argument('--rendermode', default=None, help='possible modes: plain, led')
+args = parser.parse_args()
+
+if args.rendermode:
+    RENDER_MODE = args.rendermode
+
+if DEFAULT_BRIGHTNESS is None:
+    if RENDER_MODE == 'led':
+        DEFAULT_BRIGHTNESS = -4
+    else:
+        DEFAULT_BRIGHTNESS = 0
+
+
+BRIGHTNESS = DEFAULT_BRIGHTNESS
 
 # global ----------------------
 
