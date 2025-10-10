@@ -31,6 +31,10 @@ args = parser.parse_args()
 if args.rendermode:
     RENDER_MODE = args.rendermode
 
+    if RENDER_MODE not in ['plain', 'led']:
+        print('unknown rendermode: %s' % RENDER_MODE)
+        exit()
+
 if DEFAULT_BRIGHTNESS is None:
     if RENDER_MODE == 'led':
         DEFAULT_BRIGHTNESS = -4
