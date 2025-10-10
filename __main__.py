@@ -344,6 +344,7 @@ print('loading gfx...')
 
 TILES = {'Y': Sprite('gfx/desert.png'),
          '|': Sprite('gfx/river.png'),
+         '#': Sprite('gfx/fence1.png'),
          ' ': None,
          }
 
@@ -388,7 +389,7 @@ mapdata = ['       ||       ',
            '     Y ||       ',
            '       ||  Y    ',
            '       ||       ',
-           '       ||       ',
+           '#######||#######',
            ]
 
 class Level:
