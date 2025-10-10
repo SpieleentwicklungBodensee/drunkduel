@@ -241,6 +241,17 @@ print('loading sfx...')
 
 print('\n\n')
 
+print('keyboard:')
+print('---------')
+print('f1   less brightness')
+print('f2   more brightness')
+print()
+
+if RENDER_MODE != 'led':
+    print('f11  toggle fullscreen')
+
+print('\n\n')
+
 if numJoysticks == 0:
     print('press space to continue')
 else:
@@ -315,6 +326,14 @@ while running:
             running = False
         elif e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
             running = False
+        elif e.type == pygame.KEYDOWN and e.key == pygame.K_F1:
+            BRIGHTNESS -= 1
+            ledwall.setBrightnessValue(BRIGHTNESS)
+        elif e.type == pygame.KEYDOWN and e.key == pygame.K_F2:
+            BRIGHTNESS += 1
+            if BRIGHTNESS > 0:
+                BRIGHTNESS = 0
+            ledwall.setBrightnessValue(BRIGHTNESS)
         elif e.type == pygame.KEYDOWN and e.key == pygame.K_F11:
             pygame.display.toggle_fullscreen()
         else:
