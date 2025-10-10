@@ -4,6 +4,9 @@ import argparse
 import ledwall
 print = ledwall.print
 
+
+# settings --------------------
+
 # read settings from settings.py
 # use default values if no settings.py exists
 try:
@@ -21,7 +24,6 @@ if not 'DEFAULT_BRIGHTNESS' in dir():
 
 
 # read settings from command line
-
 parser = argparse.ArgumentParser(prog='Drunk Duel')
 parser.add_argument('--rendermode', default=None, help='possible modes: plain, led')
 args = parser.parse_args()
@@ -37,6 +39,7 @@ if DEFAULT_BRIGHTNESS is None:
 
 
 BRIGHTNESS = DEFAULT_BRIGHTNESS
+
 
 # global ----------------------
 
