@@ -44,6 +44,38 @@ if DEFAULT_BRIGHTNESS is None:
 
 BRIGHTNESS = DEFAULT_BRIGHTNESS
 
+# init ------------------------
+
+print('welcome to drunk duel')
+print('---------------------')
+print()
+print('rendermode: %s' % RENDER_MODE)
+print()
+
+
+pygame.joystick.init()
+numJoysticks = pygame.joystick.get_count()
+
+joysticks = []
+
+if numJoysticks == 0:
+    print('no joysticks found')
+else:
+    print('joysticks found:')
+
+    for i in range(numJoysticks):
+        joystick = pygame.joystick.Joystick(i)
+        joysticks.append(joystick)
+
+        print('-', joystick.get_name())
+
+print()
+print('\n\n')
+
+if numJoysticks == 0:
+    print('press space to continue')
+else:
+    print('press space or button')
 
 # global ----------------------
 
@@ -52,6 +84,18 @@ ledwall.setBrightnessValue(BRIGHTNESS)
 
 clock = pygame.time.Clock()
 tick = 0
+
+
+def switchState(state):
+    global currentScreen
+    if state == 'init':
+        currentScreen = initScreen
+    elif state == 'title':
+        currentScreen = titleScreen
+    elif state == 'game':
+        currentScreen = gameScreen
+
+    ledwall.cls()
 
 
 # screens ---------------------
@@ -64,6 +108,15 @@ class Screen:
         pass
 
 
+class InitScreen(Screen):
+    def draw(self):
+        pass
+
+    def event(self, e):
+        if e.type == pygame.KEYDOWN or e.type == pygame.JOYBUTTONDOWN:
+            switchState('title')
+
+
 class TitleScreen(Screen):
     def draw(self):
         ledwall.centerText('DRUNK', y=2, color=(0, 255, 0), fontsize=3, align=False)
@@ -73,12 +126,17 @@ class TitleScreen(Screen):
         ledwall.centerText('GAMEJAM', align=False)
         ledwall.centerText('2025', align=False)
 
+        if tick % 48 < 24:
+            ledwall.centerText('PRESS BUTTON', y=25, color=(255, 255, 0), align=False)
+
     def event(self, e):
-        pass
+        if e.type == pygame.KEYDOWN or e.type == pygame.JOYBUTTONDOWN:
+            switchState('game')
+
 
 class GameScreen(Screen):
     def draw(self):
-        pass
+        ledwall.centerText('- GAME SCREEN -', y=10)
 
     def event(self, e):
         pass
@@ -86,10 +144,11 @@ class GameScreen(Screen):
 
 # main loop -------------------
 
+initScreen = InitScreen()
 titleScreen = TitleScreen()
 gameScreen = GameScreen()
 
-currentScreen = titleScreen
+currentScreen = initScreen
 
 running = True
 
@@ -107,6 +166,8 @@ while running:
             running = False
         elif e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
             running = False
+        elif e.type == pygame.KEYDOWN and e.key == pygame.K_F11:
+            pygame.display.toggle_fullscreen()
         else:
             currentScreen.event(e)
 
@@ -114,6 +175,7 @@ while running:
     clock.tick(60)
     tick += 1
 
-    if tick >= 60 * 4:
-        ledwall.cls()
+    if currentScreen != initScreen:
+        if tick >= 60 * 4:
+            ledwall.cls()
 
