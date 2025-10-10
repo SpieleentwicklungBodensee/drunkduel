@@ -49,6 +49,18 @@ DIR_RIGHT = 2
 DIR_UP = 1
 DIR_DOWN = 0
 
+PLAYER_1_KEYS = {DIR_LEFT: pygame.K_LEFT,
+                 DIR_RIGHT: pygame.K_RIGHT,
+                 DIR_UP: pygame.K_UP,
+                 DIR_DOWN: pygame.K_DOWN
+                 }
+
+PLAYER_2_KEYS = {DIR_LEFT: pygame.K_a,
+                 DIR_RIGHT: pygame.K_d,
+                 DIR_UP: pygame.K_w,
+                 DIR_DOWN: pygame.K_s
+                 }
+
 
 # global ----------------------
 
@@ -114,7 +126,10 @@ class AnimSprite:
         sprite = self.animations[self.anim][phase]
         sprite.draw(output, x, y)
 
-    def start(self, reset=True):
+    def select(self, animation):
+        self.anim = animation
+
+    def start(self, reset=False):
         self.running = True
         if reset:
             self.startTime = tick
@@ -135,7 +150,7 @@ def createAnimatedSprite(filename, width=16, height=16):
             blitx = 0 - phase * width
             blity = 0 - anim * height
 
-            slice_ = pygame.Surface((width, height))
+            slice_ = pygame.Surface((width, height), flags=pygame.SRCALPHA)
             slice_.blit(sprite, (blitx, blity))
 
             phases.append(Sprite(slice_))
@@ -159,8 +174,60 @@ class Player(Object):
     def __init__(self, xpos, ypos, sprite):
         super().__init__(xpos, ypos, sprite)
 
-        self.score = 0
+        self.xdir = 0
+        self.ydir = 0
+        self.speed = 1.5
+
         self.facedir = DIR_DOWN
+
+        self.score = 0
+
+    def moveLeft(self):
+        self.xdir = -1
+        self.ydir = 0
+        self.facedir = DIR_LEFT
+
+    def moveRight(self):
+        self.xdir = 1
+        self.ydir = 0
+        self.facedir = DIR_RIGHT
+
+    def moveUp(self):
+        self.xdir = 0
+        self.ydir = -1
+        self.facedir = DIR_UP
+
+    def moveDown(self):
+        self.xdir = 0
+        self.ydir = 1
+        self.facedir = DIR_DOWN
+
+    def stopLeft(self):
+        if self.xdir < 0:
+            self.xdir = 0
+
+    def stopRight(self):
+        if self.xdir > 0:
+            self.xdir = 0
+
+    def stopUp(self):
+        if self.ydir < 0:
+            self.ydir = 0
+
+    def stopDown(self):
+        if self.ydir > 0:
+            self.ydir = 0
+
+    def update(self):
+        self.xpos += self.xdir * self.speed
+        self.ypos += self.ydir * self.speed
+
+        self.sprite.select(self.facedir)
+
+        if self.xdir == 0 and self.ydir == 0:
+            self.sprite.stop()
+        else:
+            self.sprite.start()
 
 
 # screens ---------------------
@@ -170,6 +237,9 @@ class Screen:
         pass
 
     def event(self, e):
+        pass
+
+    def update(self):
         pass
 
 
@@ -205,8 +275,8 @@ class GameScreen(Screen):
 
         self.players = []
 
-        player1 = Player(2 * TILE_WIDTH, 2 * TILE_HEIGHT, MAN_SPRITE)
-        player2 = Player(13 * TILE_WIDTH, 13 * TILE_HEIGHT, MAN_SPRITE)
+        player1 = Player(2 * TILE_WIDTH, 2 * TILE_HEIGHT, PLAYER_1_SPRITE)
+        player2 = Player(13 * TILE_WIDTH, 13 * TILE_HEIGHT, PLAYER_2_SPRITE)
 
         self.players.append(player1)
         self.players.append(player2)
@@ -218,7 +288,31 @@ class GameScreen(Screen):
             player.draw(output)
 
     def event(self, e):
-        pass
+        if e.type == pygame.KEYDOWN:
+            for i, keys in enumerate([PLAYER_1_KEYS, PLAYER_2_KEYS]):
+                if e.key == keys[DIR_LEFT]:
+                    self.players[i].moveLeft()
+                elif e.key == keys[DIR_RIGHT]:
+                    self.players[i].moveRight()
+                elif e.key == keys[DIR_UP]:
+                    self.players[i].moveUp()
+                elif e.key == keys[DIR_DOWN]:
+                    self.players[i].moveDown()
+
+        elif e.type == pygame.KEYUP:
+            for i, keys in enumerate([PLAYER_1_KEYS, PLAYER_2_KEYS]):
+                if e.key == keys[DIR_LEFT]:
+                    self.players[i].stopLeft()
+                elif e.key == keys[DIR_RIGHT]:
+                    self.players[i].stopRight()
+                elif e.key == keys[DIR_UP]:
+                    self.players[i].stopUp()
+                elif e.key == keys[DIR_DOWN]:
+                    self.players[i].stopDown()
+
+    def update(self):
+        for player in self.players:
+            player.update()
 
 
 # init ------------------------
@@ -253,7 +347,8 @@ TILES = {'Y': Sprite('gfx/desert.png'),
          ' ': None,
          }
 
-MAN_SPRITE = createAnimatedSprite('gfx/player1.png')
+PLAYER_1_SPRITE = createAnimatedSprite('gfx/player1.png')
+PLAYER_2_SPRITE = createAnimatedSprite('gfx/player1.png')
 
 print('loading sfx...')
 
@@ -356,6 +451,9 @@ while running:
             pygame.display.toggle_fullscreen()
         else:
             currentScreen.event(e)
+
+    # updates
+    currentScreen.update()
 
     # tick
     clock.tick(60)
