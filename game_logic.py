@@ -220,6 +220,17 @@ def _handle_player_hit(bullet, hit_player_index):
             player.stopMoving()
 
 
+def removeAllBullets():
+    """Remove all bullets from the game."""
+    bullets_to_remove = []
+    for obj in game_state.gameScreen.objects:
+        if isinstance(obj, Bullet):
+            bullets_to_remove.append(obj)
+    
+    for bullet in bullets_to_remove:
+        game_state.gameScreen.removeObject(bullet)
+
+
 def checkVictory():
     # Check for victory condition (first to 5 points wins)
     for player in game_state.gameScreen.players:

@@ -149,6 +149,11 @@ class Player(Object):
 
     def die(self):
         import game_state
+        from game_logic import removeAllBullets
+        
+        # Remove all bullets when a player dies
+        removeAllBullets()
+        
         self.dying = True
         self.dyingTime = game_state.tick
 
@@ -400,6 +405,9 @@ class Player(Object):
         self.ammo = config.INITIAL_AMMO
         self.dying = False
         self.sprite.speed = 6
+
+        # Reset health to full
+        self.health = self.max_health
 
         # Reset alcohol level for hit player (teilweise)
         self.alcohol_level = max(0, self.alcohol_level - 0.3)  # Schock nüchtert etwas auf
