@@ -88,18 +88,65 @@ def switchState(state):
         currentScreen = titleScreen
     elif state == 'game':
         currentScreen = gameScreen
+    elif state == 'gameover':
+        currentScreen = gameOverScreen
 
     ledwall.cls()
 
 
-def spawnBullet(x, y, xdir):
+def spawnBullet(x, y, xdir, shooter_index):
     bullet = Bullet(x, y)
     bullet.xdir = xdir
+    bullet.shooter_index = shooter_index
 
     gameScreen.addObject(bullet)
 
 def removeBullet(bullet):
     gameScreen.removeObject(bullet)
+
+def checkCollisions():
+    # Check bullet-player collisions
+    for bullet in gameScreen.objects[:]:  # Use slice to avoid modification during iteration
+        if isinstance(bullet, Bullet):
+            for i, player in enumerate(gameScreen.players):
+                # Skip collision check with the player who shot the bullet
+                if i == bullet.shooter_index:
+                    continue
+                    
+                # Simple bounding box collision detection
+                if (bullet.xpos < player.xpos + TILE_WIDTH and
+                    bullet.xpos + TILE_WIDTH > player.xpos and
+                    bullet.ypos < player.ypos + TILE_HEIGHT and
+                    bullet.ypos + TILE_HEIGHT > player.ypos):
+                    
+                    # Collision detected - increase score for the other player
+                    other_player_index = 1 - i
+                    gameScreen.players[other_player_index].score += 1
+                    
+                    # Give shooter some ammo back as reward
+                    gameScreen.players[other_player_index].ammo = min(gameScreen.players[other_player_index].ammo + 2, 6)
+                    
+                    # Remove bullet and play sound effect
+                    removeBullet(bullet)
+                    SFX_RICOCHET.play()
+                    
+                    # Reset hit player position
+                    if i == 0:  # Player 1 hit
+                        player.xpos = 2 * TILE_WIDTH
+                        player.ypos = 2 * TILE_HEIGHT
+                    else:  # Player 2 hit
+                        player.xpos = 13 * TILE_WIDTH
+                        player.ypos = 13 * TILE_HEIGHT
+                    
+                    # Reset ammo for hit player
+                    player.ammo = 4
+                    
+                    # Check for victory condition (first to 5 points wins)
+                    if gameScreen.players[other_player_index].score >= 5:
+                        gameScreen.winner = other_player_index + 1
+                        switchState('gameover')
+                    
+                    break
 
 
 lastPlayedFootstep = 0
@@ -201,6 +248,7 @@ class Bullet(Object):
 
         self.xdir = 0
         self.speed = 4
+        self.shooter_index = -1  # Will be set when spawned
 
     def update(self):
         self.xpos += self.xdir * self.speed
@@ -259,7 +307,10 @@ class Player(Object):
         if self.ydir > 0:
             self.ydir = 0
 
-    def shoot(self):
+    def shoot(self, player_index):
+        if self.ammo <= 0:
+            return  # Can't shoot without ammo
+            
         self.showGun = True
         self.ammo -= 1
 
@@ -270,7 +321,7 @@ class Player(Object):
             bulletxdir = -1
             self.facedir = DIR_LEFT
 
-        spawnBullet(self.xpos, self.ypos, bulletxdir)
+        spawnBullet(self.xpos, self.ypos, bulletxdir, player_index)
         SFX_GUNSHOT.play(loops=0)
 
     def stopShooting(self):
@@ -432,6 +483,38 @@ class TitleScreen(Screen):
             switchState('game')
 
 
+class GameOverScreen(Screen):
+    def draw(self):
+        ledwall.centerText('GAME OVER', y=5, color=(255, 0, 0), fontsize=2, align=False)
+        
+        if hasattr(gameScreen, 'winner'):
+            ledwall.centerText(f'PLAYER {gameScreen.winner}', y=10, color=(0, 255, 0), fontsize=2, align=False)
+            ledwall.centerText('WINS!', y=12, color=(0, 255, 0), fontsize=2, align=False)
+            
+            ledwall.centerText(f'FINAL SCORE:', y=17, color=(255, 255, 255), align=False)
+            ledwall.centerText(f'P1: {gameScreen.players[0].score}  P2: {gameScreen.players[1].score}', y=19, color=(255, 255, 255), align=False)
+
+        if tick % 48 < 24:
+            ledwall.centerText('PRESS BUTTON', y=25, color=(255, 255, 0), align=False)
+            ledwall.centerText('TO RESTART', y=27, color=(255, 255, 0), align=False)
+
+    def event(self, e):
+        if e.type == pygame.KEYDOWN or e.type == pygame.JOYBUTTONDOWN:
+            # Reset game state
+            gameScreen.players[0].score = 0
+            gameScreen.players[1].score = 0
+            gameScreen.players[0].ammo = 4
+            gameScreen.players[1].ammo = 4
+            gameScreen.players[0].xpos = 2 * TILE_WIDTH
+            gameScreen.players[0].ypos = 2 * TILE_HEIGHT
+            gameScreen.players[1].xpos = 13 * TILE_WIDTH
+            gameScreen.players[1].ypos = 13 * TILE_HEIGHT
+            gameScreen.objects.clear()  # Remove all bullets
+            if hasattr(gameScreen, 'winner'):
+                delattr(gameScreen, 'winner')
+            switchState('game')
+
+
 class GameScreen(Screen):
     def __init__(self):
         super().__init__()
@@ -453,6 +536,17 @@ class GameScreen(Screen):
 
         for obj in self.objects:
             obj.draw(output)
+        
+        # Draw highscore display
+        ledwall.drawText(f'P1: {self.players[0].score}', x=2, y=2, color=(255, 255, 0))
+        ledwall.drawText(f'P2: {self.players[1].score}', x=180, y=2, color=(255, 255, 0))
+        
+        # Draw ammo display with color coding
+        ammo1_color = (255, 255, 255) if self.players[0].ammo > 0 else (255, 0, 0)
+        ammo2_color = (255, 255, 255) if self.players[1].ammo > 0 else (255, 0, 0)
+        
+        ledwall.drawText(f'AMMO: {self.players[0].ammo}', x=2, y=15, color=ammo1_color)
+        ledwall.drawText(f'AMMO: {self.players[1].ammo}', x=180, y=15, color=ammo2_color)
 
     def event(self, e):
         if e.type == pygame.KEYDOWN:
@@ -467,7 +561,7 @@ class GameScreen(Screen):
                     self.players[i].moveDown()
 
                 elif e.key == keys[FIRE]:
-                    self.players[i].shoot()
+                    self.players[i].shoot(i)
 
         elif e.type == pygame.KEYUP:
             for i, keys in enumerate([PLAYER_1_KEYS, PLAYER_2_KEYS]):
@@ -489,6 +583,9 @@ class GameScreen(Screen):
 
         for obj in self.objects:
             obj.update()
+        
+        # Check for collisions
+        checkCollisions()
 
     def addObject(self, obj):
         self.objects.append(obj)
@@ -538,6 +635,7 @@ BULLET_SPRITE = Sprite('gfx/bullet.png')
 print('loading sfx...')
 SFX_GUNSHOT = pygame.mixer.Sound("sfx/Gunshot.wav")
 SFX_FOOTSTEP = pygame.mixer.Sound("sfx/Footstep.wav")
+SFX_RICOCHET = pygame.mixer.Sound("sfx/Ricochet.wav")
 
 print('\n\n')
 
@@ -617,6 +715,7 @@ TILES['|'].start()
 initScreen = InitScreen()
 titleScreen = TitleScreen()
 gameScreen = GameScreen()
+gameOverScreen = GameOverScreen()
 
 currentScreen = initScreen
 
