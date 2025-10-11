@@ -2,6 +2,7 @@ import pygame
 import ledwall
 import config
 import controls
+import random
 from base import Screen
 import game_state
 from sound_manager import SFX_BORING
@@ -35,9 +36,38 @@ class TitleScreen(Screen):
             # Option 1: Mit Alkohol
             color1 = (255, 255, 0) if self.selected_option == 0 else (128, 128, 128)
             if self.selected_option == 0 and game_state.tick % 30 < 15:
-                ledwall.centerText('> MIT ALKOHOL <', y=22, color=color1, align=False)
+                # Add shake effect for "MIT ALKOHOL" when selected
+                shake_x = random.randint(-1, 1)
+                shake_y = random.randint(-1, 1)
+                
+                # Calculate center position manually and add shake offset
+                text = '> MIT ALKOHOL <'
+                screen_chars_width = ledwall.SCR_W // 8  # Assuming 8-pixel character width
+                center_x = (screen_chars_width - len(text)) // 2 + shake_x
+                
+                # Draw the text
+                ledwall.drawText(text, x=center_x, y=22 + shake_y, color=color1, align=False)
+                
+                # Add puke animation around the text
+                from puke_effect import PukeEffect
+                PukeEffect.draw_around_text(center_x, 22 + shake_y, len(text))
             else:
-                ledwall.centerText('MIT ALKOHOL', y=22, color=color1, align=False)
+                text = 'MIT ALKOHOL' if self.selected_option != 0 else '> MIT ALKOHOL <'
+                if self.selected_option == 0:
+                    # Still shake even when not blinking
+                    shake_x = random.randint(-1, 1) 
+                    shake_y = random.randint(-1, 1)
+                    screen_chars_width = ledwall.SCR_W // 8
+                    center_x = (screen_chars_width - len(text)) // 2 + shake_x
+                    
+                    # Draw the text
+                    ledwall.drawText(text, x=center_x, y=22 + shake_y, color=color1, align=False)
+                    
+                    # Add puke animation around the text
+                    from puke_effect import PukeEffect
+                    PukeEffect.draw_around_text(center_x, 22 + shake_y, len(text))
+                else:
+                    ledwall.centerText('MIT ALKOHOL', y=22, color=color1, align=False)
 
             # Option 2: Alkoholfrei
             color2 = (255, 255, 0) if self.selected_option == 1 else (128, 128, 128)
