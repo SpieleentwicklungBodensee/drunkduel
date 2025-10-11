@@ -1,17 +1,24 @@
 import pygame
 import random
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 DIR_LEFT = 3
 DIR_RIGHT = 2
 DIR_UP = 1
 DIR_DOWN = 0
 FIRE = 5
 
+JOY_DEADZONE = 0.3
+
 
 NAMES = {DIR_LEFT: 'links',
          DIR_RIGHT: 'rechts',
-         DIR_UP: 'hoch',
-         DIR_DOWN: 'runter',
+         DIR_UP: 'oben',
+         DIR_DOWN: 'unten',
          FIRE: 'feuer',
          }
 
@@ -87,10 +94,10 @@ def handleJoyEvent(e):
 
     if e.type == pygame.JOYAXISMOTION:
         if e.axis == 0: # x axis
-            if e.value < 0:
+            if e.value < -JOY_DEADZONE:
                 JOYSTATES[joyid][DIR_LEFT] = True
                 action = 'moveleft'
-            elif e.value > 0:
+            elif e.value > JOY_DEADZONE:
                 JOYSTATES[joyid][DIR_RIGHT] = True
                 action = 'moveright'
             else:
@@ -101,10 +108,10 @@ def handleJoyEvent(e):
                     JOYSTATES[joyid][DIR_RIGHT] = False
                     action = 'stopright'
         elif e.axis == 1: # y axis
-            if e.value < 0:
+            if e.value < -JOY_DEADZONE:
                 JOYSTATES[joyid][DIR_UP] = True
                 action = 'moveup'
-            elif e.value > 0:
+            elif e.value > JOY_DEADZONE:
                 JOYSTATES[joyid][DIR_DOWN] = True
                 action = 'movedown'
             else:

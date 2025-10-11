@@ -15,6 +15,11 @@ from game_logic import spawnBullet
 from sound_manager import playFootstepSound, SFX_GUNSHOT, SFX_VOMIT
 from game_state import TILE_WIDTH, TILE_HEIGHT
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 # Load player sprites
 PLAYER_1_SPRITE = None
 PLAYER_2_SPRITE = None
@@ -162,7 +167,7 @@ class Player(Object):
 
     def stopShooting(self):
         self.showGun = False
-        
+
     def update_facing_direction(self, other_player_x):
         """Update the facing direction to look towards the other player."""
         if not self.showGun:  # Only update when not actively shooting
@@ -175,10 +180,10 @@ class Player(Object):
     def die(self):
         import game_state
         from game_logic import removeAllBullets
-        
+
         # Remove all bullets when a player dies
         removeAllBullets()
-        
+
         self.dying = True
         self.dyingTime = game_state.tick
 
@@ -211,7 +216,7 @@ class Player(Object):
         # Wenn Alkohol deaktiviert ist, immer normale Geschwindigkeit
         if not config.ALCOHOL_ENABLED:
             return 1.0
-            
+
         drunk_level = self.get_drunk_level()
         if drunk_level == 0:
             return 1.0  # Normale Geschwindigkeit
@@ -229,7 +234,7 @@ class Player(Object):
         # Wenn Alkohol deaktiviert ist, immer normale Genauigkeit
         if not config.ALCOHOL_ENABLED:
             return 1.0
-            
+
         drunk_level = self.get_drunk_level()
         if drunk_level <= 1:
             return 1.0
@@ -393,7 +398,7 @@ class Player(Object):
         # Nur wenn Alkohol aktiviert ist
         if not config.ALCOHOL_ENABLED:
             return
-            
+
         # Alkohol-Abbau über Zeit
         if self.alcohol_level > 0:
             self.alcohol_level = max(0, self.alcohol_level - self.alcohol_decay_rate)
@@ -630,42 +635,42 @@ class Player(Object):
 
     def _draw_drunk_shader(self, output, x, y, drunk_level):
         """Zeichnet den Spieler mit Betrunkenheits-Shader-Effekten."""
-        
+
         # Erstelle eine temporäre Surface für Shader-Effekte
         sprite_surface = self._get_current_sprite_surface()
         if sprite_surface is None:
             return
-            
+
         # Kopiere die Sprite-Surface für Manipulation
         drunk_surface = sprite_surface.copy()
-        
+
         # Berechne Effekt-Intensität basierend auf Betrunkenheitsgrad
         intensity = drunk_level / 4.0  # Normalize to 0-1
-        
+
         # 1. Color tinting effect (rotierende Farben bei Betrunkenheit)
         if drunk_level >= 1:
             tint_color = self._get_drunk_tint_color(drunk_level)
             # Erhöhe Intensität basierend auf Betrunkenheitsgrad
             tint_intensity = min(0.6, intensity * 0.4 + drunk_level * 0.1)
             self._apply_color_tint(drunk_surface, tint_color, tint_intensity)
-        
+
         # 2. Transparency/Alpha effect (mehr transparent = betrunkener)
         if drunk_level >= 2:
             alpha = max(100, 255 - int(drunk_level * 30))  # Minimum 100 alpha
             drunk_surface.set_alpha(alpha)
-        
+
         # 3. Delayed/Ghosting effect - zeichne vorherige Positionen
         if drunk_level >= 3:
             self._draw_ghost_trail(output, x, y, drunk_surface, intensity)
-        
+
         # 4. Main sprite mit Distortion
         if drunk_level >= 4:
             # Starke Verzerrung bei sehr hoher Betrunkenheit
             drunk_surface = self._apply_distortion(drunk_surface, intensity)
-        
+
         # Zeichne die finale manipulierte Surface
         output.blit(drunk_surface, (int(x), int(y)))
-        
+
     def _get_current_sprite_surface(self):
         """Holt die aktuelle Sprite-Surface für Shader-Manipulation."""
         try:
@@ -682,22 +687,22 @@ class Player(Object):
                 return self.sprite.surface
         except:
             return None
-            
+
     def _get_drunk_tint_color(self, drunk_level):
         """Bestimmt die Farbtönung basierend auf Betrunkenheitsgrad mit 360° Rotation."""
         # Berechne Rotationsgeschwindigkeit basierend auf Betrunkenheitsgrad
         rotation_speed = drunk_level * 0.05  # Je betrunkener, desto schneller die Rotation
-        
+
         # Berechne aktuellen Winkel basierend auf game_state.tick
         angle = (game_state.tick * rotation_speed) % (2 * math.pi)
-        
+
         # Konvertiere Winkel zu RGB mit HSV-ähnlicher Berechnung
         # Erstelle einen vollen 360° Farbkreis
         def angle_to_rgb(angle_rad, saturation=1.0, value=1.0):
             """Konvertiert einen Winkel in Radiant zu RGB-Farbe."""
             # Normalisiere Winkel zu 0-1
             h = (angle_rad / (2 * math.pi)) % 1.0
-            
+
             # HSV zu RGB Konversion (vereinfacht)
             if h < 1/6:  # Rot zu Gelb
                 r, g, b = 1.0, h * 6, 0.0
@@ -711,29 +716,29 @@ class Player(Object):
                 r, g, b = (h - 4/6) * 6, 0.0, 1.0
             else:  # Magenta zu Rot
                 r, g, b = 1.0, 0.0, (1.0 - h) * 6
-            
+
             # Anpassung für Sättigung und Helligkeit
             r = int((r * saturation + (1 - saturation)) * value * 255)
             g = int((g * saturation + (1 - saturation)) * value * 255)
             b = int((b * saturation + (1 - saturation)) * value * 255)
-            
+
             return (r, g, b)
-        
+
         # Berechne Sättigung und Helligkeit basierend auf Betrunkenheitsgrad
         saturation = min(1.0, drunk_level * 0.3)  # Mehr Sättigung = betrunkener
         value = 0.8 + 0.2 * (drunk_level / 4.0)  # Leicht hellere Farben bei höherer Betrunkenheit
-        
+
         return angle_to_rgb(angle, saturation, value)
-            
+
     def _apply_color_tint(self, surface, tint_color, intensity):
         """Wendet eine Farbtönung auf die Surface an."""
         # Erstelle eine Tint-Surface mit der gewünschten Farbe
         tint_surface = pygame.Surface(surface.get_size(), flags=pygame.SRCALPHA)
         tint_surface.fill((*tint_color, int(255 * intensity)))
-        
+
         # Wende die Tönung mit BLEND_MULT an
         surface.blit(tint_surface, (0, 0), special_flags=pygame.BLEND_MULT)
-        
+
     def _draw_ghost_trail(self, output, x, y, sprite_surface, intensity):
         """Zeichnet Ghost-Trail-Effekt für Betrunkenheit."""
         # Speichere aktuelle Position in History (vereinfacht)
@@ -742,18 +747,18 @@ class Player(Object):
             (x - 4, y - 1),
             (x - 6, y - 2)
         ]
-        
+
         # Zeichne Ghost-Sprites mit abnehmender Transparenz
         for i, (ghost_x, ghost_y) in enumerate(trail_positions):
             ghost_alpha = max(30, int(100 * intensity * (0.7 ** i)))
             ghost_surface = sprite_surface.copy()
             ghost_surface.set_alpha(ghost_alpha)
-            
+
             # Verwende die rotierende Farbe auch für Ghosts, aber mit Offset
             angle_offset = i * math.pi / 3  # Jeder Ghost hat einen anderen Farbwinkel
             rotation_speed = 0.08
             angle = ((game_state.tick - i * 5) * rotation_speed + angle_offset) % (2 * math.pi)
-            
+
             # Berechne Ghost-Farbe basierend auf rotierendem Winkel
             h = (angle / (2 * math.pi)) % 1.0
             if h < 1/3:
@@ -762,14 +767,14 @@ class Player(Object):
                 ghost_color = (0, int(255 * (2 - h * 3)), 255)
             else:
                 ghost_color = (int(255 * (h * 3 - 2)), 0, int(255 * (3 - h * 3)))
-            
+
             # Wende Ghost-Farbtönung an
             ghost_tint = pygame.Surface(ghost_surface.get_size(), flags=pygame.SRCALPHA)
             ghost_tint.fill((*ghost_color, ghost_alpha // 3))
             ghost_surface.blit(ghost_tint, (0, 0), special_flags=pygame.BLEND_MULT)
-            
+
             output.blit(ghost_surface, (int(ghost_x), int(ghost_y)))
-            
+
     def _apply_distortion(self, surface, intensity):
         """Wendet Verzerrungseffekte auf die Surface an."""
         try:
@@ -777,10 +782,10 @@ class Player(Object):
             import math
             width, height = surface.get_size()
             distorted = pygame.Surface((width, height), flags=pygame.SRCALPHA)
-            
+
             wave_amplitude = int(2 * intensity)
             wave_frequency = 0.3
-            
+
             for y in range(height):
                 wave_offset = int(wave_amplitude * math.sin(y * wave_frequency + game_state.tick * 0.1))
                 for x in range(width):
@@ -791,7 +796,7 @@ class Player(Object):
                             distorted.set_at((x, y), pixel)
                         except:
                             pass
-            
+
             return distorted
         except:
             # Fallback wenn Distortion fehlschlägt

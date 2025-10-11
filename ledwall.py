@@ -1,5 +1,7 @@
 import pygame
+import time
 from bitmapfont import BitmapFont
+
 
 SCR_W = 256
 SCR_H = 320
@@ -20,6 +22,7 @@ fonts = {}
 fontFilename = 'gfx/wurofont.png'
 fontCharsize = (8, 8)
 lastFontColor = (255, 255, 255)
+lastPrintTime = 0
 
 printMessages = []
 
@@ -132,6 +135,9 @@ def print(*args):
             printMessages.append(line[:charsPerLine])
             line = line[charsPerLine:]
 
+    global lastPrintTime
+    lastPrintTime = time.time()
+
     _originalPrintFunction(*args)
 
 def cls():
@@ -151,3 +157,6 @@ def _drawPrintLog():
         drawText(line.upper(), color=(192, 192, 192))
 
     lastFontColor = colorBackup
+
+    if time.time() - lastPrintTime > 3:
+        cls()

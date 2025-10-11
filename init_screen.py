@@ -1,8 +1,14 @@
 import pygame
 import ledwall
+import ledwall
 from base import Screen
 from game_state import switchState
+
 from level_loader import get_level_loader
+
+# Override print function
+print = ledwall.print
+
 
 
 class InitScreen(Screen):
