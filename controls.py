@@ -152,8 +152,8 @@ def handleJoyEvent(e):
                 actions.append('moveup')
         elif hat[1] == -1:
             if not JOYSTATES[joyid][DIR_DOWN]:
-            JOYSTATES[joyid][DIR_DOWN] = True
-            actions.append('movedown')
+                JOYSTATES[joyid][DIR_DOWN] = True
+                actions.append('movedown')
         elif hat[1] == 0:
             if JOYSTATES[joyid][DIR_UP]:
                 JOYSTATES[joyid][DIR_UP] = False
