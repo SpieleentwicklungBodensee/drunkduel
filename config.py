@@ -99,10 +99,10 @@ def load_graphics():
         '|': createAnimatedSprite('gfx/water1.png'),
         '<': createAnimatedSprite('gfx/water_left.png'),   # Left water tile
         '>': createAnimatedSprite('gfx/water_right.png'),  # Right water tile
-        '#': Sprite('gfx/fence1.png'),
         'o': Sprite('gfx/stone1.png'),
         'F': None,  # Invisible wall
         ' ': None,
+        # Note: '#' (fence) tiles are handled dynamically by fence_logic.py
     }
 
     bullet_sprite = Sprite('gfx/bullet.png')
