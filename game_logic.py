@@ -123,10 +123,10 @@ def randomizeControls(playerid):
     message2 = controls.getSentence(orig, repl)
 
     if playerid == 0:
-        x = 4
+        x = 2
         color = (255, 255, 0)
     else:
-        x = 12
+        x = 19
         color = (0, 255, 0)
 
     y = 8
