@@ -763,7 +763,7 @@ print('loading gfx...')
 TILES = {'Y': Sprite('gfx/desert3.png'),
          '|': createAnimatedSprite('gfx/water1.png'),
          '#': Sprite('gfx/fence1.png'),
-         'o': Sprite('gfx/ston1.png'),
+         'o': Sprite('gfx/stone1.png'),
          ' ': None,
          }
 
