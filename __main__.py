@@ -101,6 +101,14 @@ def removeBullet(bullet):
     gameScreen.removeObject(bullet)
 
 
+lastPlayedFootstep = 0
+def playFootstepSound():
+    global lastPlayedFootstep
+    if tick != lastPlayedFootstep:
+        SFX_FOOTSTEP.play()
+        lastPlayedFootstep = tick
+
+
 # sprites and objects ---------
 
 class Sprite:
@@ -233,7 +241,6 @@ class Player(Object):
         self.xdir = 0
         self.ydir = 1
         self.facedir = DIR_DOWN
-        SFX_FOOTSTEP.play(loops=0) 
 
     def stopLeft(self):
         if self.xdir < 0:
@@ -372,7 +379,7 @@ class Player(Object):
         self.xpos = new_xpos
         self.ypos = new_ypos
 
-        # show animation
+        # show animation and play footstep sound
         spriteAnim = self.facedir + (4 if self.showGun else 0)
         self.sprite.select(spriteAnim)
 
@@ -380,6 +387,9 @@ class Player(Object):
             self.sprite.stop()
         else:
             self.sprite.start()
+
+            if tick % 8 == 0:
+                playFootstepSound()
 
 
 # screens ---------------------
