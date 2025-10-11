@@ -198,6 +198,7 @@ def _handle_player_hit(bullet, hit_player_index):
 
     other_player_index = 1 - hit_player_index
     other_player = game_state.gameScreen.players[other_player_index]
+    other_player.score += 1
 
     # Calculate damage from bullet
     damage = bullet.get_total_damage()
