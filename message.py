@@ -10,7 +10,6 @@ class Message(Object):
         self.color = color
 
         self.initTime = game_state.tick
-        print(game_state.tick)
 
     def draw(self, output):
         for i, line in enumerate(self.lines):
