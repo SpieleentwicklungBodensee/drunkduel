@@ -223,8 +223,7 @@ class GameScreen(Screen):
             if len(health_powerups) < 1:  # Max 1 health powerup on map
                 if random.random() < 0.3:  # 30% chance to spawn
                     # Use munition sprite as placeholder for health powerup
-                    if hasattr(game_state, 'munition_sprite'):
-                        spawnHealthPowerup(game_state.munition_sprite)
+                    spawnHealthPowerup(game_state.medkit_sprite)
             self.health_spawn_timer = 0
 
         # Handle cactus respawning
