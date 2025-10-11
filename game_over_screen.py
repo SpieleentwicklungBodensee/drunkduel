@@ -27,4 +27,4 @@ class GameOverScreen(Screen):
             return
 
         if e.type == pygame.KEYDOWN or e.type == pygame.JOYBUTTONDOWN:
-            switchState('init')
+            switchState('title')

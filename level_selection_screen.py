@@ -169,7 +169,7 @@ class LevelSelectionScreen:
             elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                 self.selected_index = min(self.level_loader.get_level_count() - 1,
                                         self.selected_index + 1)
-            elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+            elif event.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_RCTRL):
                 # Select this level and switch to confirm screen
                 self.level_loader.set_current_level(self.selected_index)
                 self._reload_current_level()

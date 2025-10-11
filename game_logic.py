@@ -187,10 +187,10 @@ def checkCollisions():
                     continue
 
                 # Simple bounding box collision detection
-                if (bullet.xpos < player.xpos + TILE_WIDTH and
-                    bullet.xpos + TILE_WIDTH > player.xpos and
-                    bullet.ypos < player.ypos + TILE_HEIGHT and
-                    bullet.ypos + TILE_HEIGHT > player.ypos):
+                if (bullet.xpos < player.xpos + TILE_WIDTH // 2 and
+                    bullet.xpos + TILE_WIDTH // 2 > player.xpos and
+                    bullet.ypos < player.ypos + TILE_HEIGHT // 2 and
+                    bullet.ypos + TILE_HEIGHT // 2 > player.ypos):
 
                     _handle_player_hit(bullet, i)
                     bullet_hit = True
