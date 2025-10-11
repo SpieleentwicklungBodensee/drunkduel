@@ -328,8 +328,8 @@ class Player(Object):
         self.showGun = False
 
     def update(self):
-        new_xpos = self.xpos# + self.xdir * self.speed
-        new_ypos = self.ypos# + self.ydir * self.speed
+        new_xpos = self.xpos
+        new_ypos = self.ypos
 
         new_xdir = self.xdir
         new_ydir = self.ydir
@@ -624,6 +624,7 @@ print('loading gfx...')
 TILES = {'Y': Sprite('gfx/desert3.png'),
          '|': createAnimatedSprite('gfx/water1.png'),
          '#': Sprite('gfx/fence1.png'),
+         'o': Sprite('gfx/ston1.png'),
          ' ': None,
          }
 
@@ -660,18 +661,18 @@ else:
 
 mapdata = ['       ||       ',
            '       ||   Y   ',
-           '    Y  ||       ',
+           '    Y  ||     o ',
            '       ||       ',
            '       || Y     ',
-           '       ||       ',
-           '      Y||       ',
+           '   o   ||       ',
+           '      Y||  o    ',
            '       ||    Y  ',
            '  Y    ||       ',
+           '   o   ||       ',
            '       ||       ',
-           '       ||       ',
-           '       ||       ',
+           '       ||     o ',
            '     Y ||       ',
-           '       ||  Y    ',
+           '  o    ||  Y    ',
            '       ||       ',
            '#######||#######',
            ]
