@@ -20,6 +20,9 @@ PLAYER_2_STARTY = 13
 INITIAL_AMMO = 4
 REWARD_AMMO = 0
 
+# Alkohol-Einstellungen
+ALCOHOL_ENABLED = True  # Wird durch den Startbildschirm gesetzt
+
 
 def parse_arguments():
     """Parse command line arguments."""

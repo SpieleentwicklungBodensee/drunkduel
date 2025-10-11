@@ -7,6 +7,7 @@ Handles the main gameplay screen and player interactions.
 import pygame
 import random
 
+import config
 import ledwall
 import controls
 import game_state
@@ -71,24 +72,25 @@ class GameScreen(Screen):
         ledwall.drawText(f'AMMO: {self.players[0].ammo}', x=2, y=game_state.level.getHeight() * 2 + 1, color=ammo1_color)
         ledwall.drawText(f'AMMO: {self.players[1].ammo}', x=20, y=game_state.level.getHeight() * 2 + 1, color=ammo2_color)
 
-        # Draw alcohol level display
-        alcohol1_percent = int(self.players[0].alcohol_level * 100)
-        alcohol2_percent = int(self.players[1].alcohol_level * 100)
+        # Draw alcohol level display (nur wenn Alkohol aktiviert)
+        if config.ALCOHOL_ENABLED:
+            alcohol1_percent = int(self.players[0].alcohol_level * 100)
+            alcohol2_percent = int(self.players[1].alcohol_level * 100)
 
-        # Color coding: green = sober, yellow = tipsy, red = drunk
-        def get_alcohol_color(level):
-            if level <= 20:
-                return (0, 255, 0)  # Green
-            elif level <= 50:
-                return (255, 255, 0)  # Yellow
-            else:
-                return (255, 0, 0)  # Red
+            # Color coding: green = sober, yellow = tipsy, red = drunk
+            def get_alcohol_color(level):
+                if level <= 20:
+                    return (0, 255, 0)  # Green
+                elif level <= 50:
+                    return (255, 255, 0)  # Yellow
+                else:
+                    return (255, 0, 0)  # Red
 
-        alcohol1_color = get_alcohol_color(alcohol1_percent)
-        alcohol2_color = get_alcohol_color(alcohol2_percent)
+            alcohol1_color = get_alcohol_color(alcohol1_percent)
+            alcohol2_color = get_alcohol_color(alcohol2_percent)
 
-        ledwall.drawText(f'ALC: {alcohol1_percent}%', x=2, y=game_state.level.getHeight() * 2 + 2, color=alcohol1_color)
-        ledwall.drawText(f'ALC: {alcohol2_percent}%', x=20, y=game_state.level.getHeight() * 2 + 2, color=alcohol2_color)
+            ledwall.drawText(f'ALC: {alcohol1_percent}%', x=2, y=game_state.level.getHeight() * 2 + 2, color=alcohol1_color)
+            ledwall.drawText(f'ALC: {alcohol2_percent}%', x=20, y=game_state.level.getHeight() * 2 + 2, color=alcohol2_color)
 
         # Draw health display
         def get_health_color(health):
@@ -104,6 +106,11 @@ class GameScreen(Screen):
         health1_color = get_health_color(self.players[0].health)
         health2_color = get_health_color(self.players[1].health)
 
+        # Health-Position anpassen je nachdem ob Alkohol-HUD vorhanden ist
+        health_y_pos = game_state.level.getHeight() * 2 + (3 if config.ALCOHOL_ENABLED else 2)
+        ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=health_y_pos, color=health1_color)
+        ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=health_y_pos, color=health2_color)
+        
         ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=game_state.level.getHeight() * 2 + 3, color=health1_color)
         ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=game_state.level.getHeight() * 2 + 3, color=health2_color)
 
@@ -149,7 +156,8 @@ class GameScreen(Screen):
 
         # Spawn initial beer powerups on first update
         if not self.initial_spawn_done:
-            self._spawn_initial_beer_powerups()
+            if config.ALCOHOL_ENABLED:
+                self._spawn_initial_beer_powerups()
             self.initial_spawn_done = True
 
         for player in self.players:
@@ -193,17 +201,18 @@ class GameScreen(Screen):
                         spawnWeaponDrop(munition_sprite)
             self.weapon_drop_timer = 0
 
-        # Spawn beer powerups periodically
-        self.beer_spawn_timer += 1
-        if self.beer_spawn_timer >= 120:  # Spawn every 2 seconds (120 frames at 60 FPS) für Test
-            # Only spawn if there aren't too many beer powerups already
-            beer_powerups = [obj for obj in self.objects if isinstance(obj, BeerPowerup)]
-            if len(beer_powerups) < 2:  # Max 2 beer powerups on map
-                if random.random() < 0.8:  # 80% chance to spawn (erhöht für Test)
-                    # Use the beer sprite from game state
-                    if hasattr(game_state, 'beer_sprite'):
-                        spawnBeerPowerup(game_state.beer_sprite)
-            self.beer_spawn_timer = 0
+        # Spawn beer powerups periodically (nur wenn Alkohol aktiviert)
+        if config.ALCOHOL_ENABLED:
+            self.beer_spawn_timer += 1
+            if self.beer_spawn_timer >= 120:  # Spawn every 2 seconds (120 frames at 60 FPS) für Test
+                # Only spawn if there aren't too many beer powerups already
+                beer_powerups = [obj for obj in self.objects if isinstance(obj, BeerPowerup)]
+                if len(beer_powerups) < 2:  # Max 2 beer powerups on map
+                    if random.random() < 0.8:  # 80% chance to spawn (erhöht für Test)
+                        # Use the beer sprite from game state
+                        if hasattr(game_state, 'beer_sprite'):
+                            spawnBeerPowerup(game_state.beer_sprite)
+                self.beer_spawn_timer = 0
 
         # Spawn health powerups periodically (less frequent)
         self.health_spawn_timer += 1
