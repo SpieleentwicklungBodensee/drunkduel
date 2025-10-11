@@ -13,6 +13,7 @@ DIR_DOWN = 0
 FIRE = 5
 
 JOY_DEADZONE = 0.6
+JOY_IGNOREZONE = 0.1
 
 
 NAMES = {DIR_LEFT: 'links',
@@ -93,6 +94,9 @@ def handleJoyEvent(e):
     actions = []
 
     if e.type == pygame.JOYAXISMOTION:
+        if abs(e.value) < JOY_IGNOREZONE:
+            return []
+
         if e.axis == 0: # x axis
             if e.value < -JOY_DEADZONE:
                 if not JOYSTATES[joyid][DIR_LEFT]:
