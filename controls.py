@@ -81,10 +81,8 @@ def _stopDir(player, playerid, direction):
     elif direction == FIRE:
         player.stopShooting()
 
-def handleJoyEvent(e, players):
+def handleJoyEvent(e):
     joyid = e.instance_id
-    player = players[joyid]
-    mapping = (PLAYER_1_KEYS, PLAYER_2_KEYS)[joyid]
     action = ''
 
     if e.type == pygame.JOYAXISMOTION:
