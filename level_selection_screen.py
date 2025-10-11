@@ -101,11 +101,11 @@ class LevelSelectionScreen:
             if not current_level:
                 return
                 
-            # Preview area
-            preview_x = game_state.output.get_width() - 120
-            preview_y = 45
+            # Preview area - positioned at bottom right
             preview_width = 100
             preview_height = 80
+            preview_x = game_state.output.get_width() - preview_width - 10
+            preview_y = game_state.output.get_height() - preview_height - 40  # Leave space for instructions
             
             # Background
             pygame.draw.rect(game_state.output, (30, 30, 50), 
