@@ -157,11 +157,11 @@ def _handle_player_hit(bullet, hit_player_index):
     # Reset hit player position
     player = game_state.gameScreen.players[hit_player_index]
     if hit_player_index == 0:  # Player 1 hit
-        player.xpos = 2 * TILE_WIDTH
-        player.ypos = 2 * TILE_HEIGHT
+        player.xpos = config.PLAYER_1_STARTX * TILE_WIDTH
+        player.ypos = config.PLAYER_1_STARTY * TILE_HEIGHT
     else:  # Player 2 hit
-        player.xpos = 13 * TILE_WIDTH
-        player.ypos = 13 * TILE_HEIGHT
+        player.xpos = config.PLAYER_2_STARTX * TILE_WIDTH
+        player.ypos = config.PLAYER_2_STARTY * TILE_HEIGHT
 
     # Reset ammo for hit player
     player.ammo = config.INITIAL_AMMO
