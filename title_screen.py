@@ -12,10 +12,13 @@ from player import load_player_sprites
 import ledwall
 print = ledwall.print
 
+MODE_NORMAL = 0
+MODE_ALCOHOL = 1
+MODE_LEVELSELECT = 2
 
 class TitleScreen(Screen):
     def __init__(self):
-        self.selected_option = 0  # 0 = Mit Alkohol, 1 = Alkoholfrei, 2 = Level Auswahl
+        self.selected_option = MODE_NORMAL
         self.show_menu = False
         self.blink_timer = 0
 
@@ -42,7 +45,7 @@ class TitleScreen(Screen):
         self.player2_sprite.draw(game_state.output, self.right_player_x, self.right_player_y)
 
         ledwall.centerText('DRUNK', y=2, color=(0, 255, 0), fontsize=3, align=False)
-        ledwall.centerText('DUEL', y=3, color=(0, 255, 0), fontsize=3, align=False)
+        ledwall.centerText('~DUEL~', y=3, color=(0, 255, 0), fontsize=3, align=False)
 
         ledwall.centerText('BODENSEE', y=15, color=(255, 255, 255), align=False)
         ledwall.centerText('GAMEJAM', align=False)
@@ -56,8 +59,8 @@ class TitleScreen(Screen):
             ledwall.centerText('SPIEL-OPTIONEN:', y=20, color=(255, 255, 255), align=False)
 
             # Option 1: Mit Alkohol
-            color1 = (255, 255, 0) if self.selected_option == 0 else (128, 128, 128)
-            if self.selected_option == 0 and game_state.tick % 30 < 15:
+            color1 = (255, 255, 0) if self.selected_option == MODE_ALCOHOL else (128, 128, 128)
+            if self.selected_option == MODE_ALCOHOL and game_state.tick % 30 < 15:
                 # Add shake effect for "MIT ALKOHOL" when selected
                 shake_x = random.randint(-1, 1)
                 shake_y = random.randint(-1, 1)
@@ -68,14 +71,14 @@ class TitleScreen(Screen):
                 center_x = (screen_chars_width - len(text)) // 2 + shake_x
 
                 # Draw the text
-                ledwall.drawText(text, x=center_x, y=22 + shake_y, color=color1, align=False)
+                ledwall.drawText(text, x=center_x, y=24 + shake_y, color=color1, align=False)
 
                 # Add puke animation around the text
                 from puke_effect import PukeEffect
-                PukeEffect.draw_around_text(center_x, 22 + shake_y, len(text))
+                PukeEffect.draw_around_text(center_x, 24 + shake_y, len(text))
             else:
-                text = 'MIT ALKOHOL' if self.selected_option != 0 else '> MIT ALKOHOL <'
-                if self.selected_option == 0:
+                text = 'MIT ALKOHOL' if self.selected_option != MODE_ALCOHOL else '> MIT ALKOHOL <'
+                if self.selected_option == MODE_ALCOHOL:
                     # Still shake even when not blinking
                     shake_x = random.randint(-1, 1)
                     shake_y = random.randint(-1, 1)
@@ -83,24 +86,24 @@ class TitleScreen(Screen):
                     center_x = (screen_chars_width - len(text)) // 2 + shake_x
 
                     # Draw the text
-                    ledwall.drawText(text, x=center_x, y=22 + shake_y, color=color1, align=False)
+                    ledwall.drawText(text, x=center_x, y=24 + shake_y, color=color1, align=False)
 
                     # Add puke animation around the text
                     from puke_effect import PukeEffect
-                    PukeEffect.draw_around_text(center_x, 22 + shake_y, len(text))
+                    PukeEffect.draw_around_text(center_x, 24 + shake_y, len(text))
                 else:
-                    ledwall.centerText('MIT ALKOHOL', y=22, color=color1, align=False)
+                    ledwall.centerText('MIT ALKOHOL', y=24, color=color1, align=False)
 
             # Option 2: Alkoholfrei
-            color2 = (255, 255, 0) if self.selected_option == 1 else (128, 128, 128)
-            if self.selected_option == 1 and game_state.tick % 30 < 15:
-                ledwall.centerText('> ALKOHOLFREI <', y=24, color=color2, align=False)
+            color2 = (255, 255, 0) if self.selected_option == MODE_NORMAL else (128, 128, 128)
+            if self.selected_option == MODE_NORMAL and game_state.tick % 30 < 15:
+                ledwall.centerText('> ALKOHOLFREI <', y=22, color=color2, align=False)
             else:
-                ledwall.centerText('ALKOHOLFREI', y=24, color=color2, align=False)
+                ledwall.centerText('ALKOHOLFREI', y=22, color=color2, align=False)
 
             # Option 3: Level Auswahl
-            color3 = (255, 255, 0) if self.selected_option == 2 else (128, 128, 128)
-            if self.selected_option == 2 and game_state.tick % 30 < 15:
+            color3 = (255, 255, 0) if self.selected_option == MODE_LEVELSELECT else (128, 128, 128)
+            if self.selected_option == MODE_LEVELSELECT and game_state.tick % 30 < 15:
                 ledwall.centerText('> LEVEL WAEHLEN <', y=26, color=color3, align=False)
             else:
                 ledwall.centerText('LEVEL WAEHLEN', y=26, color=color3, align=False)
@@ -137,23 +140,23 @@ class TitleScreen(Screen):
 
     def _handle_selection(self):
         """Behandelt die Auswahl im Menü."""
-        if self.selected_option == 0:
+        if self.selected_option == MODE_ALCOHOL:
             # Mit Alkohol spielen
             config.ALCOHOL_ENABLED = True
             game_state.switchState('game')
-        elif self.selected_option == 1:
+        elif self.selected_option == MODE_NORMAL:
             # Alkoholfrei spielen
             config.ALCOHOL_ENABLED = False
             if config.PLAY_BORING_SOUND:
                 SFX_BORING.play()
             game_state.switchState('game')
-        elif self.selected_option == 2:
+        elif self.selected_option == MODE_LEVELSELECT:
             # Level-Auswahl öffnen
             game_state.switchState('levels')
 
     def _start_game(self):
         """Startet das Spiel mit der gewählten Alkohol-Einstellung (Legacy-Methode)."""
-        config.ALCOHOL_ENABLED = (self.selected_option == 0)
+        config.ALCOHOL_ENABLED = (self.selected_option == MODE_ALCOHOL)
         if not config.ALCOHOL_ENABLED:
             SFX_BORING.play()
         game_state.switchState('game')
@@ -164,7 +167,7 @@ class TitleScreen(Screen):
             return
 
         # Change player behavior based on selected option
-        if self.selected_option == 0:  # MIT ALKOHOL selected
+        if self.selected_option == MODE_ALCOHOL:  # MIT ALKOHOL selected
             # Make players "drunk" - wobble and occasional puke
             wobble_x = random.randint(-1, 1)
             wobble_y = random.randint(-1, 1)
@@ -184,7 +187,7 @@ class TitleScreen(Screen):
                 # Right player puke (facing left, so puke goes left)
                 PukeEffect.draw_at_position(game_state.output, self.right_player_x - 8, self.right_player_y + 8, particle_count=4)
 
-        elif self.selected_option == 1:  # ALKOHOLFREI selected
+        elif self.selected_option == MODE_NORMAL:  # ALKOHOLFREI selected
             # Players walk normally but without any drunk effects
             self.left_player_x = 8
             self.left_player_y = 140
@@ -199,7 +202,7 @@ class TitleScreen(Screen):
                 self.player2_sprite.select(controls.DIR_LEFT)
                 self.player2_sprite.start()
 
-        elif self.selected_option == 2:  # LEVEL WAEHLEN selected
+        elif self.selected_option == MODE_LEVELSELECT:  # LEVEL WAEHLEN selected
             # Players look around (change facing direction occasionally)
             if random.randint(1, 120) == 1:  # Change direction every 2 seconds
                 # Left player looks around
@@ -219,7 +222,7 @@ class TitleScreen(Screen):
             self.right_player_y = 140
 
         # Default case: reset animations if they were stopped
-        if self.selected_option != 1:  # Not alkoholfrei
+        if self.selected_option != MODE_NORMAL:  # Not alkoholfrei
             if not self.player1_sprite.running:
                 self.player1_sprite.select(controls.DIR_RIGHT)
                 self.player1_sprite.start()
