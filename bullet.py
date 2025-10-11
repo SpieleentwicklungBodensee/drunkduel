@@ -22,6 +22,12 @@ class Bullet(Object):
         self.xdir = 0
         self.speed = 4
         self.shooter_index = -1  # Will be set when spawned
+        self.damage = 25  # Base damage, will be modified by drunk level
+        self.drunk_damage_modifier = 1.0  # Will be set when spawned
+        
+    def get_total_damage(self):
+        """Berechnet den Gesamtschaden der Kugel."""
+        return int(self.damage * self.drunk_damage_modifier)
 
     def update(self):
         """Update bullet position and check for collisions."""

@@ -4,7 +4,6 @@ Player class and related functionality for Drunk Duel.
 Handles player movement, collision detection, and interactions.
 """
 import controls
-import config
 import random
 import math
 from object import Object
@@ -37,9 +36,13 @@ class Player(Object):
         self.facedir = controls.DIR_DOWN
 
         self.score = 0
-        self.ammo = config.INITIAL_AMMO
+        self.ammo = 4
         self.showGun = False
-
+        
+        # Gesundheitssystem
+        self.health = 100  # Maximale Gesundheit
+        self.max_health = 100
+        
         # Alkohol-System
         self.alcohol_level = 0.0  # 0.0 = nüchtern, 1.0 = sehr betrunken
         self.max_alcohol = 1.0
@@ -99,14 +102,14 @@ class Player(Object):
 
         # Alkohol beeinflusst die Schussrichtung
         accuracy_modifier = self.get_drunk_accuracy_modifier()
-
+        
         if self.xpos < 128:
             bulletxdir = 1
             self.facedir = controls.DIR_RIGHT
         else:
             bulletxdir = -1
             self.facedir = controls.DIR_LEFT
-
+            
         # Bei Betrunkenheit: zufällige Abweichung der Schussrichtung
         if accuracy_modifier < 1.0:
             if random.random() > accuracy_modifier:
@@ -122,7 +125,7 @@ class Player(Object):
             # Fallback: load directly
             from sprite import Sprite
             bullet_sprite = Sprite('gfx/bullet.png')
-
+        
         spawnBullet(self.xpos, self.ypos, bulletxdir, player_index, bullet_sprite)
         SFX_GUNSHOT.play(loops=0)
 
@@ -132,7 +135,7 @@ class Player(Object):
     def drink_alcohol(self, amount=0.3):
         """Spieler trinkt Alkohol und wird betrunkener."""
         self.alcohol_level = min(self.max_alcohol, self.alcohol_level + amount)
-
+        
     def get_drunk_level(self):
         """Gibt den Betrunkenheitsgrad zurück (0-4)."""
         if self.alcohol_level <= 0.2:
@@ -145,7 +148,7 @@ class Player(Object):
             return 3  # Stark betrunken
         else:
             return 4  # Völlig besoffen
-
+            
     def get_drunk_speed_modifier(self):
         """Berechnet Geschwindigkeitsmodifikator basierend auf Alkohol-Level."""
         drunk_level = self.get_drunk_level()
@@ -159,7 +162,7 @@ class Player(Object):
             return 0.6  # 40% langsamer
         else:
             return 0.4  # 60% langsamer
-
+            
     def get_drunk_accuracy_modifier(self):
         """Berechnet Zielgenauigkeits-Modifier."""
         drunk_level = self.get_drunk_level()
@@ -171,13 +174,46 @@ class Player(Object):
             return 0.6
         else:
             return 0.3
-
+            
+    def get_drunk_damage_modifier(self):
+        """Berechnet Schadens-Modifier für betrunkene Schüsse."""
+        drunk_level = self.get_drunk_level()
+        if drunk_level == 0:
+            return 1.0  # Normaler Schaden
+        elif drunk_level == 1:
+            return 1.2  # +20% Schaden
+        elif drunk_level == 2:
+            return 1.5  # +50% Schaden  
+        elif drunk_level == 3:
+            return 1.8  # +80% Schaden
+        else:
+            return 2.0  # +100% Schaden (doppelter Schaden)
+            
+    def take_damage(self, damage):
+        """Spieler nimmt Schaden."""
+        self.health -= damage
+        if self.health < 0:
+            self.health = 0
+        return self.health <= 0  # Gibt True zurück wenn Spieler tot ist
+        
+    def heal(self, amount):
+        """Heilt den Spieler."""
+        self.health = min(self.max_health, self.health + amount)
+        
+    def is_alive(self):
+        """Prüft ob der Spieler noch am Leben ist."""
+        return self.health > 0
+        
+    def reset_health(self):
+        """Setzt die Gesundheit zurück."""
+        self.health = self.max_health
+            
     def apply_drunk_movement_chaos(self):
         """Wendet chaotische Bewegung bei Betrunkenheit an."""
         drunk_level = self.get_drunk_level()
         if drunk_level >= 2:  # Ab Level 2 beginnt das Torkeln
             self.drunk_wobble_timer += 1
-
+            
             # Zufällige Richtungsänderungen
             if drunk_level >= 3 and random.random() < 0.02:  # 2% Chance pro Frame
                 # Spontane Richtungsänderung
@@ -185,25 +221,25 @@ class Player(Object):
                     self.xdir *= -1 if random.random() < 0.5 else 1
                 if self.ydir != 0:
                     self.ydir *= -1 if random.random() < 0.5 else 1
-
+                    
             # Torkeln-Effekt
             wobble_strength = drunk_level * 0.3
             wobble_x = math.sin(self.drunk_wobble_timer * 0.1) * wobble_strength
             wobble_y = math.cos(self.drunk_wobble_timer * 0.15) * wobble_strength
-
+            
             # Anwenden der Torkelbewegung als kleine Verschiebung
             self.drunk_vision_offset_x = wobble_x
             self.drunk_vision_offset_y = wobble_y
-
+            
     def update_alcohol_system(self):
         """Aktualisiert das Alkohol-System jeden Frame."""
         # Alkohol-Abbau über Zeit
         if self.alcohol_level > 0:
             self.alcohol_level = max(0, self.alcohol_level - self.alcohol_decay_rate)
-
+            
         # Betrunkene Bewegungseffekte anwenden
         self.apply_drunk_movement_chaos()
-
+        
         # Gelegentliche Hickser bei hohem Alkohol-Level
         import game_state
         if self.get_drunk_level() >= 3 and game_state.tick - self.last_hiccup_time > 180:  # Alle 3 Sekunden
@@ -214,10 +250,10 @@ class Player(Object):
     def update(self):
         import game_state
         from game_state import TILE_WIDTH, TILE_HEIGHT
-
+        
         # Alkohol-System aktualisieren
         self.update_alcohol_system()
-
+        
         new_xpos = self.xpos
         new_ypos = self.ypos
 

@@ -6,11 +6,12 @@ Contains collision detection, weapon spawning, and other game mechanics.
 import random
 
 import controls
-import config
+import ledwall
 from bullet import Bullet
 from message import Message
 from weapon_drop import WeaponDrop
 from beer_powerup import BeerPowerup
+from health_powerup import HealthPowerup
 from sound_manager import SFX_FOOTSTEP, SFX_PLAYER_HIT, SFX_BEER_PICKUP
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
@@ -21,6 +22,11 @@ def spawnBullet(x, y, xdir, shooter_index, bullet_sprite):
     bullet = Bullet(x, y, bullet_sprite)
     bullet.xdir = xdir
     bullet.shooter_index = shooter_index
+    
+    # Set damage modifier based on shooter's alcohol level
+    shooter = game_state.gameScreen.players[shooter_index]
+    bullet.drunk_damage_modifier = shooter.get_drunk_damage_modifier()
+    
     game_state.gameScreen.addObject(bullet)
 
 
@@ -35,12 +41,48 @@ def spawnBeerPowerup(beer_sprite):
         if game_state.level.getTile(x, y) == ' ':  # Empty space
             beer_powerup = BeerPowerup(x * TILE_WIDTH, y * TILE_HEIGHT, beer_sprite)
             game_state.gameScreen.addObject(beer_powerup)
-            print(f"Bier gespawnt bei Position ({x}, {y})")  # Debug-Ausgabe
+            #print(f"Bier gespawnt bei Position ({x}, {y})")  # Debug-Ausgabe
+            break
+def spawnHealthPowerup(health_sprite):
+    """Spawn a health powerup at a random empty location."""
+    # Find a random empty spot on the map
+    attempts = 0
+    while attempts < 100:  # Prevent infinite loop
+        x = random.randint(0, game_state.level.getWidth() - 1)
+        y = random.randint(0, game_state.level.getHeight() - 1)
+
+        if game_state.level.getTile(x, y) == ' ':  # Empty space
+            health_powerup = HealthPowerup(x * TILE_WIDTH, y * TILE_HEIGHT, health_sprite)
+            game_state.gameScreen.addObject(health_powerup)
+            print(f"Medkit gespawnt bei Position ({x}, {y})")  # Debug-Ausgabe
             break
         attempts += 1
 
 
-def checkBeerPickup():
+def checkHealthPickup():
+    """Check if players pick up health powerups."""
+    for health in game_state.gameScreen.objects[:]:
+        if isinstance(health, HealthPowerup):
+            for player in game_state.gameScreen.players:
+                # Check collision with player
+                if (health.xpos < player.xpos + TILE_WIDTH and
+                    health.xpos + TILE_WIDTH > player.xpos and
+                    health.ypos < player.ypos + TILE_HEIGHT and
+                    health.ypos + TILE_HEIGHT > player.ypos):
+
+                    # Player heilt sich
+                    old_health = player.health
+                    player.heal(health.get_health_amount())
+                    healed_amount = player.health - old_health
+                    
+                    print(f"Player {game_state.gameScreen.players.index(player) + 1} healed {healed_amount} HP")
+
+                    # Remove the health powerup
+                    game_state.gameScreen.removeObject(health)
+
+                    # Play pickup sound
+                    SFX_FOOTSTEP.play()
+                    break
     """Check if players pick up beer powerups."""
     for beer in game_state.gameScreen.objects[:]:
         if isinstance(beer, BeerPowerup):
@@ -52,7 +94,7 @@ def checkBeerPickup():
                     beer.ypos + TILE_HEIGHT > player.ypos):
 
                     # Player trinkt Bier
-                    player.drink_alcohol(beer.get_alcohol_amount())
+                    player.drin(beer.get_alcohol_amount())
 
                     # Remove the beer powerup
                     game_state.gameScreen.removeObject(beer)
@@ -142,42 +184,56 @@ def checkCollisions():
 
 def _handle_player_hit(bullet, hit_player_index):
     """Handle when a player gets hit by a bullet."""
-    # Collision detected - increase score for the other player
+    hit_player = game_state.gameScreen.players[hit_player_index]
     other_player_index = 1 - hit_player_index
-    game_state.gameScreen.players[other_player_index].score += 1
-
-    # Give shooter some ammo back as reward
-    game_state.gameScreen.players[other_player_index].ammo = min(
-        game_state.gameScreen.players[other_player_index].ammo + config.REWARD_AMMO, 6)
-
+    other_player = game_state.gameScreen.players[other_player_index]
+    
+    # Calculate damage from bullet
+    damage = bullet.get_total_damage()
+    is_dead = hit_player.take_damage(damage)
+    
     # Remove bullet and play sound effect
     game_state.gameScreen.removeObject(bullet)
     SFX_PLAYER_HIT.play()
+    
+    # Debug output
+    print(f"Player {hit_player_index + 1} took {damage} damage! Health: {hit_player.health}")
+    
+    if is_dead:
+        # Player died - give point to shooter and reset
+        other_player.score += 1
+        
+        # Give shooter some ammo back as reward
+        other_player.ammo = min(other_player.ammo + 2, 6)
+        
+        # Reset hit player position and health
+        if hit_player_index == 0:  # Player 1 hit
+            hit_player.xpos = 2 * TILE_WIDTH
+            hit_player.ypos = 2 * TILE_HEIGHT
+        else:  # Player 2 hit
+            hit_player.xpos = 13 * TILE_WIDTH
+            hit_player.ypos = 13 * TILE_HEIGHT
+            
+        # Reset player stats
+        hit_player.reset_health()
+        hit_player.ammo = 4
+        
+        # Reset alcohol level for hit player (teilweise)
+        hit_player.alcohol_level = max(0, hit_player.alcohol_level - 0.3)  # Schock nüchtert etwas auf
 
-    # Reset hit player position
-    player = game_state.gameScreen.players[hit_player_index]
-    if hit_player_index == 0:  # Player 1 hit
-        player.xpos = 2 * TILE_WIDTH
-        player.ypos = 2 * TILE_HEIGHT
-    else:  # Player 2 hit
-        player.xpos = 13 * TILE_WIDTH
-        player.ypos = 13 * TILE_HEIGHT
+        # Check for victory condition (first to 5 points wins)
+        if other_player.score >= 5:
+            game_state.gameScreen.winner = other_player_index + 1
+            switchState('gameover')
 
-    # Reset ammo for hit player
-    player.ammo = config.INITIAL_AMMO
-
-    # Reset alcohol level for hit player (teilweise)
-    player.alcohol_level = max(0, player.alcohol_level - 0.3)  # Schock nüchtert etwas auf
-
-    # Check for victory condition (first to 5 points wins)
-    if game_state.gameScreen.players[other_player_index].score >= 5:
-        game_state.gameScreen.winner = other_player_index + 1
-        switchState('gameover')
-
-    # Switch controls
-    randomizeControls(bullet.shooter_index)
-    for player in game_state.gameScreen.players:
-        player.stopMoving()
+        # Switch controls
+        randomizeControls(bullet.shooter_index)
+        for player in game_state.gameScreen.players:
+            player.stopMoving()
+    else:
+        # Player survived but took damage
+        # Small alcohol reduction from shock
+        hit_player.alcohol_level = max(0, hit_player.alcohol_level - 0.1)
 
 
 def randomizeControls(playerid):
