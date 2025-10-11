@@ -35,7 +35,7 @@ def load_sounds():
     # Für Bier-Pickup verwenden wir erstmal den Footstep-Sound
     SFX_BEER_PICKUP = SFX_FOOTSTEP
     # Für Kotzen verwenden wir erstmal einen existierenden Sound
-    SFX_VOMIT = SFX_PLAYER_HIT  # Könnte später durch echten Kotz-Sound ersetzt werden
+    SFX_VOMIT = pygame.mixer.Sound("sfx/Kotz.wav")
 
     # Load multiple laughing sounds
     # Find all laughing sound files by parsing filenames
