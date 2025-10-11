@@ -48,5 +48,7 @@ def swapRandomly(keymapping):
     keymapping[origKey] = replVal
     keymapping[replKey] = origVal
 
-    return origVal, replVal
+    return origKey, replKey
 
+def getSentence(key1, key2):
+    return '%s ist %s' % (NAMES[key1], NAMES[key2])

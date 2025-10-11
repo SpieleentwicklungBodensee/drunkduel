@@ -128,6 +128,11 @@ def checkCollisions():
                         gameScreen.winner = other_player_index + 1
                         switchState('gameover')
 
+                    # switch controls
+                    keymapping = [controls.PLAYER_1_KEYS, controls.PLAYER_2_KEYS][bullet.shooter_index]
+                    orig, repl = controls.swapRandomly(keymapping)
+                    print(controls.getSentence(orig, repl))
+
                     break
 
 
