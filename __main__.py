@@ -76,6 +76,10 @@ ledwall.setBrightnessValue(BRIGHTNESS)
 clock = pygame.time.Clock()
 tick = 0
 
+TILE_WIDTH = 16
+TILE_HEIGHT = 16
+
+
 def switchState(state):
     global currentScreen
     if state == 'init':
@@ -86,9 +90,6 @@ def switchState(state):
         currentScreen = gameScreen
 
     ledwall.cls()
-
-TILE_WIDTH = 16
-TILE_HEIGHT = 16
 
 
 def spawnBullet(x, y, xdir):
