@@ -525,6 +525,7 @@ BULLET_SPRITE = Sprite('gfx/bullet.png')
 
 print('loading sfx...')
 SFX_GUNSHOT = pygame.mixer.Sound("sfx/Gunshot.wav")
+SFX_FOOTSTEP = pygame.mixer.Sound("sfx/Footstep.wav")
 
 print('\n\n')
 
