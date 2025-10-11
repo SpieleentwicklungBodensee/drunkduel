@@ -5,19 +5,13 @@ from base import Screen
 import controls
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
-
-# Override print function
-import ledwall
-print = ledwall.print
-
-
 class GameOverScreen(Screen):
     def draw(self):
         ledwall.centerText('GAME OVER', y=4, color=(255, 0, 0), fontsize=2, align=False)
 
         if game_state.gameScreen and hasattr(game_state.gameScreen, 'winner'):
             if game_state.tick > 128 or game_state.tick % 32 < 16:
-                ledwall.centerText(f'PLAYER {game_state.gameScreen.winner}', y=7, color=(0, 255, 0), fontsize=2, align=False)
+                ledwall.centerText(f'PLAYER {game_state.gameScreen.winner + 1}', y=7, color=(0, 255, 0), fontsize=2, align=False)
                 ledwall.centerText('WINS!', color=(0, 255, 0), fontsize=2, align=False)
 
             ledwall.centerText(f'FINAL SCORE:', y=22, color=(255, 255, 255), align=False)
