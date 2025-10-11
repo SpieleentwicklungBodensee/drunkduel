@@ -4,29 +4,19 @@ Contains collision detection, weapon spawning, and other game mechanics.
 """
 
 import random
+
+import controls
+import ledwall
 from bullet import Bullet
 from weapon_drop import WeaponDrop
 from sound_manager import SFX_FOOTSTEP, SFX_PLAYER_HIT
-import controls
-import ledwall
-
-
-"""
-Game logic module for Drunk Duel.
-Contains collision detection, weapon spawning, and other game mechanics.
-"""
-
-import random
-from bullet import Bullet
-from weapon_drop import WeaponDrop
-from sound_manager import SFX_FOOTSTEP, SFX_PLAYER_HIT
-import controls
-import ledwall
-
+import game_state
+from game_state import TILE_WIDTH, TILE_HEIGHT
+    from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
 
 def spawnBullet(x, y, xdir, shooter_index, bullet_sprite):
     """Spawn a bullet at the given position."""
-    import game_state
+    
     bullet = Bullet(x, y, bullet_sprite)
     bullet.xdir = xdir
     bullet.shooter_index = shooter_index
@@ -35,9 +25,6 @@ def spawnBullet(x, y, xdir, shooter_index, bullet_sprite):
 
 def spawnWeaponDrop(munition_sprite):
     """Spawn a weapon drop at a random empty location."""
-    import game_state
-    from game_state import TILE_WIDTH, TILE_HEIGHT
-    
     # Find a random empty spot on the map
     attempts = 0
     while attempts < 100:  # Prevent infinite loop
@@ -53,9 +40,6 @@ def spawnWeaponDrop(munition_sprite):
 
 def checkWeaponPickup():
     """Check if players pick up weapon drops."""
-    import game_state
-    from game_state import TILE_WIDTH, TILE_HEIGHT
-    
     for weapon_drop in game_state.gameScreen.objects[:]:
         if isinstance(weapon_drop, WeaponDrop):
             for player in game_state.gameScreen.players:
@@ -78,9 +62,6 @@ def checkWeaponPickup():
 
 def checkCollisions():
     """Check bullet-player collisions and handle hits."""
-    import game_state
-    from game_state import TILE_WIDTH, TILE_HEIGHT
-    
     for bullet in game_state.gameScreen.objects[:]:  # Use slice to avoid modification during iteration
         if isinstance(bullet, Bullet):
             for i, player in enumerate(game_state.gameScreen.players):
@@ -100,9 +81,6 @@ def checkCollisions():
 
 def _handle_player_hit(bullet, hit_player_index):
     """Handle when a player gets hit by a bullet."""
-    import game_state
-    from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
-    
     # Collision detected - increase score for the other player
     other_player_index = 1 - hit_player_index
     game_state.gameScreen.players[other_player_index].score += 1

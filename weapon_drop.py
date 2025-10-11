@@ -4,8 +4,8 @@ Handles ammunition pickups that appear in the game.
 """
 
 import math
+
 from object import Object
-from game_state import TILE_WIDTH, TILE_HEIGHT
 
 
 class WeaponDrop(Object):

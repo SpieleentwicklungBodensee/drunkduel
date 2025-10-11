@@ -1,7 +1,13 @@
 
+"""
+Player class and related functionality for Drunk Duel.
+Handles player movement, collision detection, and interactions.
+"""
+
 import pygame
-from object import Object
+
 import controls
+from object import Object
 from sprite import createAnimatedSprite
 from game_logic import spawnBullet
 from sound_manager import playFootstepSound, SFX_GUNSHOT

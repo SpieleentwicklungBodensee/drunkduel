@@ -5,12 +5,8 @@ Handles initialization and main game loop.
 
 import pygame
 
-# Initialize Mixer for sound first
-pygame.mixer.init()
-
 import ledwall
-print = ledwall.print
-
+import game_state
 from config import (
     parse_arguments, load_settings, validate_render_mode, 
     get_default_brightness, initialize_joysticks, load_graphics,
@@ -18,10 +14,13 @@ from config import (
 )
 from sound_manager import load_sounds
 from level import Level
-from game_state import (
-    initialize_game_state, switchState, TILE_WIDTH, TILE_HEIGHT
-)
-import game_state
+from game_state import initialize_game_state, switchState
+
+# Initialize Mixer for sound first
+pygame.mixer.init()
+
+# Override print function
+print = ledwall.print
 
 
 def initialize_game():

@@ -5,8 +5,8 @@ Creates particle-based explosion effects.
 
 import random
 import pygame
-from object import Object
 import ledwall
+from object import Object
 
 
 class Explosion(Object):

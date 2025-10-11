@@ -1,15 +1,20 @@
 
+"""
+Game screen module for Drunk Duel.
+Handles the main gameplay screen and player interactions.
+"""
+
 import pygame
-import ledwall
 import random
-from base import Screen
+
+import ledwall
 import controls
+import game_state
+from base import Screen
+from game_state import TILE_WIDTH, TILE_HEIGHT
 from player import Player, load_player_sprites
 from game_logic import checkCollisions, checkWeaponPickup, spawnWeaponDrop
 from weapon_drop import WeaponDrop
-# Import constants
-import game_state
-from game_state import TILE_WIDTH, TILE_HEIGHT
 
 class GameScreen(Screen):
     def __init__(self):
@@ -23,8 +28,6 @@ class GameScreen(Screen):
         # Load player sprites and constants
         player1_sprite, player2_sprite = load_player_sprites()
         
-
-        
         player1 = Player(2 * TILE_WIDTH, 2 * TILE_HEIGHT, player1_sprite)
         player2 = Player(13 * TILE_WIDTH, 13 * TILE_HEIGHT, player2_sprite)
 
@@ -32,8 +35,6 @@ class GameScreen(Screen):
         self.players.append(player2)
 
     def draw(self):
-      
-        
         game_state.level.draw(game_state.output)
 
         for player in self.players:
@@ -103,7 +104,6 @@ class GameScreen(Screen):
             if len(weapon_drops) < 3:  # Max 3 weapon drops on map
                 if random.random() < 0.7:  # 70% chance to spawn
                     # Get munition sprite from game state
-                    import game_state
                     if hasattr(game_state, 'munition_sprite'):
                         spawnWeaponDrop(game_state.munition_sprite)
                     else:

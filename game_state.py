@@ -4,6 +4,10 @@ Contains global game state variables and state switching logic.
 """
 
 import pygame
+from init_screen import InitScreen
+from title_screen import TitleScreen  
+from game_screen import GameScreen
+from game_over_screen import GameOverScreen
 
 # Global game state variables
 tick = 0
@@ -26,12 +30,6 @@ TILE_HEIGHT = 16
 def switchState(state):
     """Switch between game states."""
     global currentScreen, gameScreen, initScreen, titleScreen, gameOverScreen
-    
-    # Import screens here to avoid circular imports
-    from init_screen import InitScreen
-    from title_screen import TitleScreen  
-    from game_screen import GameScreen
-    from game_over_screen import GameOverScreen
     
     if state == 'init':
         if initScreen is None:

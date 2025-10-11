@@ -4,10 +4,18 @@ Handles bullet movement, collision detection, and behavior.
 """
 
 import random
-import pygame
-from object import Object
-import ledwall
 
+import ledwall
+import game_state
+from object import Object
+from sound_manager import SFX_RICOCHET
+import game_state
+from game_state import TILE_WIDTH, TILE_HEIGHT
+import game_state
+from game_state import TILE_WIDTH, TILE_HEIGHT
+from explosion import Explosion
+from weapon_drop import WeaponDrop
+from sound_manager import SFX_EXPLOSION
 
 class Bullet(Object):
     """A bullet fired by a player."""
@@ -21,8 +29,7 @@ class Bullet(Object):
 
     def update(self):
         """Update bullet position and check for collisions."""
-        import game_state
-        from game_state import TILE_WIDTH, TILE_HEIGHT
+        
         
         self.xpos += self.xdir * self.speed
 
@@ -45,11 +52,7 @@ class Bullet(Object):
 
     def _explode_cactus(self, tile_x, tile_y):
         """Handle cactus explosion logic."""
-        import game_state
-        from game_state import TILE_WIDTH, TILE_HEIGHT
-        from explosion import Explosion
-        from weapon_drop import WeaponDrop
-        from sound_manager import SFX_EXPLOSION
+
         
         # Create explosion effect
         explosion = Explosion(tile_x * TILE_WIDTH, tile_y * TILE_HEIGHT)
@@ -72,11 +75,9 @@ class Bullet(Object):
 
     def _hit_solid_object(self):
         """Handle collision with solid objects."""
-        from sound_manager import SFX_RICOCHET
         SFX_RICOCHET.play()
         self._remove_bullet()
 
     def _remove_bullet(self):
         """Remove this bullet from the game."""
-        import game_state
         game_state.gameScreen.removeObject(self)
