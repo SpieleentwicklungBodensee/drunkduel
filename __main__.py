@@ -15,6 +15,7 @@ from config import (
 )
 from sound_manager import load_sounds
 from level import Level
+from level_loader import initialize_levels
 from game_state import initialize_game_state, switchState
 
 # Initialize Mixer for sound first
@@ -62,6 +63,9 @@ def initialize_game():
     # Load graphics and sounds
     tiles, bullet_sprite, munition_sprite, beer_sprite, medkit_sprite = load_graphics()
     load_sounds()
+
+    # Initialize level system
+    initialize_levels()
 
     # Store sprites in game state for access by other modules
     game_state.bullet_sprite = bullet_sprite

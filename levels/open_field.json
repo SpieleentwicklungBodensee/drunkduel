@@ -1,0 +1,27 @@
+{
+  "name": "Open Field",
+  "mapdata": [
+    "                ",
+    "   Y       Y    ",
+    "                ",
+    "  o           o ",
+    "                ",
+    "                ",
+    "       ||       ",
+    "       ||       ",
+    "       ||       ",
+    "       ||       ",
+    "                ",
+    "                ",
+    "  o           o ",
+    "                ",
+    "   Y       Y    ",
+    "                "
+  ],
+  "metadata": {
+    "description": "Wide open arena for fast-paced action with minimal cover",
+    "author": "miathedev",
+    "difficulty": "Hard",
+    "version": "1.0"
+  }
+}
