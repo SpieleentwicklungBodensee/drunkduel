@@ -2,7 +2,7 @@ import pygame
 import ledwall
 import config
 from base import Screen
-from game_state import switchState, tick
+import game_state
 from sound_manager import SFX_BORING
 
 class TitleScreen(Screen):
@@ -20,26 +20,26 @@ class TitleScreen(Screen):
         ledwall.centerText('2025', align=False)
 
         if not self.show_menu:
-            if tick % 48 < 24:
+            if game_state.tick % 48 < 24:
                 ledwall.centerText('PRESS BUTTON', y=25, color=(255, 255, 0), align=False)
         else:
             # Zeige Alkohol-Auswahl
             ledwall.centerText('SPIEL-MODUS:', y=22, color=(255, 255, 255), align=False)
-            
+
             # Option 1: Mit Alkohol
             color1 = (255, 255, 0) if self.selected_option == 0 else (128, 128, 128)
-            if self.selected_option == 0 and tick % 30 < 15:
+            if self.selected_option == 0 and game_state.tick % 30 < 15:
                 ledwall.centerText('> MIT ALKOHOL <', y=24, color=color1, align=False)
             else:
                 ledwall.centerText('MIT ALKOHOL', y=24, color=color1, align=False)
-                
-            # Option 2: Alkoholfrei  
+
+            # Option 2: Alkoholfrei
             color2 = (255, 255, 0) if self.selected_option == 1 else (128, 128, 128)
-            if self.selected_option == 1 and tick % 30 < 15:
+            if self.selected_option == 1 and game_state.tick % 30 < 15:
                 ledwall.centerText('> ALKOHOLFREI <', y=26, color=color2, align=False)
             else:
                 ledwall.centerText('ALKOHOLFREI', y=26, color=color2, align=False)
-            
+
             ledwall.centerText('ENTER ZUM STARTEN', y=29, color=(0, 255, 0), align=False)
 
     def event(self, e):
@@ -68,10 +68,10 @@ class TitleScreen(Screen):
                     self.selected_option = 0
                 elif e.value[1] == -1:  # Runter
                     self.selected_option = 1
-    
+
     def _start_game(self):
         """Startet das Spiel mit der gewählten Alkohol-Einstellung."""
         config.ALCOHOL_ENABLED = (self.selected_option == 0)
         if not config.ALCOHOL_ENABLED:
             SFX_BORING.play()
-        switchState('game')
+        game_state.switchState('game')
