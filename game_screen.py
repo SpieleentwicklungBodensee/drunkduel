@@ -18,6 +18,7 @@ from game_logic import checkCollisions, checkWeaponPickup, checkBeerPickup, chec
 from weapon_drop import WeaponDrop
 from beer_powerup import BeerPowerup
 from health_powerup import HealthPowerup
+from bird import Bird
 
 # Override print function
 import ledwall
@@ -34,6 +35,7 @@ class GameScreen(Screen):
         self.weapon_drop_timer = 0  # Timer for spawning weapon drops
         self.beer_spawn_timer = 0  # Timer for spawning beer powerups
         self.health_spawn_timer = 0  # Timer for spawning health powerups
+        self.bird_spawn_timer = 0  # Timer for spawning birds
         self.winner = None  # Track game winner
 
         # Cactus respawn system
@@ -264,10 +266,16 @@ class GameScreen(Screen):
         # Handle cactus respawning
         self._handle_cactus_respawn()
 
-        # Remove expired powerups
+        # Spawn birds randomly
+        self._handle_bird_spawning()
+
+        # Remove expired powerups and inactive birds
         for obj in self.objects[:]:
             if isinstance(obj, (BeerPowerup, HealthPowerup)):
                 if obj.update():  # Returns True if should be removed
+                    self.removeObject(obj)
+            elif isinstance(obj, Bird):
+                if not obj.is_active():
                     self.removeObject(obj)
 
     def addObject(self, obj):
@@ -363,6 +371,7 @@ class GameScreen(Screen):
             self.weapon_drop_timer = 0
             self.beer_spawn_timer = 0
             self.health_spawn_timer = 0
+            self.bird_spawn_timer = 0
             self.initial_spawn_done = False
 
             # Show level change message
@@ -399,3 +408,53 @@ class GameScreen(Screen):
         # Also spawn 1 health powerup at start
         if hasattr(game_state, 'munition_sprite'):
             spawnHealthPowerup(game_state.munition_sprite)
+
+    def _handle_bird_spawning(self):
+        """Handle random bird spawning across the screen."""
+        self.bird_spawn_timer += 1
+        
+        # Spawn a bird every 180-600 frames (3-10 seconds at 60 FPS)
+        spawn_interval = random.randint(180, 600)
+        
+        if self.bird_spawn_timer >= spawn_interval:
+            # Only spawn if there aren't too many birds already
+            birds = [obj for obj in self.objects if isinstance(obj, Bird)]
+            if len(birds) < 3:  # Max 3 birds on screen at once
+                self._spawn_random_bird()
+            self.bird_spawn_timer = 0
+    
+    def _spawn_random_bird(self):
+        """Spawn a bird at a random position flying across the screen."""
+        # Random height within the game area (avoid UI area at bottom)
+        screen_height = game_state.level.getHeight() * TILE_HEIGHT
+        y = random.randint(16, screen_height - 32)  # Leave some margin
+        
+        # Randomly choose direction
+        flying_right = random.choice([True, False])
+        
+        if flying_right:
+            # Spawn from left edge, flying right
+            x = -16  # Start just off screen
+        else:
+            # Spawn from right edge, flying left
+            x = game_state.output.get_width()
+        
+        # Create and add the bird
+        bird = Bird(x, y, flying_right)
+        self.addObject(bird)
+
+    def _create_birds_from_level(self):
+        """Create bird objects for all 'b' tiles in the level and replace them with empty spaces."""
+        if not hasattr(game_state, 'level') or not game_state.level:
+            return
+            
+        # Scan the level for 'b' tiles and create bird objects
+        for y in range(game_state.level.getHeight()):
+            for x in range(game_state.level.getWidth()):
+                if game_state.level.getTile(x, y) == 'b':
+                    # Create a bird object at this position
+                    bird = Bird(x * TILE_WIDTH, y * TILE_HEIGHT)
+                    self.addObject(bird)
+                    
+                    # Replace the tile with empty space so it doesn't also draw the tile sprite
+                    game_state.level.setTile(x, y, ' ')
