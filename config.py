@@ -25,6 +25,7 @@ ACCURATE_INTONATION = False # wenn True, klingen die saetze langweiliger
 
 # Alkohol-Einstellungen
 ALCOHOL_ENABLED = True  # Wird durch den Startbildschirm gesetzt
+PLAY_BORING_SOUND = False
 
 
 def parse_arguments():
