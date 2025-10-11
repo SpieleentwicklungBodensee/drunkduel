@@ -5,6 +5,9 @@ import ledwall
 print = ledwall.print
 
 
+# Initialize Mixer for sound
+pygame.mixer.init()
+
 # settings --------------------
 
 # read settings from settings.py
@@ -259,8 +262,8 @@ class Player(Object):
             self.facedir = DIR_LEFT
 
         spawnBullet(self.xpos, self.ypos, bulletxdir)
-
-
+        SFX_GUNSHOT.play(loops=0) 
+         
     def stopShooting(self):
         self.showGun = False
 
@@ -521,6 +524,7 @@ PLAYER_2_SPRITE = createAnimatedSprite('gfx/player2.png')
 BULLET_SPRITE = Sprite('gfx/bullet.png')
 
 print('loading sfx...')
+SFX_GUNSHOT = pygame.mixer.Sound("sfx/Gunshot.wav")
 
 print('\n\n')
 
