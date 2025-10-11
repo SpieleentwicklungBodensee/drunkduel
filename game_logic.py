@@ -13,7 +13,7 @@ from message import Message
 from weapon_drop import WeaponDrop
 from beer_powerup import BeerPowerup
 from health_powerup import HealthPowerup
-from bird import Bird
+from bird import Bird, FenceBird
 from sound_manager import SFX_FOOTSTEP, SFX_LAUGHING, SFX_PLAYER_HIT
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
@@ -209,6 +209,20 @@ def checkCollisions():
                             bullet.ypos + TILE_HEIGHT > bird_bounds['y']):
                             
                             # Bird got hit!
+                            bird.get_shot()
+                            game_state.gameScreen.removeObject(bullet)
+                            bullet_hit = True
+                            break
+                    elif isinstance(bird, FenceBird) and bird.state in ["sitting", "scared_flying"]:
+                        bird_bounds = bird.get_bounds()
+                        
+                        # Simple bounding box collision detection
+                        if (bullet.xpos < bird_bounds['x'] + bird_bounds['width'] and
+                            bullet.xpos + TILE_WIDTH > bird_bounds['x'] and
+                            bullet.ypos < bird_bounds['y'] + bird_bounds['height'] and
+                            bullet.ypos + TILE_HEIGHT > bird_bounds['y']):
+                            
+                            # Fence bird got hit!
                             bird.get_shot()
                             game_state.gameScreen.removeObject(bullet)
                             bullet_hit = True
