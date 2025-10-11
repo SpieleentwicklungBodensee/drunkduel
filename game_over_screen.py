@@ -40,6 +40,8 @@ class GameOverScreen(Screen):
                 game_state.gameScreen.weapon_drop_timer = 0  # Reset weapon drop timer
                 game_state.gameScreen.destroyed_cacti.clear()  # Reset cactus respawn timers
 
+                game_state.message = None
+
                 controls.restore(0)
                 controls.restore(1)
 
