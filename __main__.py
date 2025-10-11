@@ -262,8 +262,8 @@ class Player(Object):
             self.facedir = DIR_LEFT
 
         spawnBullet(self.xpos, self.ypos, bulletxdir)
-        SFX_GUNSHOT.play(loops=0) 
-         
+        SFX_GUNSHOT.play(loops=0)
+
     def stopShooting(self):
         self.showGun = False
 
