@@ -197,6 +197,9 @@ class GameScreen(Screen):
 
             player.update()
 
+        # Check if a player has won
+        checkVictory()
+
         if game_state.message:  # do not handle rest of updates while message is shown
             game_state.message.update()
             return
@@ -215,9 +218,6 @@ class GameScreen(Screen):
 
         # Check for health pickups
         checkHealthPickup()
-
-        # Check if a player has won
-        checkVictory()
 
         # Spawn weapon drops periodically
         self.weapon_drop_timer += 1

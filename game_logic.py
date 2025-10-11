@@ -237,6 +237,12 @@ def removeAllBullets():
 
 
 def checkVictory():
+    # First check if one of the players is dead:
+    for player in game_state.gameScreen.players:
+        if player.dying:
+            if player.sprite.lastPhase < 3:
+                return
+
     # Check for victory condition (first to 5 points wins)
     for player in game_state.gameScreen.players:
         if player.score >= 5:
