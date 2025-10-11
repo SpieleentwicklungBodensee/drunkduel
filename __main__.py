@@ -268,6 +268,24 @@ class Player(Object):
         self.xpos += self.xdir * self.speed
         self.ypos += self.ydir * self.speed
 
+        # collision with level border:
+        if self.xpos < 0:
+            self.xpos = 0
+            self.xdir = 0
+
+        if self.xpos > (level.getWidth() -1) * TILE_WIDTH:
+            self.xpos = (level.getWidth() -1) * TILE_WIDTH
+            self.xdir = 0
+
+        if self.ypos < 0:
+            self.ypos = 0
+            self.ydir = 0
+
+        if self.ypos > (level.getHeight() -1) * TILE_HEIGHT:
+            self.ypos = (level.getHeight() -1) * TILE_HEIGHT
+            self.ydir = 0
+
+        # show animation
         spriteAnim = self.facedir + (4 if self.showGun else 0)
         self.sprite.select(spriteAnim)
 
@@ -473,6 +491,12 @@ class Level:
 
     def getTile(self, x, y):
         return self.mapdata[y][x]
+
+    def getWidth(self):
+        return self.width
+
+    def getHeight(self):
+        return self.height
 
     def draw(self, output):
         for y in range(self.height):
