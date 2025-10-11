@@ -3,9 +3,6 @@
 Player class and related functionality for Drunk Duel.
 Handles player movement, collision detection, and interactions.
 """
-
-import pygame
-
 import controls
 from object import Object
 from sprite import createAnimatedSprite

@@ -4,7 +4,6 @@ Handles command line arguments, settings, and initial setup.
 """
 
 import argparse
-import settings
 import pygame
 from sprite import Sprite, createAnimatedSprite
 
