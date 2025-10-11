@@ -20,6 +20,9 @@ PLAYER_2_STARTY = 13
 INITIAL_AMMO = 4
 REWARD_AMMO = 0
 
+# Sprachausgabe-Einstellungen
+ACCURATE_INTONATION = False # wenn True, klingen die saetze langweiliger
+
 # Alkohol-Einstellungen
 ALCOHOL_ENABLED = True  # Wird durch den Startbildschirm gesetzt
 

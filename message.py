@@ -2,6 +2,7 @@ import ledwall
 
 import game_state
 import sound_manager
+import config
 from object import Object
 
 # Override print function
@@ -41,7 +42,10 @@ class Message(Object):
             sound = sound_manager.SOUND_WORDS[line]
 
             if type(sound) is tuple:
-                sound[0].play()
+                if config.ACCURATE_INTONATION and lineno == len(self.lines) -1:
+                    sound[1].play()
+                else:
+                    sound[0].play()
             else:
                 sound.play()
 
