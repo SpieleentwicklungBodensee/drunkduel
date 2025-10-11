@@ -11,14 +11,6 @@ from sprite import Sprite, createAnimatedSprite
 import ledwall
 print = ledwall.print
 
-PLAYER_1_STARTX = 2
-PLAYER_1_STARTY = 2
-PLAYER_2_STARTX = 13
-PLAYER_2_STARTY = 13
-
-INITIAL_AMMO = 4
-REWARD_AMMO = 0
-
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -96,7 +88,7 @@ def load_graphics():
 
     bullet_sprite = Sprite('gfx/bullet.png')
     munition_sprite = Sprite('gfx/munition.png')
-    beer_sprite = Sprite('gfx/munition.png')
+    beer_sprite = Sprite('gfx/bier.png')
 
     # Animate water
     tiles['|'].speed = 12

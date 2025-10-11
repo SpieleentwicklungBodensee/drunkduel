@@ -9,14 +9,14 @@ import random
 
 import ledwall
 import controls
-import config
 import game_state
 from base import Screen
 from game_state import TILE_WIDTH, TILE_HEIGHT
 from player import Player, load_player_sprites
-from game_logic import checkCollisions, checkWeaponPickup, checkBeerPickup, spawnWeaponDrop, spawnBeerPowerup
+from game_logic import checkCollisions, checkWeaponPickup, checkBeerPickup, checkHealthPickup, spawnWeaponDrop, spawnBeerPowerup, spawnHealthPowerup
 from weapon_drop import WeaponDrop
 from beer_powerup import BeerPowerup
+from health_powerup import HealthPowerup
 
 class GameScreen(Screen):
     def __init__(self):
@@ -26,20 +26,21 @@ class GameScreen(Screen):
         self.objects = []
         self.weapon_drop_timer = 0  # Timer for spawning weapon drops
         self.beer_spawn_timer = 0  # Timer for spawning beer powerups
+        self.health_spawn_timer = 0  # Timer for spawning health powerups
         self.winner = None  # Track game winner
-
+        
         # Cactus respawn system
         self.destroyed_cacti = []  # List of (destruction_time, respawn_time) tuples
 
         # Load player sprites and constants
         player1_sprite, player2_sprite = load_player_sprites()
 
-        player1 = Player(config.PLAYER_1_STARTX * TILE_WIDTH, config.PLAYER_1_STARTY * TILE_HEIGHT, player1_sprite)
-        player2 = Player(config.PLAYER_2_STARTX * TILE_WIDTH, config.PLAYER_2_STARTY * TILE_HEIGHT, player2_sprite)
+        player1 = Player(2 * TILE_WIDTH, 2 * TILE_HEIGHT, player1_sprite)
+        player2 = Player(13 * TILE_WIDTH, 13 * TILE_HEIGHT, player2_sprite)
 
         self.players.append(player1)
         self.players.append(player2)
-
+        
         # Flag to spawn initial beer powerups on first update
         self.initial_spawn_done = False
 
@@ -60,8 +61,8 @@ class GameScreen(Screen):
                 game_state.message = None
 
         # Draw highscore display
-        ledwall.drawText(f'HITS: {self.players[0].score}', x=2, y=game_state.level.getHeight() * 2, color=(255, 255, 0))
-        ledwall.drawText(f'HITS: {self.players[1].score}', x=20, y=game_state.level.getHeight() * 2, color=(255, 255, 0))
+        ledwall.drawText(f'P1: {self.players[0].score}', x=2, y=game_state.level.getHeight() * 2, color=(255, 255, 0))
+        ledwall.drawText(f'P2: {self.players[1].score}', x=20, y=game_state.level.getHeight() * 2, color=(255, 255, 0))
 
         # Draw ammo display with color coding - P1 left, P2 right
         ammo1_color = (255, 255, 255) if self.players[0].ammo > 0 else (255, 0, 0)
@@ -69,11 +70,11 @@ class GameScreen(Screen):
 
         ledwall.drawText(f'AMMO: {self.players[0].ammo}', x=2, y=game_state.level.getHeight() * 2 + 1, color=ammo1_color)
         ledwall.drawText(f'AMMO: {self.players[1].ammo}', x=20, y=game_state.level.getHeight() * 2 + 1, color=ammo2_color)
-
+        
         # Draw alcohol level display
         alcohol1_percent = int(self.players[0].alcohol_level * 100)
         alcohol2_percent = int(self.players[1].alcohol_level * 100)
-
+        
         # Color coding: green = sober, yellow = tipsy, red = drunk
         def get_alcohol_color(level):
             if level <= 20:
@@ -82,17 +83,31 @@ class GameScreen(Screen):
                 return (255, 255, 0)  # Yellow
             else:
                 return (255, 0, 0)  # Red
-
+        
         alcohol1_color = get_alcohol_color(alcohol1_percent)
         alcohol2_color = get_alcohol_color(alcohol2_percent)
-
+        
         ledwall.drawText(f'ALC: {alcohol1_percent}%', x=2, y=game_state.level.getHeight() * 2 + 2, color=alcohol1_color)
         ledwall.drawText(f'ALC: {alcohol2_percent}%', x=20, y=game_state.level.getHeight() * 2 + 2, color=alcohol2_color)
+        
+        # Draw health display
+        def get_health_color(health):
+            if health >= 75:
+                return (0, 255, 0)  # Green
+            elif health >= 50:
+                return (255, 255, 0)  # Yellow
+            elif health >= 25:
+                return (255, 165, 0)  # Orange
+            else:
+                return (255, 0, 0)  # Red
+        
+        health1_color = get_health_color(self.players[0].health)
+        health2_color = get_health_color(self.players[1].health)
+        
+        ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=game_state.level.getHeight() * 2 + 3, color=health1_color)
+        ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=game_state.level.getHeight() * 2 + 3, color=health2_color)
 
     def event(self, e):
-        if game_state.message:  # pause while message is displayed
-            return
-
         if e.type == pygame.KEYDOWN:
             for i, keys in enumerate([controls.PLAYER_1_KEYS, controls.PLAYER_2_KEYS]):
                 if e.key == keys[controls.DIR_LEFT]:
@@ -126,7 +141,7 @@ class GameScreen(Screen):
         if not self.initial_spawn_done:
             self._spawn_initial_beer_powerups()
             self.initial_spawn_done = True
-
+            
         for player in self.players:
             player.update()
 
@@ -138,9 +153,12 @@ class GameScreen(Screen):
 
         # Check for weapon pickups
         checkWeaponPickup()
-
+        
         # Check for beer pickups
         checkBeerPickup()
+        
+        # Check for health pickups
+        checkHealthPickup()
 
         # Spawn weapon drops periodically
         self.weapon_drop_timer += 1
@@ -158,7 +176,7 @@ class GameScreen(Screen):
                         munition_sprite = Sprite('gfx/munition.png')
                         spawnWeaponDrop(munition_sprite)
             self.weapon_drop_timer = 0
-
+            
         # Spawn beer powerups periodically
         self.beer_spawn_timer += 1
         if self.beer_spawn_timer >= 120:  # Spawn every 2 seconds (120 frames at 60 FPS) für Test
@@ -170,13 +188,25 @@ class GameScreen(Screen):
                     if hasattr(game_state, 'beer_sprite'):
                         spawnBeerPowerup(game_state.beer_sprite)
             self.beer_spawn_timer = 0
+            
+        # Spawn health powerups periodically (less frequent)
+        self.health_spawn_timer += 1
+        if self.health_spawn_timer >= 480:  # Spawn every 8 seconds (480 frames at 60 FPS)
+            # Only spawn if there aren't too many health powerups already
+            health_powerups = [obj for obj in self.objects if isinstance(obj, HealthPowerup)]
+            if len(health_powerups) < 1:  # Max 1 health powerup on map
+                if random.random() < 0.3:  # 30% chance to spawn
+                    # Use munition sprite as placeholder for health powerup
+                    if hasattr(game_state, 'munition_sprite'):
+                        spawnHealthPowerup(game_state.munition_sprite)
+            self.health_spawn_timer = 0
 
         # Handle cactus respawning
         self._handle_cactus_respawn()
-
-        # Remove expired beer powerups
+        
+        # Remove expired powerups
         for obj in self.objects[:]:
-            if isinstance(obj, BeerPowerup):
+            if isinstance(obj, (BeerPowerup, HealthPowerup)):
                 if obj.update():  # Returns True if should be removed
                     self.removeObject(obj)
 
@@ -197,7 +227,7 @@ class GameScreen(Screen):
     def _handle_cactus_respawn(self):
         """Check if any cacti are ready to respawn and spawn them."""
         current_time = game_state.tick
-
+        
         # Check all scheduled respawns
         for respawn_time in self.destroyed_cacti[:]:  # Use slice to avoid modification during iteration
             if current_time >= respawn_time:
@@ -213,13 +243,13 @@ class GameScreen(Screen):
             y = random.randint(0, game_state.level.getHeight() - 1)
 
             tile = game_state.level.getTile(x, y)
-
+            
             # Check if the location is empty and suitable for a cactus
             if tile == ' ':
                 # Also check if there are no players or objects too close
                 tile_center_x = x * TILE_WIDTH + TILE_WIDTH // 2
                 tile_center_y = y * TILE_HEIGHT + TILE_HEIGHT // 2
-
+                
                 # Ensure cactus doesn't spawn too close to players
                 too_close = False
                 for player in self.players:
@@ -229,17 +259,21 @@ class GameScreen(Screen):
                     if distance_sq < (TILE_WIDTH * 3) ** 2:  # At least 3 tiles away
                         too_close = True
                         break
-
+                
                 if not too_close:
                     # Spawn the cactus
                     game_state.level.setTile(x, y, 'Y')
                     break
-
+            
             attempts += 1
-
+            
     def _spawn_initial_beer_powerups(self):
         """Spawnt 1-2 Bier-Powerups beim Spielstart."""
         if hasattr(game_state, 'beer_sprite'):
             # Spawn 1-2 beer powerups at game start
             for _ in range(random.randint(1, 2)):
                 spawnBeerPowerup(game_state.beer_sprite)
+                
+        # Also spawn 1 health powerup at start
+        if hasattr(game_state, 'munition_sprite'):
+            spawnHealthPowerup(game_state.munition_sprite)
