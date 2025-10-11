@@ -8,12 +8,12 @@ DIR_DOWN = 0
 FIRE = 5
 
 
-NAMES = [DIR_LEFT: 'links',
+NAMES = {DIR_LEFT: 'links',
          DIR_RIGHT: 'rechts',
          DIR_UP: 'hoch',
          DIR_DOWN: 'runter',
          FIRE: 'feuer',
-         ]
+         }
 
 
 PLAYER_2_KEYS = {DIR_LEFT: pygame.K_LEFT,
@@ -39,8 +39,8 @@ def swapRandomly(keymapping):
     chosen2 = random.choice(available)
 
     # swap chosen1 with chosen2
-    origKey = keymapping.keys()[chosen1]
-    replKey = keymapping.keys()[chosen2]
+    origKey = list(keymapping.keys())[chosen1]
+    replKey = list(keymapping.keys())[chosen2]
 
     origVal = keymapping[origKey]
     replVal = keymapping[replKey]
