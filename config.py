@@ -95,6 +95,7 @@ def load_graphics():
         '|': createAnimatedSprite('gfx/water1.png'),
         '#': Sprite('gfx/fence1.png'),
         'o': Sprite('gfx/stone1.png'),
+        'F': None,  # Invisible wall
         ' ': None,
     }
 
