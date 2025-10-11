@@ -6,6 +6,7 @@ Handles player movement, collision detection, and interactions.
 import controls
 import random
 import math
+import config
 from object import Object
 from sprite import createAnimatedSprite
 from game_logic import spawnBullet
@@ -321,7 +322,6 @@ class Player(Object):
 
     def update(self):
         import game_state
-        import game_logic
 
         if self.dying:
             if self.sprite.lastPhase == 3:
