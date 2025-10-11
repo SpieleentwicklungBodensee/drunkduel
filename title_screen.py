@@ -45,7 +45,12 @@ class TitleScreen(Screen):
                 screen_chars_width = ledwall.SCR_W // 8  # Assuming 8-pixel character width
                 center_x = (screen_chars_width - len(text)) // 2 + shake_x
                 
+                # Draw the text
                 ledwall.drawText(text, x=center_x, y=22 + shake_y, color=color1, align=False)
+                
+                # Add puke animation around the text
+                from puke_effect import PukeEffect
+                PukeEffect.draw_around_text(center_x, 22 + shake_y, len(text))
             else:
                 text = 'MIT ALKOHOL' if self.selected_option != 0 else '> MIT ALKOHOL <'
                 if self.selected_option == 0:
@@ -54,7 +59,13 @@ class TitleScreen(Screen):
                     shake_y = random.randint(-1, 1)
                     screen_chars_width = ledwall.SCR_W // 8
                     center_x = (screen_chars_width - len(text)) // 2 + shake_x
+                    
+                    # Draw the text
                     ledwall.drawText(text, x=center_x, y=22 + shake_y, color=color1, align=False)
+                    
+                    # Add puke animation around the text
+                    from puke_effect import PukeEffect
+                    PukeEffect.draw_around_text(center_x, 22 + shake_y, len(text))
                 else:
                     ledwall.centerText('MIT ALKOHOL', y=22, color=color1, align=False)
 

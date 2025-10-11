@@ -595,43 +595,8 @@ class Player(Object):
 
         # Zeichne visuellen Kotz-Effekt
         if self.is_vomiting:
-            self._draw_vomit_effect(output, draw_x, draw_y)
-
-    def _draw_vomit_effect(self, output, player_x, player_y):
-        """Zeichnet einen visuellen Kotz-Effekt."""
-        import ledwall
-
-        # Berechne Position vor dem Spieler basierend auf Blickrichtung
-        if self.facedir == controls.DIR_LEFT:
-            vomit_x = player_x - 8
-            vomit_y = player_y + 8
-        elif self.facedir == controls.DIR_RIGHT:
-            vomit_x = player_x + 16
-            vomit_y = player_y + 8
-        elif self.facedir == controls.DIR_UP:
-            vomit_x = player_x + 8
-            vomit_y = player_y - 8
-        else:  # DIR_DOWN
-            vomit_x = player_x + 8
-            vomit_y = player_y + 16
-
-        # Zeichne mehrere "Kotze-Pixel" in grün/gelb
-        colors = [(0, 255, 0), (255, 255, 0), (128, 255, 0), (200, 255, 0)]
-
-        for i in range(3):  # 3 Kotze-Partikel
-            offset_x = random.randint(-4, 4)
-            offset_y = random.randint(-2, 2)
-            color = random.choice(colors)
-
-            final_x = vomit_x + offset_x
-            final_y = vomit_y + offset_y
-
-            # Zeichne Kotze-Pixel (falls im sichtbaren Bereich)
-            if 0 <= final_x < ledwall.SCR_W and 0 <= final_y < ledwall.SCR_H:
-                try:
-                    output.set_at((int(final_x), int(final_y)), color)
-                except:
-                    pass  # Ignoriere Fehler wenn außerhalb des Bildschirms
+            from puke_effect import PukeEffect
+            PukeEffect.draw_around_player(output, draw_x, draw_y, self.facedir)
 
     def _draw_drunk_shader(self, output, x, y, drunk_level):
         """Zeichnet den Spieler mit Betrunkenheits-Shader-Effekten."""
