@@ -54,6 +54,9 @@ def switchState(state):
     if state != 'init':
         ledwall.cls()
 
+    global tick
+    tick = 0
+
 
 def initialize_game_state():
     """Initialize the global game state."""
