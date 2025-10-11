@@ -216,15 +216,16 @@ class GameScreen(Screen):
                 self.beer_spawn_timer = 0
 
         # Spawn health powerups periodically (less frequent)
-        self.health_spawn_timer += 1
-        if self.health_spawn_timer >= 480:  # Spawn every 8 seconds (480 frames at 60 FPS)
-            # Only spawn if there aren't too many health powerups already
-            health_powerups = [obj for obj in self.objects if isinstance(obj, HealthPowerup)]
-            if len(health_powerups) < 1:  # Max 1 health powerup on map
-                if random.random() < 0.3:  # 30% chance to spawn
-                    # Use munition sprite as placeholder for health powerup
-                    spawnHealthPowerup(game_state.medkit_sprite)
-            self.health_spawn_timer = 0
+        if config.ALCOHOL_ENABLED:
+            self.health_spawn_timer += 1
+            if self.health_spawn_timer >= 480:  # Spawn every 8 seconds (480 frames at 60 FPS)
+                # Only spawn if there aren't too many health powerups already
+                health_powerups = [obj for obj in self.objects if isinstance(obj, HealthPowerup)]
+                if len(health_powerups) < 1:  # Max 1 health powerup on map
+                    if random.random() < 0.3:  # 30% chance to spawn
+                        # Use munition sprite as placeholder for health powerup
+                        spawnHealthPowerup(game_state.medkit_sprite)
+                self.health_spawn_timer = 0
 
         # Handle cactus respawning
         self._handle_cactus_respawn()
