@@ -185,6 +185,10 @@ def checkCollisions():
 def _handle_player_hit(bullet, hit_player_index):
     """Handle when a player gets hit by a bullet."""
     hit_player = game_state.gameScreen.players[hit_player_index]
+
+    if hit_player.dying:
+        return
+
     other_player_index = 1 - hit_player_index
     other_player = game_state.gameScreen.players[other_player_index]
 
