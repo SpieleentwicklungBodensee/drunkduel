@@ -1,11 +1,15 @@
 import ledwall
 
 import game_state
+import sound_manager
 from object import Object
 
 # Override print function
 import ledwall
 print = ledwall.print
+
+
+WORD_DURATION = 35
 
 
 class Message(Object):
@@ -18,8 +22,29 @@ class Message(Object):
 
     def draw(self, output):
         for i, line in enumerate(self.lines):
-            if (i -1) < (game_state.tick - self.initTime) // 32:
+            if (i -1) < (game_state.tick - self.initTime) // WORD_DURATION:
                 ledwall.drawText(line.upper(), self.xpos, self.ypos + i, self.color)
+
+
+    def update(self):
+        if (game_state.tick - self.initTime) % WORD_DURATION != 0:
+            return
+
+        lineno = (game_state.tick - self.initTime) // WORD_DURATION
+
+        if lineno >= len(self.lines):
+            return
+
+        line = self.lines[lineno]
+
+        if line in sound_manager.SOUND_WORDS:
+            sound = sound_manager.SOUND_WORDS[line]
+
+            if type(sound) is tuple:
+                sound[0].play()
+            else:
+                sound.play()
+
 
     def isDue(self):
         if (game_state.tick - self.initTime) // 32 > len(self.lines) + 1:

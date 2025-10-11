@@ -17,8 +17,8 @@ JOY_DEADZONE = 0.3
 
 NAMES = {DIR_LEFT: 'links',
          DIR_RIGHT: 'rechts',
-         DIR_UP: 'hoch',
-         DIR_DOWN: 'runter',
+         DIR_UP: 'oben',
+         DIR_DOWN: 'unten',
          FIRE: 'feuer',
          }
 

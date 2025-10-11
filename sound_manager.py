@@ -21,6 +21,9 @@ SFX_EXPLOSION = None
 SFX_BEER_PICKUP = None  # Neuer Sound für Bier-Pickup
 SFX_VOMIT = None  # Neuer Sound für Kotzen
 
+# Sound words
+SOUND_WORDS = {}
+
 # Laughing sounds for beer drinking
 SFX_LAUGHING = []  # List of laughing sounds
 
@@ -50,6 +53,32 @@ def load_sounds():
         if filename.startswith("laughing") and filename.endswith(".wav"):
             sound = pygame.mixer.Sound(os.path.join("sfx", filename))
             SFX_LAUGHING.append(sound)
+
+    SOUND_WORDS['links'] = (pygame.mixer.Sound('sfx/links_01_d.wav'),
+                            pygame.mixer.Sound('sfx/links_02_d.wav'))
+
+    SOUND_WORDS['rechts'] = (pygame.mixer.Sound('sfx/rechts_01_d.wav'),
+                             pygame.mixer.Sound('sfx/rechts_02_d.wav'))
+
+    SOUND_WORDS['oben'] = (pygame.mixer.Sound('sfx/oben_01_d.wav'),
+                           pygame.mixer.Sound('sfx/oben_02_d.wav'))
+
+    SOUND_WORDS['unten'] = (pygame.mixer.Sound('sfx/unten_01_d.wav'),
+                             pygame.mixer.Sound('sfx/unten_02_d.wav'))
+
+    SOUND_WORDS['feuer'] = (pygame.mixer.Sound('sfx/feuer_01_d.wav'),
+                            pygame.mixer.Sound('sfx/feuer_02_d.wav'))
+
+    SOUND_WORDS['ist'] = pygame.mixer.Sound('sfx/ist_d.wav')
+
+    SOUND_WORDS['spieler 1:'] = pygame.mixer.Sound('sfx/spieler_eins_d.wav')
+    SOUND_WORDS['spieler 2:'] = pygame.mixer.Sound('sfx/spieler_zwei_d.wav')
+
+    SOUND_WORDS['spieler'] = pygame.mixer.Sound('sfx/spieler_d.wav')
+    SOUND_WORDS['eins'] = pygame.mixer.Sound('sfx/eins_d.wav')
+    SOUND_WORDS['zwei'] = pygame.mixer.Sound('sfx/zwei_d.wav')
+
+    print(SOUND_WORDS)
 
 
 def playFootstepSound():
