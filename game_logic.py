@@ -11,8 +11,7 @@ from bullet import Bullet
 from weapon_drop import WeaponDrop
 from sound_manager import SFX_FOOTSTEP, SFX_PLAYER_HIT
 import game_state
-from game_state import TILE_WIDTH, TILE_HEIGHT
-    from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
+from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
 
 def spawnBullet(x, y, xdir, shooter_index, bullet_sprite):
     """Spawn a bullet at the given position."""
