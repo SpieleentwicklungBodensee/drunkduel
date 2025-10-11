@@ -111,11 +111,11 @@ def handleJoyEvent(e):
                     actions.append('stopright')
         elif e.axis == 1: # y axis
             if e.value < -JOY_DEADZONE:
-                if not JOYSTATES[joyid][DIR_LEFT]:
+                if not JOYSTATES[joyid][DIR_UP]:
                     JOYSTATES[joyid][DIR_UP] = True
                     actions.append('moveup')
             elif e.value > JOY_DEADZONE:
-                if JOYSTATES[joyid][DIR_RIGHT]:
+                if not JOYSTATES[joyid][DIR_DOWN]:
                     JOYSTATES[joyid][DIR_DOWN] = True
                     actions.append('movedown')
             else:
@@ -131,11 +131,13 @@ def handleJoyEvent(e):
         hat = JOYSTICKS[joyid].get_hat(h)
 
         if hat[0] == -1:
-            JOYSTATES[joyid][DIR_LEFT] = True
-            actions.append('moveleft')
+            if not JOYSTATES[joyid][DIR_LEFT]:
+                JOYSTATES[joyid][DIR_LEFT] = True
+                actions.append('moveleft')
         elif hat[0] == 1:
-            JOYSTATES[joyid][DIR_RIGHT] = True
-            actions.append('moveright')
+            if not JOYSTATES[joyid][DIR_RIGHT]:
+                JOYSTATES[joyid][DIR_RIGHT] = True
+                actions.append('moveright')
         elif hat[0] == 0:
             if JOYSTATES[joyid][DIR_LEFT]:
                 JOYSTATES[joyid][DIR_LEFT] = False
@@ -145,9 +147,11 @@ def handleJoyEvent(e):
                 actions.append('stopright')
 
         if hat[1] == 1:
-            JOYSTATES[joyid][DIR_UP] = True
-            actions.append('moveup')
+            if not JOYSTATES[joyid][DIR_UP]:
+                JOYSTATES[joyid][DIR_UP] = True
+                actions.append('moveup')
         elif hat[1] == -1:
+            if not JOYSTATES[joyid][DIR_DOWN]:
             JOYSTATES[joyid][DIR_DOWN] = True
             actions.append('movedown')
         elif hat[1] == 0:
