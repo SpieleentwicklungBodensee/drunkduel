@@ -1,0 +1,27 @@
+{
+  "name": "Stone Gardens",
+  "mapdata": [
+    "   ooo     ooo  ",
+    "  o   o   o   o ",
+    " o  Y  o o  Y  o",
+    "o   Y   Y   Y   o",
+    "oo  Y       Y  oo",
+    "o   Y   ||  Y   o",
+    " o  Y   ||  Y  o ",
+    "  o     ||     o ",
+    "  o     ||     o ",
+    " o  Y   ||  Y  o ",
+    "o   Y   ||  Y   o",
+    "oo  Y       Y  oo",
+    "o   Y   Y   Y   o",
+    " o  Y  o o  Y  o",
+    "  o   o   o   o ",
+    "   ooo     ooo  "
+  ],
+  "metadata": {
+    "description": "Stone formation",
+    "author": "miathedev", 
+    "difficulty": "Normal",
+    "version": "1.0"
+  }
+}
