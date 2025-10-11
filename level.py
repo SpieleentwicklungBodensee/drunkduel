@@ -10,12 +10,38 @@ import ledwall
 print = ledwall.print
 
 
+def process_water_tiles(mapdata):
+    """
+    Process map data to convert || patterns to <> patterns for animated water.
+    Returns a new mapdata with water sides properly set.
+    """
+    if not mapdata:
+        return mapdata
+    
+    processed_mapdata = []
+    
+    for row in mapdata:
+        new_row = ""
+        i = 0
+        while i < len(row):
+            if i < len(row) - 1 and row[i] == '|' and row[i + 1] == '|':
+                # Found || pattern, replace with <>
+                new_row += '<>'
+                i += 2
+            else:
+                new_row += row[i]
+                i += 1
+        processed_mapdata.append(new_row)
+    
+    return processed_mapdata
+
 
 class Level:
     """Represents a game level with tile-based map data."""
 
     def __init__(self, mapdata, tiles):
-        self.mapdata = mapdata
+        # Process water tiles before storing
+        self.mapdata = process_water_tiles(mapdata)
         self.tiles = tiles
 
         self.width = len(self.mapdata[0])
