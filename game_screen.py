@@ -151,7 +151,10 @@ class GameScreen(Screen):
                     self.players[i].moveDown()
 
                 elif e.key == keys[controls.FIRE]:
-                    self.players[i].shoot(i)
+                    # Pass the other player's position to determine shooting direction
+                    other_player_index = 1 - i  # Get the other player (0->1, 1->0)
+                    other_player_x = self.players[other_player_index].xpos
+                    self.players[i].shoot(i, other_player_x)
 
         elif e.type == pygame.KEYUP:
             for i, keys in enumerate([controls.PLAYER_1_KEYS, controls.PLAYER_2_KEYS]):
@@ -175,7 +178,12 @@ class GameScreen(Screen):
                 self._spawn_initial_beer_powerups()
             self.initial_spawn_done = True
 
-        for player in self.players:
+        for i, player in enumerate(self.players):
+            # Update facing direction to look towards other player
+            other_player_index = 1 - i
+            other_player_x = self.players[other_player_index].xpos
+            player.update_facing_direction(other_player_x)
+            
             player.update()
 
         if game_state.message:  # do not handle rest of updates while message is shown
@@ -368,13 +376,6 @@ class GameScreen(Screen):
         text_width = len(level_text) * 8  # Assume 8-pixel wide font
         screen_width = game_state.output.get_width()
         ledwall.drawText(level_text, x=screen_width - text_width - 5, y=2, color=(200, 200, 200))
-        
-        # Draw hotkey help (smaller, fade in/out)
-        if game_state.tick % 300 < 150:  # Show for 2.5 seconds, hide for 2.5 seconds
-            help_text = "F3/F4: Prev/Next Level  F5: Level Select"
-            help_width = len(help_text) * 6  # Smaller font
-            ledwall.drawText(help_text, x=screen_width - help_width - 5, y=10, 
-                           color=(128, 128, 128), fontsize=1)
 
     def _spawn_initial_beer_powerups(self):
         """Spawnt 1-2 Bier-Powerups beim Spielstart."""
