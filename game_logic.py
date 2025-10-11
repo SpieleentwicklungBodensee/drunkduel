@@ -198,7 +198,6 @@ def _handle_player_hit(bullet, hit_player_index):
 
     other_player_index = 1 - hit_player_index
     other_player = game_state.gameScreen.players[other_player_index]
-    other_player.score += 1
 
     # Calculate damage from bullet
     damage = bullet.get_total_damage()
@@ -208,14 +207,19 @@ def _handle_player_hit(bullet, hit_player_index):
     game_state.gameScreen.removeObject(bullet)
     SFX_PLAYER_HIT.play()
 
-    # Reset hit player position
-    player = game_state.gameScreen.players[hit_player_index]
-    player.die()
+    # Only kill player if they actually died from the damage
+    if is_dead:
+        # Award point to the shooter only on death
+        other_player.score += 1
+        
+        # Reset hit player position
+        player = game_state.gameScreen.players[hit_player_index]
+        player.die()
 
-    # Switch controls
-    randomizeControls(bullet.shooter_index)
-    for player in game_state.gameScreen.players:
-        player.stopMoving()
+        # Switch controls only on death
+        randomizeControls(bullet.shooter_index)
+        for player in game_state.gameScreen.players:
+            player.stopMoving()
 
 
 def checkVictory():
