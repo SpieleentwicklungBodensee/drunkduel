@@ -124,6 +124,38 @@ def handleJoyEvent(e):
 
         return action
 
+    elif e.type == pygame.JOYHATMOTION:
+        h = e.hat
+        hat = JOYSTICKS[joyid].get_hat(h)
+
+        if hat[0] == -1:
+            JOYSTATES[joyid][DIR_LEFT] = True
+            action = 'moveleft'
+        elif hat[0] == 1:
+            JOYSTATES[joyid][DIR_RIGHT] = True
+            action = 'moveright'
+        else:
+            if JOYSTATES[joyid][DIR_LEFT]:
+                JOYSTATES[joyid][DIR_LEFT] = False
+                action = 'stopleft'
+            if JOYSTATES[joyid][DIR_RIGHT]:
+                JOYSTATES[joyid][DIR_RIGHT] = False
+                action = 'stopright'
+
+        if hat[1] == -1:
+            JOYSTATES[joyid][DIR_UP] = True
+            action = 'moveup'
+        elif hat[1] == 1:
+            JOYSTATES[joyid][DIR_DOWN] = True
+            action = 'movedown'
+        else:
+            if JOYSTATES[joyid][DIR_UP]:
+                JOYSTATES[joyid][DIR_UP] = False
+                action = 'stopup'
+            if JOYSTATES[joyid][DIR_DOWN]:
+                JOYSTATES[joyid][DIR_DOWN] = False
+                action = 'stopdown'
+
     elif e.type == pygame.JOYBUTTONDOWN:
         return 'fire'
 

@@ -176,7 +176,7 @@ class GameScreen(Screen):
                 elif e.key == keys[controls.FIRE]:
                     self.players[i].stopShooting()
 
-        elif e.type in (pygame.JOYAXISMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
+        elif e.type in (pygame.JOYAXISMOTION, pygame.JOYHATMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
             action = controls.handleJoyEvent(e)
             controls.performAction(action, self.players[e.instance_id], e.instance_id)
 
