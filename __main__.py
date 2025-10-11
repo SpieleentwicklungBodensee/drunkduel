@@ -667,14 +667,14 @@ class GameScreen(Screen):
 
         # Draw highscore display
         ledwall.drawText(f'P1: {self.players[0].score}', x=2, y=2, color=(255, 255, 0))
-        ledwall.drawText(f'P2: {self.players[1].score}', x=180, y=2, color=(255, 255, 0))
+        ledwall.drawText(f'P2: {self.players[1].score}', x=20, y=2, color=(255, 255, 0))
 
-        # Draw ammo display with color coding
+        # Draw ammo display with color coding - P1 left, P2 right
         ammo1_color = (255, 255, 255) if self.players[0].ammo > 0 else (255, 0, 0)
         ammo2_color = (255, 255, 255) if self.players[1].ammo > 0 else (255, 0, 0)
 
-        ledwall.drawText(f'AMMO: {self.players[0].ammo}', x=2, y=15, color=ammo1_color)
-        ledwall.drawText(f'AMMO: {self.players[1].ammo}', x=180, y=15, color=ammo2_color)
+        ledwall.drawText(f'AMMO: {self.players[0].ammo}', x=2, y=4, color=ammo1_color)
+        ledwall.drawText(f'AMMO: {self.players[1].ammo}', x=20, y=4, color=ammo2_color)
 
     def event(self, e):
         if e.type == pygame.KEYDOWN:
