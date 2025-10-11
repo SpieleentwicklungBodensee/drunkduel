@@ -117,39 +117,49 @@ def handleJoyEvent(e, players):
                     JOYSTATES[joyid][DIR_DOWN] = False
                     action = 'stopdown'
 
-        if action == 'moveleft':
-            actualDir = translateDirection((pygame.K_LEFT, pygame.K_a)[1-joyid], mapping)
-            _moveDir(player, joyid, actualDir)
-        elif action == 'moveright':
-            actualDir = translateDirection((pygame.K_RIGHT, pygame.K_d)[1-joyid], mapping)
-            _moveDir(player, joyid, actualDir)
-        elif action == 'moveup':
-            actualDir = translateDirection((pygame.K_UP, pygame.K_w)[1-joyid], mapping)
-            _moveDir(player, joyid, actualDir)
-        elif action == 'movedown':
-            actualDir = translateDirection((pygame.K_DOWN, pygame.K_s)[1-joyid], mapping)
-            _moveDir(player, joyid, actualDir)
-
-        if action == 'stopleft':
-            actualDir = translateDirection((pygame.K_LEFT, pygame.K_a)[1-joyid], mapping)
-            _stopDir(player, joyid, actualDir)
-        elif action == 'stopright':
-            actualDir = translateDirection((pygame.K_RIGHT, pygame.K_d)[1-joyid], mapping)
-            _stopDir(player, joyid, actualDir)
-        elif action == 'stopup':
-            actualDir = translateDirection((pygame.K_UP, pygame.K_w)[1-joyid], mapping)
-            _stopDir(player, joyid, actualDir)
-        elif action == 'stopdown':
-            actualDir = translateDirection((pygame.K_DOWN, pygame.K_s)[1-joyid], mapping)
-            _stopDir(player, joyid, actualDir)
+        return action
 
     elif e.type == pygame.JOYBUTTONDOWN:
-        actualDir = translateDirection((pygame.K_TAB, pygame.K_RCTRL)[joyid], mapping)
-        _moveDir(player, joyid, actualDir)
+        return 'fire'
 
     elif e.type == pygame.JOYBUTTONUP:
-        actualDir = translateDirection((pygame.K_TAB, pygame.K_RCTRL)[joyid], mapping)
-        _stopDir(player, joyid, actualDir)
+        return 'stopfire'
+
+def performAction(action, player, playerid):
+    mapping = (PLAYER_1_KEYS, PLAYER_2_KEYS)[playerid]
+
+    if action == 'moveleft':
+        actualDir = translateDirection((pygame.K_LEFT, pygame.K_a)[1-playerid], mapping)
+        _moveDir(player, playerid, actualDir)
+    elif action == 'moveright':
+        actualDir = translateDirection((pygame.K_RIGHT, pygame.K_d)[1-playerid], mapping)
+        _moveDir(player, playerid, actualDir)
+    elif action == 'moveup':
+        actualDir = translateDirection((pygame.K_UP, pygame.K_w)[1-playerid], mapping)
+        _moveDir(player, playerid, actualDir)
+    elif action == 'movedown':
+        actualDir = translateDirection((pygame.K_DOWN, pygame.K_s)[1-playerid], mapping)
+        _moveDir(player, playerid, actualDir)
+
+    if action == 'stopleft':
+        actualDir = translateDirection((pygame.K_LEFT, pygame.K_a)[1-playerid], mapping)
+        _stopDir(player, playerid, actualDir)
+    elif action == 'stopright':
+        actualDir = translateDirection((pygame.K_RIGHT, pygame.K_d)[1-playerid], mapping)
+        _stopDir(player, playerid, actualDir)
+    elif action == 'stopup':
+        actualDir = translateDirection((pygame.K_UP, pygame.K_w)[1-playerid], mapping)
+        _stopDir(player, playerid, actualDir)
+    elif action == 'stopdown':
+        actualDir = translateDirection((pygame.K_DOWN, pygame.K_s)[1-playerid], mapping)
+        _stopDir(player, playerid, actualDir)
+
+    if action == 'fire':
+        actualDir = translateDirection((pygame.K_TAB, pygame.K_RCTRL)[playerid], mapping)
+        _moveDir(player, playerid, actualDir)
+    elif action == 'stopfire':
+        actualDir = translateDirection((pygame.K_TAB, pygame.K_RCTRL)[playerid], mapping)
+        _stopDir(player, playerid, actualDir)
 
 def restore(playerid):
     global PLAYER_1_KEYS, PLAYER_2_KEYS

@@ -154,7 +154,8 @@ class GameScreen(Screen):
                     self.players[i].stopShooting()
 
         elif e.type in (pygame.JOYAXISMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
-            controls.handleJoyEvent(e, self.players)
+            action = controls.handleJoyEvent(e, self.players)
+            controls.performAction(action, self.players[e.instance_id], e.instance_id)
 
     def update(self):
 
