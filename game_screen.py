@@ -27,7 +27,7 @@ class GameScreen(Screen):
 
         # Load player sprites and constants
         player1_sprite, player2_sprite = load_player_sprites()
-        
+
         player1 = Player(2 * TILE_WIDTH, 2 * TILE_HEIGHT, player1_sprite)
         player2 = Player(13 * TILE_WIDTH, 13 * TILE_HEIGHT, player2_sprite)
 
@@ -42,6 +42,13 @@ class GameScreen(Screen):
 
         for obj in self.objects:
             obj.draw(game_state.output)
+
+        # draw message
+        if game_state.message:
+            game_state.message.draw(game_state.output)
+
+            if game_state.message.isDue():
+                game_state.message = None
 
         # Draw highscore display
         ledwall.drawText(f'P1: {self.players[0].score}', x=2, y=game_state.level.getHeight() * 2, color=(255, 255, 0))

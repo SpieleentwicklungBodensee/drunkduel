@@ -15,21 +15,31 @@ NAMES = {DIR_LEFT: 'links',
          FIRE: 'feuer',
          }
 
+PLAYER_2_KEYS_ORIGINAL = {DIR_LEFT: pygame.K_LEFT,
+                          DIR_RIGHT: pygame.K_RIGHT,
+                          DIR_UP: pygame.K_UP,
+                          DIR_DOWN: pygame.K_DOWN,
+                          FIRE: pygame.K_RCTRL,
+                          }
 
-PLAYER_2_KEYS = {DIR_LEFT: pygame.K_LEFT,
-                 DIR_RIGHT: pygame.K_RIGHT,
-                 DIR_UP: pygame.K_UP,
-                 DIR_DOWN: pygame.K_DOWN,
-                 FIRE: pygame.K_RCTRL,
-                 }
+PLAYER_1_KEYS_ORIGINAL = {DIR_LEFT: pygame.K_a,
+                          DIR_RIGHT: pygame.K_d,
+                          DIR_UP: pygame.K_w,
+                          DIR_DOWN: pygame.K_s,
+                          FIRE: pygame.K_TAB,
+                          }
 
-PLAYER_1_KEYS = {DIR_LEFT: pygame.K_a,
-                 DIR_RIGHT: pygame.K_d,
-                 DIR_UP: pygame.K_w,
-                 DIR_DOWN: pygame.K_s,
-                 FIRE: pygame.K_TAB,
-                 }
+PLAYER_1_KEYS = PLAYER_1_KEYS_ORIGINAL.copy()
+PLAYER_2_KEYS = PLAYER_2_KEYS_ORIGINAL.copy()
 
+
+def restore(playerid):
+    global PLAYER_1_KEYS, PLAYER_2_KEYS
+
+    if playerid == 0:
+        PLAYER_1_KEYS = PLAYER_1_KEYS_ORIGINAL.copy()
+    elif playerid == 1:
+        PLAYER_2_KEYS = PLAYER_2_KEYS_ORIGINAL.copy()
 
 def swapRandomly(keymapping):
     available = list(range(len(keymapping)))
@@ -51,4 +61,4 @@ def swapRandomly(keymapping):
     return origKey, replKey
 
 def getSentence(key1, key2):
-    return '%s ist %s' % (NAMES[key1], NAMES[key2])
+    return (NAMES[key1], 'ist', NAMES[key2])

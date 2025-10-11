@@ -1,10 +1,10 @@
 import pygame
-from game_state import tick
+import game_state
 
 
 class Sprite:
     """Basic sprite class for displaying images."""
-    
+
     def __init__(self, filenameOrSurface):
         if type(filenameOrSurface) is str:
             self.surface = pygame.image.load(filenameOrSurface)
@@ -34,7 +34,7 @@ class AnimSprite:
 
     def draw(self, output, x, y):
         if self.running:
-            phase = ((tick - self.startTime) // self.speed) % len(self.animations[0])
+            phase = ((game_state.tick - self.startTime) // self.speed) % len(self.animations[0])
             self.lastPhase = phase
         else:
             phase = self.lastPhase
@@ -48,7 +48,7 @@ class AnimSprite:
     def start(self, reset=False):
         self.running = True
         if reset:
-            self.startTime = tick
+            self.startTime = game_state.tick
 
     def stop(self, reset=True):
         self.running = False
