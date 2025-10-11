@@ -13,13 +13,23 @@ import sys
 pygame.mixer.init()
 
 # Predefined playlist (name -> file path)
+
+
+SFX_rechts_d = pygame.mixer.Sound("sfx/rechts_d.wav")
+SFX_links_d = pygame.mixer.Sound("sfx/links_d.wav")
+SFX_oben_d = pygame.mixer.Sound("sfx/oben_d.wav")
+SFX_unten_d = pygame.mixer.Sound("sfx/unten_d.wav")
+SFX_ist_d = pygame.mixer.Sound("sfx/ist_d.wav")
+
 playlist = {
-    "rechts": "rechts.wav",
-    "links": "links.wav",
-    "oben": "oben.wav",
-    "unten": "unten.wav",
-    "ist": "ist.wav"
+    "rechts": SFX_rechts_d,
+    "links": SFX_links_d,
+    "oben": SFX_oben_d,
+    "unten": SFX_unten_d,
+    "ist": SFX_ist_d
 }
+def play(name):
+    play_tracks([playlist[name]])
 
 
 def play_tracks(tracks):
@@ -27,19 +37,16 @@ def play_tracks(tracks):
     Play a list of audio files in order.
     :param tracks: list of file paths
     """
-    pygame.mixer.init()
+    #pygame.mixer.init()
 
-    for file in tracks:
-        print(f"▶️ Playing: {file}")
-        pygame.mixer.music.load(file)
-        pygame.mixer.music.play()
+    for track in tracks:
+        print(f"▶️ Playing: {track}")
+        #track.play()
+        channel = track.play()
+        while channel.get_busy():
+            time.sleep(0.05)
 
-        #time.sleep(0.1)  # ensure the first sound isn't cut off
-
-        while pygame.mixer.music.get_busy():
-            time.sleep(0.1)
-
-    pygame.mixer.quit()
+    #pygame.mixer.quit()
     print("✅ Done.")
 
 
