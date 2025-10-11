@@ -265,25 +265,108 @@ class Player(Object):
         self.showGun = False
 
     def update(self):
-        self.xpos += self.xdir * self.speed
-        self.ypos += self.ydir * self.speed
+        new_xpos = self.xpos# + self.xdir * self.speed
+        new_ypos = self.ypos# + self.ydir * self.speed
+
+        new_xdir = self.xdir
+        new_ydir = self.ydir
+
+        tempspeed = self.speed
 
         # collision with level border:
-        if self.xpos < 0:
-            self.xpos = 0
-            self.xdir = 0
+        if new_xpos < 0:
+            new_xpos = 0
+            new_xdir = 0
 
-        if self.xpos > (level.getWidth() -1) * TILE_WIDTH:
-            self.xpos = (level.getWidth() -1) * TILE_WIDTH
-            self.xdir = 0
+        if new_xpos > (level.getWidth() -1) * TILE_WIDTH:
+            new_xpos = (level.getWidth() -1) * TILE_WIDTH
+            new_xdir = 0
 
-        if self.ypos < 0:
-            self.ypos = 0
-            self.ydir = 0
+        if new_ypos < 0:
+            new_ypos = 0
+            new_ydir = 0
 
-        if self.ypos > (level.getHeight() -1) * TILE_HEIGHT:
-            self.ypos = (level.getHeight() -1) * TILE_HEIGHT
-            self.ydir = 0
+        if new_ypos > (level.getHeight() -1) * TILE_HEIGHT:
+            new_ypos = (level.getHeight() -1) * TILE_HEIGHT
+            new_ydir = 0
+
+        # collision with tiles:
+        x1 = new_xpos // TILE_WIDTH
+        y1 = new_ypos // TILE_HEIGHT
+        x2 = (new_xpos + TILE_WIDTH -1) // TILE_WIDTH
+        y2 = (new_ypos + TILE_HEIGHT -1) // TILE_HEIGHT
+
+        # tiles for coll checK:
+        #
+        # t1 | t2
+        # ---+---
+        # t3 | t4
+
+        t1 = level.getTile(x1, y1)
+        t2 = level.getTile(x2, y1)
+        t3 = level.getTile(x1, y2)
+        t4 = level.getTile(x2, y2)
+
+        t1blocked = t1 != ' '
+        t2blocked = t2 != ' '
+        t3blocked = t3 != ' '
+        t4blocked = t4 != ' '
+
+        if new_xdir < 0:   # going left
+            if t1blocked and t3blocked:
+                new_xdir = 0
+            elif t1blocked and not t3blocked:
+                new_xdir = 0
+                new_ydir = 1
+                tempspeed = 1
+            elif not t1blocked and t3blocked:
+                new_xdir = 0
+                new_ydir = -1
+                tempspeed = 1
+
+        elif new_xdir > 0: # going right
+            if t2blocked and t4blocked:
+                new_xdir = 0
+            elif t2blocked and not t4blocked:
+                new_xdir = 0
+                new_ydir = 1
+                tempspeed = 1
+            elif not t2blocked and t4blocked:
+                new_xdir = 0
+                new_ydir = -1
+                tempspeed = 1
+
+        elif new_ydir < 0: # going up
+            if t1blocked and t2blocked:
+                new_ydir = 0
+            elif t1blocked and not t2blocked:
+                new_ydir = 0
+                new_xdir = 1
+                tempspeed = 1
+            elif not t1blocked and t2blocked:
+                new_ydir = 0
+                new_xdir = -1
+                tempspeed = 1
+
+        elif new_ydir > 0: # going down
+            if t3blocked and t4blocked:
+                new_ydir = 0
+            elif t3blocked and not t4blocked:
+                new_ydir = 0
+                new_xdir = 1
+                tempspeed = 1
+            elif not t3blocked and t4blocked:
+                new_ydir = 0
+                new_xdir = -1
+                tempspeed = 1
+
+        # calculate new position
+        new_xpos += new_xdir * tempspeed
+        new_ypos += new_ydir * tempspeed
+
+        # apply changed position
+        self.xpos = new_xpos
+        self.ypos = new_ypos
 
         # show animation
         spriteAnim = self.facedir + (4 if self.showGun else 0)
@@ -490,7 +573,7 @@ class Level:
         self.mapdata[y] = self.mapdata[y][:x] + tile + self.mapdata[y][x+1:]
 
     def getTile(self, x, y):
-        return self.mapdata[y][x]
+        return self.mapdata[int(y)][int(x)]
 
     def getWidth(self):
         return self.width
