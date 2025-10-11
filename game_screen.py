@@ -111,6 +111,9 @@ class GameScreen(Screen):
         ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=health_y_pos, color=health1_color)
         ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=health_y_pos, color=health2_color)
         
+        ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=game_state.level.getHeight() * 2 + 3, color=health1_color)
+        ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=game_state.level.getHeight() * 2 + 3, color=health2_color)
+
         # Draw vomiting status
         if self.players[0].is_vomiting:
             ledwall.drawText('KOTZT', x=2, y=game_state.level.getHeight() * 2 + 4, color=(0, 255, 0))
@@ -118,6 +121,9 @@ class GameScreen(Screen):
             ledwall.drawText('KOTZT', x=20, y=game_state.level.getHeight() * 2 + 4, color=(0, 255, 0))
 
     def event(self, e):
+        if game_state.message:  # do not handle input while message is shown
+            return
+
         if e.type == pygame.KEYDOWN:
             for i, keys in enumerate([controls.PLAYER_1_KEYS, controls.PLAYER_2_KEYS]):
                 if e.key == keys[controls.DIR_LEFT]:
@@ -147,7 +153,8 @@ class GameScreen(Screen):
                     self.players[i].stopShooting()
 
     def update(self):
-        # Spawn initial beer powerups on first update (nur wenn Alkohol aktiviert)
+
+        # Spawn initial beer powerups on first update
         if not self.initial_spawn_done:
             if config.ALCOHOL_ENABLED:
                 self._spawn_initial_beer_powerups()
@@ -155,6 +162,9 @@ class GameScreen(Screen):
 
         for player in self.players:
             player.update()
+
+        if game_state.message:  # do not handle rest of updates while message is shown
+            return
 
         for obj in self.objects:
             obj.update()
