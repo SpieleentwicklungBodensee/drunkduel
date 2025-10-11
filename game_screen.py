@@ -107,18 +107,19 @@ class GameScreen(Screen):
         health2_color = get_health_color(self.players[1].health)
 
         # Health-Position anpassen je nachdem ob Alkohol-HUD vorhanden ist
-        health_y_pos = game_state.level.getHeight() * 2 + (3 if config.ALCOHOL_ENABLED else 2)
-        ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=health_y_pos, color=health1_color)
-        ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=health_y_pos, color=health2_color)
-        
-        ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=game_state.level.getHeight() * 2 + 3, color=health1_color)
-        ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=game_state.level.getHeight() * 2 + 3, color=health2_color)
+        if config.ALCOHOL_ENABLED:
+            health_y_pos = game_state.level.getHeight() * 2 + (3 if config.ALCOHOL_ENABLED else 2)
+            ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=health_y_pos, color=health1_color)
+            ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=health_y_pos, color=health2_color)
+            
+            ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=game_state.level.getHeight() * 2 + 3, color=health1_color)
+            ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=game_state.level.getHeight() * 2 + 3, color=health2_color)
 
-        # Draw vomiting status
-        if self.players[0].is_vomiting:
-            ledwall.drawText('KOTZT', x=2, y=game_state.level.getHeight() * 2 + 4, color=(0, 255, 0))
-        if self.players[1].is_vomiting:
-            ledwall.drawText('KOTZT', x=20, y=game_state.level.getHeight() * 2 + 4, color=(0, 255, 0))
+            # Draw vomiting status
+            if self.players[0].is_vomiting:
+                ledwall.drawText('KOTZT', x=2, y=game_state.level.getHeight() * 2 + 4, color=(0, 255, 0))
+            if self.players[1].is_vomiting:
+                ledwall.drawText('KOTZT', x=20, y=game_state.level.getHeight() * 2 + 4, color=(0, 255, 0))
 
     def event(self, e):
         if game_state.message:  # do not handle input while message is shown

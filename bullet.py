@@ -7,6 +7,7 @@ import random
 
 import ledwall
 import game_state
+import config
 from object import Object
 from sound_manager import SFX_RICOCHET, SFX_EXPLOSION
 from game_state import TILE_WIDTH, TILE_HEIGHT
@@ -27,7 +28,11 @@ class Bullet(Object):
         
     def get_total_damage(self):
         """Berechnet den Gesamtschaden der Kugel."""
-        return int(self.damage * self.drunk_damage_modifier)
+        if config.ALCOHOL_ENABLED:
+            return int(self.damage * self.drunk_damage_modifier)
+        else:
+            #Kill player instantly if alcohol is disabled
+            return 1000
 
     def update(self):
         """Update bullet position and check for collisions."""
