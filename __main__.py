@@ -277,8 +277,8 @@ class Player(Object):
         self.showGun = False
 
     def update(self):
-        new_xpos = self.xpos# + self.xdir * self.speed
-        new_ypos = self.ypos# + self.ydir * self.speed
+        new_xpos = self.xpos
+        new_ypos = self.ypos
 
         new_xdir = self.xdir
         new_ydir = self.ydir
