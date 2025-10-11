@@ -32,6 +32,13 @@ class GameOverScreen(Screen):
                 game_state.gameScreen.players[1].ypos = 13 * TILE_HEIGHT
                 game_state.gameScreen.objects.clear()  # Remove all bullets and weapon drops
                 game_state.gameScreen.weapon_drop_timer = 0  # Reset weapon drop timer
+                game_state.gameScreen.destroyed_cacti.clear()  # Reset cactus respawn timers
+                
+                # Reset level to original state
+                from config import get_level_map_data
+                original_mapdata = get_level_map_data()
+                game_state.level.mapdata = original_mapdata[:]  # Create a copy
+                
                 if hasattr(game_state.gameScreen, 'winner'):
                     delattr(game_state.gameScreen, 'winner')
             switchState('game')

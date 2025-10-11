@@ -57,6 +57,9 @@ class Bullet(Object):
         # Remove the cactus from the map
         game_state.level.setTile(tile_x, tile_y, ' ')
 
+        # Schedule a new cactus to respawn after 5-10 seconds
+        game_state.gameScreen.schedule_cactus_respawn()
+
         # Play explosion sound
         SFX_EXPLOSION.play()
 

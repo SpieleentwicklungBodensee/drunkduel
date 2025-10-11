@@ -24,6 +24,9 @@ class GameScreen(Screen):
         self.objects = []
         self.weapon_drop_timer = 0  # Timer for spawning weapon drops
         self.winner = None  # Track game winner
+        
+        # Cactus respawn system
+        self.destroyed_cacti = []  # List of (destruction_time, respawn_time) tuples
 
         # Load player sprites and constants
         player1_sprite, player2_sprite = load_player_sprites()
@@ -120,8 +123,62 @@ class GameScreen(Screen):
                         spawnWeaponDrop(munition_sprite)
             self.weapon_drop_timer = 0
 
+        # Handle cactus respawning
+        self._handle_cactus_respawn()
+
     def addObject(self, obj):
         self.objects.append(obj)
 
     def removeObject(self, obj):
         self.objects.remove(obj)
+
+    def schedule_cactus_respawn(self):
+        """Schedule a new cactus to respawn after 5-10 seconds."""
+        current_time = game_state.tick
+        # Random respawn time between 5-10 seconds (300-600 frames at 60 FPS)
+        respawn_delay = random.randint(300, 600)
+        respawn_time = current_time + respawn_delay
+        self.destroyed_cacti.append(respawn_time)
+
+    def _handle_cactus_respawn(self):
+        """Check if any cacti are ready to respawn and spawn them."""
+        current_time = game_state.tick
+        
+        # Check all scheduled respawns
+        for respawn_time in self.destroyed_cacti[:]:  # Use slice to avoid modification during iteration
+            if current_time >= respawn_time:
+                # Time to respawn a cactus
+                self._spawn_new_cactus()
+                self.destroyed_cacti.remove(respawn_time)
+
+    def _spawn_new_cactus(self):
+        """Spawn a new cactus at a random empty location."""
+        attempts = 0
+        while attempts < 100:  # Prevent infinite loop
+            x = random.randint(0, game_state.level.getWidth() - 1)
+            y = random.randint(0, game_state.level.getHeight() - 1)
+
+            tile = game_state.level.getTile(x, y)
+            
+            # Check if the location is empty and suitable for a cactus
+            if tile == ' ':
+                # Also check if there are no players or objects too close
+                tile_center_x = x * TILE_WIDTH + TILE_WIDTH // 2
+                tile_center_y = y * TILE_HEIGHT + TILE_HEIGHT // 2
+                
+                # Ensure cactus doesn't spawn too close to players
+                too_close = False
+                for player in self.players:
+                    player_center_x = player.xpos + TILE_WIDTH // 2
+                    player_center_y = player.ypos + TILE_HEIGHT // 2
+                    distance_sq = (tile_center_x - player_center_x) ** 2 + (tile_center_y - player_center_y) ** 2
+                    if distance_sq < (TILE_WIDTH * 3) ** 2:  # At least 3 tiles away
+                        too_close = True
+                        break
+                
+                if not too_close:
+                    # Spawn the cactus
+                    game_state.level.setTile(x, y, 'Y')
+                    break
+            
+            attempts += 1
