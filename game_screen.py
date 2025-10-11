@@ -61,8 +61,8 @@ class GameScreen(Screen):
                 game_state.message = None
 
         # Draw highscore display
-        ledwall.drawText(f'P1: {self.players[0].score}', x=2, y=game_state.level.getHeight() * 2, color=(255, 255, 0))
-        ledwall.drawText(f'P2: {self.players[1].score}', x=20, y=game_state.level.getHeight() * 2, color=(255, 255, 0))
+        ledwall.drawText(f'HITS: {self.players[0].score}', x=2, y=game_state.level.getHeight() * 2, color=(255, 255, 0))
+        ledwall.drawText(f'HITS: {self.players[1].score}', x=20, y=game_state.level.getHeight() * 2, color=(255, 255, 0))
 
         # Draw ammo display with color coding - P1 left, P2 right
         ammo1_color = (255, 255, 255) if self.players[0].ammo > 0 else (255, 0, 0)
