@@ -1,5 +1,6 @@
 import pygame
 import ledwall
+import config
 from base import Screen
 import controls
 import game_state
@@ -29,12 +30,12 @@ class GameOverScreen(Screen):
             if game_state.gameScreen:
                 game_state.gameScreen.players[0].score = 0
                 game_state.gameScreen.players[1].score = 0
-                game_state.gameScreen.players[0].ammo = 4
-                game_state.gameScreen.players[1].ammo = 4
-                game_state.gameScreen.players[0].xpos = 2 * TILE_WIDTH
-                game_state.gameScreen.players[0].ypos = 2 * TILE_HEIGHT
-                game_state.gameScreen.players[1].xpos = 13 * TILE_WIDTH
-                game_state.gameScreen.players[1].ypos = 13 * TILE_HEIGHT
+                game_state.gameScreen.players[0].ammo = config.INITIAL_AMMO
+                game_state.gameScreen.players[1].ammo = config.INITIAL_AMMO
+                game_state.gameScreen.players[0].xpos = config.PLAYER_1_STARTX * TILE_WIDTH
+                game_state.gameScreen.players[0].ypos = config.PLAYER_1_STARTY * TILE_HEIGHT
+                game_state.gameScreen.players[1].xpos = config.PLAYER_2_STARTX * TILE_WIDTH
+                game_state.gameScreen.players[1].ypos = config.PLAYER_2_STARTY * TILE_HEIGHT
                 game_state.gameScreen.objects.clear()  # Remove all bullets and weapon drops
                 game_state.gameScreen.weapon_drop_timer = 0  # Reset weapon drop timer
                 game_state.gameScreen.destroyed_cacti.clear()  # Reset cactus respawn timers

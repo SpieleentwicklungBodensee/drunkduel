@@ -22,6 +22,7 @@ message = None
 TILE_WIDTH = 16
 TILE_HEIGHT = 16
 
+
 def switchState(state):
     """Switch between game states."""
     global currentScreen, gameScreen, initScreen, titleScreen, gameOverScreen

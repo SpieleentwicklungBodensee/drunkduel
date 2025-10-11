@@ -9,6 +9,7 @@ import random
 
 import ledwall
 import controls
+import config
 import game_state
 from base import Screen
 from game_state import TILE_WIDTH, TILE_HEIGHT
@@ -31,8 +32,8 @@ class GameScreen(Screen):
         # Load player sprites and constants
         player1_sprite, player2_sprite = load_player_sprites()
 
-        player1 = Player(2 * TILE_WIDTH, 2 * TILE_HEIGHT, player1_sprite)
-        player2 = Player(13 * TILE_WIDTH, 13 * TILE_HEIGHT, player2_sprite)
+        player1 = Player(config.PLAYER_1_STARTX * TILE_WIDTH, config.PLAYER_1_STARTY * TILE_HEIGHT, player1_sprite)
+        player2 = Player(config.PLAYER_2_STARTX * TILE_WIDTH, config.PLAYER_2_STARTY * TILE_HEIGHT, player2_sprite)
 
         self.players.append(player1)
         self.players.append(player2)

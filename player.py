@@ -4,6 +4,7 @@ Player class and related functionality for Drunk Duel.
 Handles player movement, collision detection, and interactions.
 """
 import controls
+import config
 from object import Object
 from sprite import createAnimatedSprite
 from game_logic import spawnBullet
@@ -34,7 +35,7 @@ class Player(Object):
         self.facedir = controls.DIR_DOWN
 
         self.score = 0
-        self.ammo = 4
+        self.ammo = config.INITIAL_AMMO
         self.showGun = False
 
     def moveLeft(self):

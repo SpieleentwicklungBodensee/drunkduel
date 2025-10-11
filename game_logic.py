@@ -6,7 +6,7 @@ Contains collision detection, weapon spawning, and other game mechanics.
 import random
 
 import controls
-import ledwall
+import config
 from bullet import Bullet
 from message import Message
 from weapon_drop import WeaponDrop
@@ -87,7 +87,7 @@ def _handle_player_hit(bullet, hit_player_index):
 
     # Give shooter some ammo back as reward
     game_state.gameScreen.players[other_player_index].ammo = min(
-        game_state.gameScreen.players[other_player_index].ammo + 2, 6)
+        game_state.gameScreen.players[other_player_index].ammo + config.REWARD_AMMO, 6)
 
     # Remove bullet and play sound effect
     game_state.gameScreen.removeObject(bullet)
@@ -103,7 +103,7 @@ def _handle_player_hit(bullet, hit_player_index):
         player.ypos = 13 * TILE_HEIGHT
 
     # Reset ammo for hit player
-    player.ammo = 4
+    player.ammo = config.INITIAL_AMMO
 
     # Check for victory condition (first to 5 points wins)
     if game_state.gameScreen.players[other_player_index].score >= 5:
