@@ -110,8 +110,8 @@ def checkCollisions():
 
                     # Remove bullet and play sound effect
                     removeBullet(bullet)
-                    SFX_RICOCHET.play()
-
+                    SFX_PLAYER_HIT.play()
+                    
                     # Reset hit player position
                     if i == 0:  # Player 1 hit
                         player.xpos = 2 * TILE_WIDTH
@@ -301,8 +301,8 @@ class Bullet(Object):
                 level.setTile(tile_x, tile_y, ' ')
 
                 # Play explosion sound
-                SFX_EXPLOSION.play()
-
+                SFX_RICOCHET.play()
+                
                 # Remove the bullet
                 removeBullet(self)
                 return
@@ -698,7 +698,7 @@ print('loading sfx...')
 SFX_GUNSHOT = pygame.mixer.Sound("sfx/Gunshot.wav")
 SFX_FOOTSTEP = pygame.mixer.Sound("sfx/Footstep.wav")
 SFX_RICOCHET = pygame.mixer.Sound("sfx/Ricochet.wav")
-SFX_EXPLOSION = pygame.mixer.Sound("sfx/Wilhelm_Scream.wav")
+SFX_PLAYER_HIT = pygame.mixer.Sound("sfx/Wilhelm_Scream.wav")
 
 print('\n\n')
 
