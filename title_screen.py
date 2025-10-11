@@ -122,7 +122,7 @@ class TitleScreen(Screen):
                     self.selected_option = max(0, self.selected_option - 1)
                 elif e.key == pygame.K_DOWN or e.key == pygame.K_s:
                     self.selected_option = min(2, self.selected_option + 1)
-                elif e.key == pygame.K_RETURN or e.key == pygame.K_SPACE:
+                elif e.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_RCTRL):
                     self._handle_selection()
             elif e.type == pygame.JOYBUTTONDOWN:
                 # Joystick Button wechselt zwischen Optionen oder startet
