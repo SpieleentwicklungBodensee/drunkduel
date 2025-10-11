@@ -75,18 +75,13 @@ class TitleScreen(Screen):
                     self._handle_selection()
                 else:
                     self.selected_option = (self.selected_option + 1) % 3  # Cycle through options
-            elif e.type == pygame.JOYAXISMOTION:
-                action = controls.handleJoyEvent(e)
-                if action == 'moveup':
-                    self.selected_option = max(0, self.selected_option - 1)
-                elif action == 'movedown':
-                    self.selected_option = min(2, self.selected_option + 1)
-            elif e.type == pygame.JOYHATMOTION:
-                # D-Pad Navigation
-                if e.value[1] == 1:  # Hoch
-                    self.selected_option = max(0, self.selected_option - 1)
-                elif e.value[1] == -1:  # Runter
-                    self.selected_option = min(2, self.selected_option + 1)
+            elif e.type in (pygame.JOYAXISMOTION, pygame.JOYHATMOTION):
+                actions = controls.handleJoyEvent(e)
+                for action in actions:
+                    if action == 'moveup':
+                        self.selected_option = max(0, self.selected_option - 1)
+                    elif action == 'movedown':
+                        self.selected_option = min(2, self.selected_option + 1)
 
     def _handle_selection(self):
         """Behandelt die Auswahl im Menü."""

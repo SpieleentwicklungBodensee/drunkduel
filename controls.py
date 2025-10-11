@@ -12,7 +12,7 @@ DIR_UP = 1
 DIR_DOWN = 0
 FIRE = 5
 
-JOY_DEADZONE = 0.3
+JOY_DEADZONE = 0.6
 
 
 NAMES = {DIR_LEFT: 'links',
@@ -90,39 +90,37 @@ def _stopDir(player, playerid, direction):
 
 def handleJoyEvent(e):
     joyid = e.instance_id
-    action = ''
+    actions = []
 
     if e.type == pygame.JOYAXISMOTION:
         if e.axis == 0: # x axis
             if e.value < -JOY_DEADZONE:
                 JOYSTATES[joyid][DIR_LEFT] = True
-                action = 'moveleft'
+                actions.append('moveleft')
             elif e.value > JOY_DEADZONE:
                 JOYSTATES[joyid][DIR_RIGHT] = True
-                action = 'moveright'
+                action.append('moveright')
             else:
                 if JOYSTATES[joyid][DIR_LEFT]:
                     JOYSTATES[joyid][DIR_LEFT] = False
-                    action = 'stopleft'
+                    action.append('stopleft')
                 if JOYSTATES[joyid][DIR_RIGHT]:
                     JOYSTATES[joyid][DIR_RIGHT] = False
-                    action = 'stopright'
+                    action.append('stopright')
         elif e.axis == 1: # y axis
             if e.value < -JOY_DEADZONE:
                 JOYSTATES[joyid][DIR_UP] = True
-                action = 'moveup'
+                action.append('moveup')
             elif e.value > JOY_DEADZONE:
                 JOYSTATES[joyid][DIR_DOWN] = True
-                action = 'movedown'
+                action.append('movedown')
             else:
                 if JOYSTATES[joyid][DIR_UP]:
                     JOYSTATES[joyid][DIR_UP] = False
-                    action = 'stopup'
+                    action.append('stopup')
                 if JOYSTATES[joyid][DIR_DOWN]:
                     JOYSTATES[joyid][DIR_DOWN] = False
-                    action = 'stopdown'
-
-        return action
+                    action.append('stopdown')
 
     elif e.type == pygame.JOYHATMOTION:
         h = e.hat
@@ -130,37 +128,39 @@ def handleJoyEvent(e):
 
         if hat[0] == -1:
             JOYSTATES[joyid][DIR_LEFT] = True
-            action = 'moveleft'
+            action.append('moveleft')
         elif hat[0] == 1:
             JOYSTATES[joyid][DIR_RIGHT] = True
-            action = 'moveright'
-        else:
+            action.append('moveright')
+        elif hat[0] == 0:
             if JOYSTATES[joyid][DIR_LEFT]:
                 JOYSTATES[joyid][DIR_LEFT] = False
-                action = 'stopleft'
+                action.append('stopleft')
             if JOYSTATES[joyid][DIR_RIGHT]:
                 JOYSTATES[joyid][DIR_RIGHT] = False
-                action = 'stopright'
+                action.append('stopright')
 
-        if hat[1] == -1:
+        if hat[1] == 1:
             JOYSTATES[joyid][DIR_UP] = True
-            action = 'moveup'
-        elif hat[1] == 1:
+            action.append('moveup')
+        elif hat[1] == -1:
             JOYSTATES[joyid][DIR_DOWN] = True
-            action = 'movedown'
-        else:
+            action.append('movedown')
+        elif hat[1] == 0:
             if JOYSTATES[joyid][DIR_UP]:
                 JOYSTATES[joyid][DIR_UP] = False
-                action = 'stopup'
+                action.append('stopup')
             if JOYSTATES[joyid][DIR_DOWN]:
                 JOYSTATES[joyid][DIR_DOWN] = False
-                action = 'stopdown'
+                action.append('stopdown')
 
     elif e.type == pygame.JOYBUTTONDOWN:
-        return 'fire'
+        actions.append('fire')
 
     elif e.type == pygame.JOYBUTTONUP:
-        return 'stopfire'
+        actions.append('stopfire')
+
+    return actions
 
 def performAction(action, player, playerid):
     mapping = (PLAYER_1_KEYS, PLAYER_2_KEYS)[playerid]
