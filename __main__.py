@@ -233,6 +233,7 @@ class Player(Object):
         self.xdir = 0
         self.ydir = 1
         self.facedir = DIR_DOWN
+        SFX_FOOTSTEP.play(loops=0) 
 
     def stopLeft(self):
         if self.xdir < 0:
