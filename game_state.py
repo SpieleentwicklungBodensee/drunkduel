@@ -3,6 +3,9 @@ Game state management module.
 Contains global game state variables and state switching logic.
 """
 
+import controls
+import config
+
 # Override print function
 import ledwall
 print = ledwall.print
@@ -58,6 +61,7 @@ def switchState(state):
         if gameScreen is None:
             gameScreen = GameScreen()
         currentScreen = gameScreen
+        reset_game_state()
     elif state == 'gameover':
         if gameOverScreen is None:
             gameOverScreen = GameOverScreen()
@@ -80,3 +84,34 @@ def initialize_game_state():
     """Initialize the global game state."""
     global tick
     tick = 0
+
+def reset_game_state():
+    if gameScreen:
+        gameScreen.players[0].score = 0
+        gameScreen.players[1].score = 0
+        gameScreen.players[0].ammo = config.INITIAL_AMMO
+        gameScreen.players[1].ammo = config.INITIAL_AMMO
+        gameScreen.players[0].xpos = config.PLAYER_1_STARTX * TILE_WIDTH
+        gameScreen.players[0].ypos = config.PLAYER_1_STARTY * TILE_HEIGHT
+        gameScreen.players[1].xpos = config.PLAYER_2_STARTX * TILE_WIDTH
+        gameScreen.players[1].ypos = config.PLAYER_2_STARTY * TILE_HEIGHT
+
+        gameScreen.players[0].sprite.speed = 6
+        gameScreen.players[1].sprite.speed = 6
+
+        gameScreen.objects.clear()  # Remove all bullets and weapon drops
+        gameScreen.weapon_drop_timer = 0  # Reset weapon drop timer
+        gameScreen.destroyed_cacti.clear()  # Reset cactus respawn timers
+
+        message = None
+
+        controls.restore(0)
+        controls.restore(1)
+
+        # Reset level to original state
+        from config import get_level_map_data
+        original_mapdata = get_level_map_data()
+        level.mapdata = original_mapdata[:]  # Create a copy
+
+        if hasattr(gameScreen, 'winner'):
+            delattr(gameScreen, 'winner')
