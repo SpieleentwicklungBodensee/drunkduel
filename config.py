@@ -12,6 +12,15 @@ import ledwall
 print = ledwall.print
 
 
+PLAYER_1_STARTX = 2
+PLAYER_1_STARTY = 2
+PLAYER_2_STARTX = 13
+PLAYER_2_STARTY = 13
+
+INITIAL_AMMO = 4
+REWARD_AMMO = 0
+
+
 def parse_arguments():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(prog='Drunk Duel')
