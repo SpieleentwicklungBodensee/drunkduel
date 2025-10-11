@@ -261,5 +261,6 @@ def randomizeControls(playerid):
 
     y = 8
 
-    message = Message(x, y, [message1, *message2], color)
+    #message = Message(x, y, ['', message1, '', *message2], color)
+    message = Message(x, y, ['', 'spieler', ['eins', 'zwei'][playerid], '', *message2], color)
     game_state.message = message
