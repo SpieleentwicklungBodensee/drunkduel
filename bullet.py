@@ -50,7 +50,7 @@ class Bullet(Object):
             if tile == 'Y':  # Hit a cactus - explode it
                 self._explode_cactus(tile_x, tile_y)
                 return
-            elif tile in ['#', 'o']:  # Hit fence or stone - just bounce/disappear
+            elif tile in ['#', 'o', 'F']:  # Hit fence, stone, or invisible wall - just bounce/disappear
                 self._hit_solid_object()
                 return
 
