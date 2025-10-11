@@ -4,6 +4,7 @@ Contains the Level class and level-related functionality.
 """
 
 from game_state import TILE_WIDTH, TILE_HEIGHT
+from fence_logic import get_fence_tile_for_position
 
 # Override print function
 import ledwall
@@ -68,5 +69,12 @@ class Level:
         for y in range(self.height):
             for x in range(self.width):
                 tile = self.getTile(x, y)
-                if tile in self.tiles and self.tiles[tile] is not None:
+                
+                # Handle fence tiles with smart connection logic
+                if tile == '#':
+                    fence_sprite = get_fence_tile_for_position(self.mapdata, x, y)
+                    if fence_sprite:
+                        fence_sprite.draw(output, x * TILE_WIDTH, y * TILE_HEIGHT)
+                # Handle other tiles normally
+                elif tile in self.tiles and self.tiles[tile] is not None:
                     self.tiles[tile].draw(output, x * TILE_WIDTH, y * TILE_HEIGHT)
