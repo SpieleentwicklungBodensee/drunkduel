@@ -95,11 +95,13 @@ def handleJoyEvent(e):
     if e.type == pygame.JOYAXISMOTION:
         if e.axis == 0: # x axis
             if e.value < -JOY_DEADZONE:
-                JOYSTATES[joyid][DIR_LEFT] = True
-                actions.append('moveleft')
+                if not JOYSTATES[joyid][DIR_LEFT]:
+                    JOYSTATES[joyid][DIR_LEFT] = True
+                    actions.append('moveleft')
             elif e.value > JOY_DEADZONE:
-                JOYSTATES[joyid][DIR_RIGHT] = True
-                actions.append('moveright')
+                if not JOYSTATES[joyid][DIR_RIGHT]:
+                    JOYSTATES[joyid][DIR_RIGHT] = True
+                    actions.append('moveright')
             else:
                 if JOYSTATES[joyid][DIR_LEFT]:
                     JOYSTATES[joyid][DIR_LEFT] = False
@@ -109,11 +111,13 @@ def handleJoyEvent(e):
                     actions.append('stopright')
         elif e.axis == 1: # y axis
             if e.value < -JOY_DEADZONE:
-                JOYSTATES[joyid][DIR_UP] = True
-                actions.append('moveup')
+                if not JOYSTATES[joyid][DIR_LEFT]:
+                    JOYSTATES[joyid][DIR_UP] = True
+                    actions.append('moveup')
             elif e.value > JOY_DEADZONE:
-                JOYSTATES[joyid][DIR_DOWN] = True
-                actions.append('movedown')
+                if JOYSTATES[joyid][DIR_RIGHT]:
+                    JOYSTATES[joyid][DIR_DOWN] = True
+                    actions.append('movedown')
             else:
                 if JOYSTATES[joyid][DIR_UP]:
                     JOYSTATES[joyid][DIR_UP] = False
