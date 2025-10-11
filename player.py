@@ -9,7 +9,7 @@ import math
 from object import Object
 from sprite import createAnimatedSprite
 from game_logic import spawnBullet
-from sound_manager import playFootstepSound, SFX_GUNSHOT
+from sound_manager import playFootstepSound, SFX_GUNSHOT, SFX_VOMIT
 
 # Load player sprites
 PLAYER_1_SPRITE = None
@@ -52,6 +52,13 @@ class Player(Object):
         self.drunk_vision_offset_y = 0
         self.last_hiccup_time = 0  # Für Hickser-Sound-Timing
         self.random_movement_timer = 0  # Timer für zufällige Bewegungen
+        
+        # Ausnüchtern/Kotzen-System
+        self.was_drunk = False  # War der Spieler betrunken?
+        self.is_vomiting = False  # Kotzt der Spieler gerade?
+        self.vomit_timer = 0  # Timer für Kotz-Animation
+        self.vomit_duration = 120  # Dauer des Kotzens in Frames (2 Sekunden bei 60 FPS)
+        self.last_vomit_time = 0  # Verhindert mehrfaches Kotzen
 
     def moveLeft(self):
         self.xdir = -1
@@ -208,6 +215,60 @@ class Player(Object):
     def reset_health(self):
         """Setzt die Gesundheit zurück."""
         self.health = self.max_health
+        
+    def start_vomiting(self):
+        """Startet das Kotzen wenn der Spieler ausnüchtert."""
+        import game_state
+        
+        # Verhindere mehrfaches Kotzen in kurzer Zeit
+        if game_state.tick - self.last_vomit_time < 300:  # 5 Sekunden Cooldown
+            return
+            
+        self.is_vomiting = True
+        self.vomit_timer = self.vomit_duration
+        self.last_vomit_time = game_state.tick
+        
+        # Spieler kann sich während dem Kotzen nicht bewegen
+        self.xdir = 0
+        self.ydir = 0
+        
+        # Spiele Kotz-Sound ab
+        SFX_VOMIT.play()
+        
+        print(f"Player {id(self)} kotzt! 🤮")  # Debug-Ausgabe
+        
+    def update_vomiting(self):
+        """Aktualisiert das Kotz-System."""
+        if self.is_vomiting:
+            self.vomit_timer -= 1
+            
+            # Während dem Kotzen kann sich der Spieler nicht bewegen
+            if self.vomit_timer > 0:
+                self.xdir = 0
+                self.ydir = 0
+                
+                # Kotz-Animation: leichtes Zittern
+                if self.vomit_timer % 4 == 0:  # Alle 4 Frames
+                    self.drunk_vision_offset_x = random.uniform(-0.5, 0.5)
+                    self.drunk_vision_offset_y = random.uniform(-0.5, 0.5)
+            else:
+                # Kotzen ist vorbei
+                self.is_vomiting = False
+                self.drunk_vision_offset_x = 0
+                self.drunk_vision_offset_y = 0
+                
+    def check_sobering_up(self):
+        """Prüft ob der Spieler ausnüchtert und kotzen muss."""
+        current_alcohol_percent = self.alcohol_level * 100
+        
+        # War betrunken (über 10%) und ist jetzt unter 10%?
+        if self.was_drunk and current_alcohol_percent < 10:
+            self.start_vomiting()
+            self.was_drunk = False  # Reset flag
+            
+        # Setze Flag wenn Spieler betrunken wird (über 20%)
+        if current_alcohol_percent > 20:
+            self.was_drunk = True
             
     def apply_drunk_movement_chaos(self):
         """Wendet chaotische Bewegung bei Betrunkenheit an."""
@@ -276,8 +337,15 @@ class Player(Object):
         if self.alcohol_level > 0:
             self.alcohol_level = max(0, self.alcohol_level - self.alcohol_decay_rate)
             
-        # Betrunkene Bewegungseffekte anwenden
-        self.apply_drunk_movement_chaos()
+        # Prüfe ob Spieler ausnüchtert und kotzen muss
+        self.check_sobering_up()
+        
+        # Aktualisiere Kotz-System
+        self.update_vomiting()
+        
+        # Betrunkene Bewegungseffekte anwenden (nur wenn nicht am kotzen)
+        if not self.is_vomiting:
+            self.apply_drunk_movement_chaos()
         
         # Gelegentliche Hickser bei hohem Alkohol-Level
         import game_state
@@ -410,10 +478,14 @@ class Player(Object):
                 playFootstepSound()
 
     def draw(self, output):
-        """Überschreibt die Standard-Draw-Methode um Torkel-Effekte hinzuzufügen."""
-        # Anwenden der Torkel-Offsets für visuellen Effekt
-        drunk_level = self.get_drunk_level()
-        if drunk_level >= 2:
+        """Überschreibt die Standard-Draw-Methode um Torkel- und Kotz-Effekte hinzuzufügen."""
+        # Anwenden der Offsets für visuelle Effekte
+        if self.is_vomiting:
+            # Kotz-Effekt: stärkere Zittereffekte
+            draw_x = self.xpos + self.drunk_vision_offset_x
+            draw_y = self.ypos + self.drunk_vision_offset_y
+        elif self.get_drunk_level() >= 2:
+            # Torkel-Effekt bei Betrunkenheit
             draw_x = self.xpos + self.drunk_vision_offset_x
             draw_y = self.ypos + self.drunk_vision_offset_y
         else:
@@ -421,5 +493,45 @@ class Player(Object):
             draw_y = self.ypos
             
         self.sprite.draw(output, draw_x, draw_y)
+        
+        # Zeichne visuellen Kotz-Effekt
+        if self.is_vomiting:
+            self._draw_vomit_effect(output, draw_x, draw_y)
+            
+    def _draw_vomit_effect(self, output, player_x, player_y):
+        """Zeichnet einen visuellen Kotz-Effekt."""
+        import ledwall
+        
+        # Berechne Position vor dem Spieler basierend auf Blickrichtung
+        if self.facedir == controls.DIR_LEFT:
+            vomit_x = player_x - 8
+            vomit_y = player_y + 8
+        elif self.facedir == controls.DIR_RIGHT:
+            vomit_x = player_x + 16
+            vomit_y = player_y + 8
+        elif self.facedir == controls.DIR_UP:
+            vomit_x = player_x + 8
+            vomit_y = player_y - 8
+        else:  # DIR_DOWN
+            vomit_x = player_x + 8
+            vomit_y = player_y + 16
+            
+        # Zeichne mehrere "Kotze-Pixel" in grün/gelb
+        colors = [(0, 255, 0), (255, 255, 0), (128, 255, 0), (200, 255, 0)]
+        
+        for i in range(3):  # 3 Kotze-Partikel
+            offset_x = random.randint(-4, 4)
+            offset_y = random.randint(-2, 2)
+            color = random.choice(colors)
+            
+            final_x = vomit_x + offset_x
+            final_y = vomit_y + offset_y
+            
+            # Zeichne Kotze-Pixel (falls im sichtbaren Bereich)
+            if 0 <= final_x < ledwall.SCR_W and 0 <= final_y < ledwall.SCR_H:
+                try:
+                    output.set_at((int(final_x), int(final_y)), color)
+                except:
+                    pass  # Ignoriere Fehler wenn außerhalb des Bildschirms
 
 
