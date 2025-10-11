@@ -108,7 +108,7 @@ class Player(Object):
         self.xdir = 0
         self.ydir = 0
 
-    def shoot(self, player_index):
+    def shoot(self, player_index, other_player_x=None):
         if self.ammo <= 0:
             return  # Can't shoot without ammo
 
@@ -118,12 +118,28 @@ class Player(Object):
         # Alkohol beeinflusst die Schussrichtung
         accuracy_modifier = self.get_drunk_accuracy_modifier()
 
-        if self.xpos < 128:
-            bulletxdir = 1
-            self.facedir = controls.DIR_RIGHT
+        # Determine shooting direction based on other player's position
+        if other_player_x is not None:
+            # Shoot towards the other player
+            if self.xpos < other_player_x:
+                bulletxdir = 1  # Shoot right
+                self.facedir = controls.DIR_RIGHT
+            elif self.xpos > other_player_x:
+                bulletxdir = -1  # Shoot left
+                self.facedir = controls.DIR_LEFT
+            else:
+                # Players are at same x position, use fallback direction
+                # Favor right direction as default
+                bulletxdir = 1
+                self.facedir = controls.DIR_RIGHT
         else:
-            bulletxdir = -1
-            self.facedir = controls.DIR_LEFT
+            # Fallback: use old logic (position-based)
+            if self.xpos < 128:
+                bulletxdir = 1
+                self.facedir = controls.DIR_RIGHT
+            else:
+                bulletxdir = -1
+                self.facedir = controls.DIR_LEFT
 
         # Bei Betrunkenheit: zufällige Abweichung der Schussrichtung
         if accuracy_modifier < 1.0:
@@ -146,6 +162,15 @@ class Player(Object):
 
     def stopShooting(self):
         self.showGun = False
+        
+    def update_facing_direction(self, other_player_x):
+        """Update the facing direction to look towards the other player."""
+        if not self.showGun:  # Only update when not actively shooting
+            if self.xpos < other_player_x:
+                self.facedir = controls.DIR_RIGHT
+            elif self.xpos > other_player_x:
+                self.facedir = controls.DIR_LEFT
+            # If same x position, keep current direction
 
     def die(self):
         import game_state
