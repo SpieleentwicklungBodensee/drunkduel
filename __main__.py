@@ -93,7 +93,7 @@ def spawnWeaponDrop():
     while attempts < 100:  # Prevent infinite loop
         x = random.randint(0, level.getWidth() - 1)
         y = random.randint(0, level.getHeight() - 1)
-        
+
         if level.getTile(x, y) == ' ':  # Empty space
             weapon_drop = WeaponDrop(x * TILE_WIDTH, y * TILE_HEIGHT)
             gameScreen.addObject(weapon_drop)
@@ -110,13 +110,13 @@ def checkWeaponPickup():
                     weapon_drop.xpos + TILE_WIDTH > player.xpos and
                     weapon_drop.ypos < player.ypos + TILE_HEIGHT and
                     weapon_drop.ypos + TILE_HEIGHT > player.ypos):
-                    
+
                     # Player picks up ammo
                     player.ammo = min(player.ammo + weapon_drop.ammo_amount, 10)  # Max 10 ammo
-                    
+
                     # Remove the weapon drop
                     gameScreen.removeObject(weapon_drop)
-                    
+
                     # Play pickup sound (reuse footstep for now)
                     SFX_FOOTSTEP.play()
                     break
@@ -146,7 +146,7 @@ def checkCollisions():
                     # Remove bullet and play sound effect
                     removeBullet(bullet)
                     SFX_PLAYER_HIT.play()
-                    
+
                     # Reset hit player position
                     if i == 0:  # Player 1 hit
                         player.xpos = 2 * TILE_WIDTH
@@ -166,6 +166,9 @@ def checkCollisions():
                     # switch controls
                     keymapping = [controls.PLAYER_1_KEYS, controls.PLAYER_2_KEYS][bullet.shooter_index]
                     orig, repl = controls.swapRandomly(keymapping)
+
+                    ledwall.cls()
+                    print('spieler %s:' % bullet.shooter_index)
                     print(controls.getSentence(orig, repl))
 
                     break
@@ -320,12 +323,12 @@ class WeaponDrop(Object):
         super().__init__(xpos, ypos, MUNITION_SPRITE)
         self.ammo_amount = 3  # How much ammo this drop gives
         self.bob_offset = 0   # For floating animation
-        
+
     def update(self):
         # Floating animation
         self.bob_offset += 0.1
         # The sprite will bob up and down slightly
-        
+
     def draw(self, output):
         # Draw with slight vertical bobbing animation
         bob_y = self.ypos + math.sin(self.bob_offset) * 2
@@ -359,7 +362,7 @@ class Bullet(Object):
 
                 # Play explosion sound
                 SFX_EXPLOSION.play()
-                
+
                 # 30% chance to spawn a weapon drop where the cactus was
                 if random.random() < 0.3:
                     weapon_drop = WeaponDrop(tile_x * TILE_WIDTH, tile_y * TILE_HEIGHT)
@@ -711,10 +714,10 @@ class GameScreen(Screen):
 
         # Check for collisions
         checkCollisions()
-        
+
         # Check for weapon pickups
         checkWeaponPickup()
-        
+
         # Spawn weapon drops periodically
         self.weapon_drop_timer += 1
         if self.weapon_drop_timer >= 300:  # Spawn every 5 seconds (300 frames at 60 FPS)
@@ -897,8 +900,3 @@ while running:
     # tick
     clock.tick(60)
     tick += 1
-
-    if currentScreen != initScreen:
-        if tick >= 60 * 4:
-            ledwall.cls()
-
