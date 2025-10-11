@@ -781,7 +781,7 @@ SFX_GUNSHOT = pygame.mixer.Sound("sfx/Gunshot.wav")
 SFX_FOOTSTEP = pygame.mixer.Sound("sfx/Footstep.wav")
 SFX_RICOCHET = pygame.mixer.Sound("sfx/Ricochet.wav")
 SFX_PLAYER_HIT = pygame.mixer.Sound("sfx/Wilhelm_Scream.wav")
-SFX_EXPLOSION = pygame.mixer.Sound("sfx/Explosion.wav")
+#SFX_EXPLOSION = pygame.mixer.Sound("sfx/Explosion.wav")
 
 print('\n\n')
 
