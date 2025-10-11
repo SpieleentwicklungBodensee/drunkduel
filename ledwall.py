@@ -13,6 +13,7 @@ overlay = None  # vertical masking stripes
 
 brightnessValue = -4
 showOverlay = True
+autoClearPrints = True
 
 renderMode = 'led'
 
@@ -158,5 +159,6 @@ def _drawPrintLog():
 
     lastFontColor = colorBackup
 
-    if time.time() - lastPrintTime > 3:
-        cls()
+    if autoClearPrints:
+        if time.time() - lastPrintTime > 3:
+            cls()

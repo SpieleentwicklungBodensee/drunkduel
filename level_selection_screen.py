@@ -170,10 +170,10 @@ class LevelSelectionScreen:
                 self.selected_index = min(self.level_loader.get_level_count() - 1,
                                         self.selected_index + 1)
             elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
-                # Select this level and return to init screen
+                # Select this level and switch to confirm screen
                 self.level_loader.set_current_level(self.selected_index)
                 self._reload_current_level()
-                game_state.switchState('init')
+                game_state.switchState('confirm')
             elif event.key == pygame.K_ESCAPE:
                 # Back to title screen
                 game_state.switchState('title')
@@ -184,7 +184,7 @@ class LevelSelectionScreen:
             if event.button == 0:  # A-Button or similar - confirm selection
                 self.level_loader.set_current_level(self.selected_index)
                 self._reload_current_level()
-                game_state.switchState('init')
+                game_state.switchState('confirm')
             elif event.button == 1:  # B-Button or similar - back to menu
                 game_state.switchState('title')
         elif event.type == pygame.JOYHATMOTION:

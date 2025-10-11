@@ -78,9 +78,6 @@ def load_sounds():
     SOUND_WORDS['eins'] = pygame.mixer.Sound('sfx/eins_d.wav')
     SOUND_WORDS['zwei'] = pygame.mixer.Sound('sfx/zwei_d.wav')
 
-    print(SOUND_WORDS)
-
-
 def playFootstepSound():
     """Play footstep sound with timing control."""
     global lastPlayedFootstep

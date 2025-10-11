@@ -20,6 +20,7 @@ initScreen = None
 titleScreen = None
 gameOverScreen = None
 levelSelectionScreen = None
+confirmScreen = None
 level = None
 output = None
 message = None
@@ -31,7 +32,7 @@ TILE_HEIGHT = 16
 
 def switchState(state):
     """Switch between game states."""
-    global currentScreen, gameScreen, initScreen, titleScreen, gameOverScreen, levelSelectionScreen
+    global currentScreen, gameScreen, initScreen, titleScreen, gameOverScreen, levelSelectionScreen, confirmScreen
 
     # Import screens here to avoid circular imports
     from init_screen import InitScreen
@@ -39,6 +40,7 @@ def switchState(state):
     from game_screen import GameScreen
     from game_over_screen import GameOverScreen
     from level_selection_screen import LevelSelectionScreen
+    from confirm_screen import ConfirmScreen
 
     if state == 'init':
         if initScreen is None:
@@ -60,6 +62,10 @@ def switchState(state):
         if gameOverScreen is None:
             gameOverScreen = GameOverScreen()
         currentScreen = gameOverScreen
+    elif state == 'confirm':
+        if confirmScreen is None:
+            confirmScreen = ConfirmScreen()
+        currentScreen = confirmScreen
 
     import ledwall
 
