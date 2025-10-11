@@ -29,6 +29,7 @@ class Bullet(Object):
     def get_total_damage(self):
         """Berechnet den Gesamtschaden der Kugel."""
         if config.ALCOHOL_ENABLED:
+            print("Drunk Damage Modifier:", self.drunk_damage_modifier)
             return int(self.damage * self.drunk_damage_modifier)
         else:
             #Kill player instantly if alcohol is disabled
