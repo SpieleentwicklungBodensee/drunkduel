@@ -96,12 +96,13 @@ def load_graphics():
 
     bullet_sprite = Sprite('gfx/bullet.png')
     munition_sprite = Sprite('gfx/munition.png')
+    beer_sprite = Sprite('gfx/munition.png')
 
     # Animate water
     tiles['|'].speed = 12
     tiles['|'].start()
 
-    return tiles, bullet_sprite, munition_sprite
+    return tiles, bullet_sprite, munition_sprite, beer_sprite
 
 
 def get_level_map_data():

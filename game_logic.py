@@ -10,7 +10,8 @@ import config
 from bullet import Bullet
 from message import Message
 from weapon_drop import WeaponDrop
-from sound_manager import SFX_FOOTSTEP, SFX_PLAYER_HIT
+from beer_powerup import BeerPowerup
+from sound_manager import SFX_FOOTSTEP, SFX_PLAYER_HIT, SFX_BEER_PICKUP
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
 
@@ -21,6 +22,44 @@ def spawnBullet(x, y, xdir, shooter_index, bullet_sprite):
     bullet.xdir = xdir
     bullet.shooter_index = shooter_index
     game_state.gameScreen.addObject(bullet)
+
+
+def spawnBeerPowerup(beer_sprite):
+    """Spawn a beer powerup at a random empty location."""
+    # Find a random empty spot on the map
+    attempts = 0
+    while attempts < 100:  # Prevent infinite loop
+        x = random.randint(0, game_state.level.getWidth() - 1)
+        y = random.randint(0, game_state.level.getHeight() - 1)
+
+        if game_state.level.getTile(x, y) == ' ':  # Empty space
+            beer_powerup = BeerPowerup(x * TILE_WIDTH, y * TILE_HEIGHT, beer_sprite)
+            game_state.gameScreen.addObject(beer_powerup)
+            print(f"Bier gespawnt bei Position ({x}, {y})")  # Debug-Ausgabe
+            break
+        attempts += 1
+
+
+def checkBeerPickup():
+    """Check if players pick up beer powerups."""
+    for beer in game_state.gameScreen.objects[:]:
+        if isinstance(beer, BeerPowerup):
+            for player in game_state.gameScreen.players:
+                # Check collision with player
+                if (beer.xpos < player.xpos + TILE_WIDTH and
+                    beer.xpos + TILE_WIDTH > player.xpos and
+                    beer.ypos < player.ypos + TILE_HEIGHT and
+                    beer.ypos + TILE_HEIGHT > player.ypos):
+
+                    # Player trinkt Bier
+                    player.drink_alcohol(beer.get_alcohol_amount())
+
+                    # Remove the beer powerup
+                    game_state.gameScreen.removeObject(beer)
+
+                    # Play pickup sound (reuse footstep for now)
+                    SFX_FOOTSTEP.play()
+                    break
 
 
 def spawnWeaponDrop(munition_sprite):
@@ -57,6 +96,28 @@ def checkWeaponPickup():
 
                     # Play pickup sound (reuse footstep for now)
                     SFX_FOOTSTEP.play()
+                    break
+
+
+def checkBeerPickup():
+    """Check if players pick up beer powerups."""
+    for beer in game_state.gameScreen.objects[:]:
+        if isinstance(beer, BeerPowerup):
+            for player in game_state.gameScreen.players:
+                # Check collision with player
+                if (beer.xpos < player.xpos + TILE_WIDTH and
+                    beer.xpos + TILE_WIDTH > player.xpos and
+                    beer.ypos < player.ypos + TILE_HEIGHT and
+                    beer.ypos + TILE_HEIGHT > player.ypos):
+
+                    # Player trinkt Bier
+                    player.drink_alcohol(beer.get_alcohol_amount())
+
+                    # Remove the beer powerup
+                    game_state.gameScreen.removeObject(beer)
+
+                    # Play beer pickup sound
+                    SFX_BEER_PICKUP.play()
                     break
 
 
@@ -104,6 +165,9 @@ def _handle_player_hit(bullet, hit_player_index):
 
     # Reset ammo for hit player
     player.ammo = config.INITIAL_AMMO
+
+    # Reset alcohol level for hit player (teilweise)
+    player.alcohol_level = max(0, player.alcohol_level - 0.3)  # Schock nüchtert etwas auf
 
     # Check for victory condition (first to 5 points wins)
     if game_state.gameScreen.players[other_player_index].score >= 5:
