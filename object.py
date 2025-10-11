@@ -1,3 +1,7 @@
+# Override print function
+import ledwall
+print = ledwall.print
+
 
 class Object:
     def __init__(self, xpos, ypos, sprite):

@@ -1,6 +1,11 @@
 import pygame
 import game_state
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 
 class Sprite:
     """Basic sprite class for displaying images."""

@@ -5,10 +5,15 @@ Contains the Level class and level-related functionality.
 
 from game_state import TILE_WIDTH, TILE_HEIGHT
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 
 class Level:
     """Represents a game level with tile-based map data."""
-    
+
     def __init__(self, mapdata, tiles):
         self.mapdata = mapdata
         self.tiles = tiles

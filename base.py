@@ -3,6 +3,12 @@ Base classes and shared elements for the Drunk Duel game.
 This module contains the base Screen class and common game elements.
 """
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
+
 class Screen:
     """Base class for all game screens."""
     def draw(self):

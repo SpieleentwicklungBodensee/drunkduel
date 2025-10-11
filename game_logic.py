@@ -17,6 +17,11 @@ from sound_manager import SFX_FOOTSTEP, SFX_LAUGHING, SFX_PLAYER_HIT
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 def spawnBullet(x, y, xdir, shooter_index, bullet_sprite):
     """Spawn a bullet at the given position."""
 
@@ -36,11 +41,11 @@ def spawnBeerPowerup(beer_sprite):
     # Nur wenn Alkohol aktiviert ist
     if not config.ALCOHOL_ENABLED:
         return
-        
+
     for attempt in range(50):  # Versuche maximal 50 mal einen freien Platz zu finden
         x = random.randint(1, 14)  # Avoid edges
         y = random.randint(1, 14)
-        
+
         # Check if position is empty
         if game_state.level.getTile(x, y) == ' ':
             beer_powerup = BeerPowerup(x * TILE_WIDTH, y * TILE_HEIGHT, beer_sprite)
@@ -146,7 +151,7 @@ def checkBeerPickup():
     # Nur wenn Alkohol aktiviert ist
     if not config.ALCOHOL_ENABLED:
         return
-        
+
     for beer in game_state.gameScreen.objects[:]:
         if isinstance(beer, BeerPowerup):
             for player in game_state.gameScreen.players:
@@ -164,7 +169,7 @@ def checkBeerPickup():
 
                     # Play random laughing sound
                     random.choice(SFX_LAUGHING).play()
-                    
+
                     break
 
 
@@ -209,7 +214,7 @@ def _handle_player_hit(bullet, hit_player_index):
     if is_dead:
         # Award point to the shooter only on death
         other_player.score += 1
-        
+
         # Reset hit player position
         player = game_state.gameScreen.players[hit_player_index]
         player.die()
@@ -226,7 +231,7 @@ def removeAllBullets():
     for obj in game_state.gameScreen.objects:
         if isinstance(obj, Bullet):
             bullets_to_remove.append(obj)
-    
+
     for bullet in bullets_to_remove:
         game_state.gameScreen.removeObject(bullet)
 

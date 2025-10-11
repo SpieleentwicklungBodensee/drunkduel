@@ -3,6 +3,11 @@ Game state management module.
 Contains global game state variables and state switching logic.
 """
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 # Global game state variables
 tick = 0
 currentScreen = None

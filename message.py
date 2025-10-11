@@ -3,6 +3,11 @@ import ledwall
 import game_state
 from object import Object
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 class Message(Object):
     def __init__(self, xpos, ypos, lines, color):
         super().__init__(xpos, ypos, None)
