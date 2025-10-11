@@ -527,6 +527,7 @@ print('loading gfx...')
 TILES = {'Y': Sprite('gfx/desert3.png'),
          '|': createAnimatedSprite('gfx/water1.png'),
          '#': Sprite('gfx/fence1.png'),
+         'o': Sprite('gfx/ston1.png'),
          ' ': None,
          }
 
@@ -562,18 +563,18 @@ else:
 
 mapdata = ['       ||       ',
            '       ||   Y   ',
-           '    Y  ||       ',
+           '    Y  ||     o ',
            '       ||       ',
            '       || Y     ',
-           '       ||       ',
-           '      Y||       ',
+           '   o   ||       ',
+           '      Y||  o    ',
            '       ||    Y  ',
            '  Y    ||       ',
+           '   o   ||       ',
            '       ||       ',
-           '       ||       ',
-           '       ||       ',
+           '       ||     o ',
            '     Y ||       ',
-           '       ||  Y    ',
+           '  o    ||  Y    ',
            '       ||       ',
            '#######||#######',
            ]
