@@ -58,12 +58,13 @@ def initialize_game():
     joysticks, num_joysticks = initialize_joysticks()
 
     # Load graphics and sounds
-    tiles, bullet_sprite, munition_sprite = load_graphics()
+    tiles, bullet_sprite, munition_sprite, beer_sprite = load_graphics()
     load_sounds()
 
     # Store sprites in game state for access by other modules
     game_state.bullet_sprite = bullet_sprite
     game_state.munition_sprite = munition_sprite
+    game_state.beer_sprite = beer_sprite
 
     # Create level
     mapdata = get_level_map_data()
