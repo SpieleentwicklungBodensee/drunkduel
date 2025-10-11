@@ -53,4 +53,4 @@ class GameOverScreen(Screen):
 
                 if hasattr(game_state.gameScreen, 'winner'):
                     delattr(game_state.gameScreen, 'winner')
-            switchState('game')
+            switchState('init')
