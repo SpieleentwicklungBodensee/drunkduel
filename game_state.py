@@ -3,7 +3,6 @@ Game state management module.
 Contains global game state variables and state switching logic.
 """
 
-import pygame
 from init_screen import InitScreen
 from title_screen import TitleScreen  
 from game_screen import GameScreen

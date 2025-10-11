@@ -8,14 +8,10 @@ import random
 import ledwall
 import game_state
 from object import Object
-from sound_manager import SFX_RICOCHET
-import game_state
-from game_state import TILE_WIDTH, TILE_HEIGHT
-import game_state
+from sound_manager import SFX_RICOCHET, SFX_EXPLOSION
 from game_state import TILE_WIDTH, TILE_HEIGHT
 from explosion import Explosion
 from weapon_drop import WeaponDrop
-from sound_manager import SFX_EXPLOSION
 
 class Bullet(Object):
     """A bullet fired by a player."""

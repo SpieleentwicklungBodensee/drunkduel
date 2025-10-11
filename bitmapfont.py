@@ -13,7 +13,6 @@ import pygame
 NUM_CHARS = 96
 TEXT_CACHING = True
 
-
 class BitmapFont:
     def __init__(self, filename, char_w=8, char_h=8, zoom=1, scr_w=320, scr_h=240):
         self.lastxpos, self.lastypos = 0, 0

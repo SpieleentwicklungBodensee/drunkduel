@@ -1,8 +1,7 @@
 import pygame
 import ledwall
 from base import Screen
-from game_state import switchState, tick
-from game_state import TILE_WIDTH, TILE_HEIGHT, gameScreen
+from game_state import TILE_WIDTH, TILE_HEIGHT, gameScreen, switchState, tick
 class GameOverScreen(Screen):
     def draw(self):
         ledwall.centerText('GAME OVER', y=5, color=(255, 0, 0), fontsize=2, align=False)
