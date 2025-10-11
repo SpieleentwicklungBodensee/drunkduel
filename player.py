@@ -46,11 +46,12 @@ class Player(Object):
         # Alkohol-System
         self.alcohol_level = 0.0  # 0.0 = nüchtern, 1.0 = sehr betrunken
         self.max_alcohol = 1.0
-        self.alcohol_decay_rate = 0.002  # Wie schnell der Alkohol abgebaut wird pro Frame
+        self.alcohol_decay_rate = 0.0005  # Langsamerer Alkohol-Abbau (war 0.002)
         self.drunk_wobble_timer = 0  # Timer für Torkelbewegung
         self.drunk_vision_offset_x = 0  # Visuelle Verzerrung
         self.drunk_vision_offset_y = 0
         self.last_hiccup_time = 0  # Für Hickser-Sound-Timing
+        self.random_movement_timer = 0  # Timer für zufällige Bewegungen
 
     def moveLeft(self):
         self.xdir = -1
@@ -211,25 +212,63 @@ class Player(Object):
     def apply_drunk_movement_chaos(self):
         """Wendet chaotische Bewegung bei Betrunkenheit an."""
         drunk_level = self.get_drunk_level()
-        if drunk_level >= 2:  # Ab Level 2 beginnt das Torkeln
+        if drunk_level >= 1:  # Ab Level 1 beginnen leichte Effekte
             self.drunk_wobble_timer += 1
+            self.random_movement_timer += 1
             
-            # Zufällige Richtungsänderungen
-            if drunk_level >= 3 and random.random() < 0.02:  # 2% Chance pro Frame
-                # Spontane Richtungsänderung
-                if self.xdir != 0:
-                    self.xdir *= -1 if random.random() < 0.5 else 1
-                if self.ydir != 0:
-                    self.ydir *= -1 if random.random() < 0.5 else 1
+            # Zufällige spontane Bewegungen basierend auf Betrunkenheitsgrad
+            if drunk_level >= 2:
+                # Chance für zufällige Bewegung steigt mit Betrunkenheitsgrad
+                random_chance = drunk_level * 0.008  # 0.8% bei Level 2, 2.4% bei Level 3, 3.2% bei Level 4
+                
+                if random.random() < random_chance:
+                    # Zufällige Bewegungsrichtung für kurze Zeit
+                    random_directions = [
+                        (-1, 0),  # Links
+                        (1, 0),   # Rechts
+                        (0, -1),  # Oben
+                        (0, 1),   # Unten
+                        (-1, -1), # Links-Oben
+                        (1, -1),  # Rechts-Oben
+                        (-1, 1),  # Links-Unten
+                        (1, 1),   # Rechts-Unten
+                        (0, 0)    # Stoppen
+                    ]
                     
-            # Torkeln-Effekt
-            wobble_strength = drunk_level * 0.3
-            wobble_x = math.sin(self.drunk_wobble_timer * 0.1) * wobble_strength
-            wobble_y = math.cos(self.drunk_wobble_timer * 0.15) * wobble_strength
+                    random_dir = random.choice(random_directions)
+                    
+                    # Temporäre zufällige Bewegung (überschreibt Spielereingabe kurzzeitig)
+                    if drunk_level >= 4:  # Bei sehr hoher Betrunkenheit stärkere Effekte
+                        self.xdir = random_dir[0]
+                        self.ydir = random_dir[1]
+                    elif drunk_level >= 3:  # Bei hoher Betrunkenheit moderate Effekte
+                        if random.random() < 0.7:  # 70% Chance die Richtung zu ändern
+                            self.xdir = random_dir[0]
+                            self.ydir = random_dir[1]
+                    else:  # Bei mittlerer Betrunkenheit leichte Störungen
+                        if random.random() < 0.4:  # 40% Chance für leichte Störung
+                            # Nur kleine Abweichungen von der gewünschten Richtung
+                            if self.xdir != 0 and random.random() < 0.3:
+                                self.xdir *= -1  # Richtung umkehren
+                            if self.ydir != 0 and random.random() < 0.3:
+                                self.ydir *= -1  # Richtung umkehren
             
-            # Anwenden der Torkelbewegung als kleine Verschiebung
-            self.drunk_vision_offset_x = wobble_x
-            self.drunk_vision_offset_y = wobble_y
+            # Kontinuierliches Torkeln (visuelle Effekte)
+            if drunk_level >= 2:
+                wobble_strength = drunk_level * 0.4
+                wobble_x = math.sin(self.drunk_wobble_timer * 0.12) * wobble_strength
+                wobble_y = math.cos(self.drunk_wobble_timer * 0.18) * wobble_strength
+                
+                # Anwenden der Torkelbewegung als kleine Verschiebung
+                self.drunk_vision_offset_x = wobble_x
+                self.drunk_vision_offset_y = wobble_y
+            
+            # Gelegentliches "Hängenbleiben" bei sehr hoher Betrunkenheit
+            if drunk_level >= 4 and self.random_movement_timer % 120 == 0:  # Alle 2 Sekunden
+                if random.random() < 0.15:  # 15% Chance
+                    # Spieler bleibt kurz stehen (als ob er das Gleichgewicht verliert)
+                    self.xdir = 0
+                    self.ydir = 0
             
     def update_alcohol_system(self):
         """Aktualisiert das Alkohol-System jeden Frame."""
@@ -369,5 +408,18 @@ class Player(Object):
 
             if game_state.tick % 8 == 0:
                 playFootstepSound()
+
+    def draw(self, output):
+        """Überschreibt die Standard-Draw-Methode um Torkel-Effekte hinzuzufügen."""
+        # Anwenden der Torkel-Offsets für visuellen Effekt
+        drunk_level = self.get_drunk_level()
+        if drunk_level >= 2:
+            draw_x = self.xpos + self.drunk_vision_offset_x
+            draw_y = self.ypos + self.drunk_vision_offset_y
+        else:
+            draw_x = self.xpos
+            draw_y = self.ypos
+            
+        self.sprite.draw(output, draw_x, draw_y)
 
 
