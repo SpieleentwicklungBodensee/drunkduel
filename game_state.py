@@ -50,7 +50,9 @@ def switchState(state):
         currentScreen = gameOverScreen
 
     import ledwall
-    ledwall.cls()
+
+    if state != 'init':
+        ledwall.cls()
 
 
 def initialize_game_state():

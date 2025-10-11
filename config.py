@@ -7,6 +7,10 @@ import argparse
 import pygame
 from sprite import Sprite, createAnimatedSprite
 
+# Override print function
+import ledwall
+print = ledwall.print
+
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -18,7 +22,7 @@ def parse_arguments():
 def load_settings():
     """Load settings from settings.py file with defaults."""
     settings = {}
-    
+
     # Try to load settings from settings.py
     try:
         for attr in dir(settings):
@@ -30,10 +34,10 @@ def load_settings():
     # Set defaults if not defined
     if 'RENDER_MODE' not in settings:
         settings['RENDER_MODE'] = 'plain'
-    
+
     if 'DEFAULT_BRIGHTNESS' not in settings:
         settings['DEFAULT_BRIGHTNESS'] = None
-    
+
     return settings
 
 
@@ -73,7 +77,7 @@ def initialize_joysticks():
 def load_graphics():
     """Load all game graphics and sprites."""
     print('loading gfx...')
-    
+
     tiles = {
         'Y': Sprite('gfx/desert3.png'),
         '|': createAnimatedSprite('gfx/water1.png'),
@@ -84,11 +88,11 @@ def load_graphics():
 
     bullet_sprite = Sprite('gfx/bullet.png')
     munition_sprite = Sprite('gfx/munition.png')
-    
+
     # Animate water
     tiles['|'].speed = 12
     tiles['|'].start()
-    
+
     return tiles, bullet_sprite, munition_sprite
 
 
