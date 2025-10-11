@@ -111,7 +111,7 @@ class GameScreen(Screen):
             health_y_pos = game_state.level.getHeight() * 2 + (3 if config.ALCOHOL_ENABLED else 2)
             ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=health_y_pos, color=health1_color)
             ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=health_y_pos, color=health2_color)
-            
+
             ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=game_state.level.getHeight() * 2 + 3, color=health1_color)
             ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=game_state.level.getHeight() * 2 + 3, color=health2_color)
 
@@ -152,6 +152,9 @@ class GameScreen(Screen):
 
                 elif e.key == keys[controls.FIRE]:
                     self.players[i].stopShooting()
+
+        elif e.type in (pygame.JOYAXISMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
+            controls.handleJoyEvent(e, self.players)
 
     def update(self):
 
