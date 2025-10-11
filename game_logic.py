@@ -5,6 +5,7 @@ Contains collision detection, weapon spawning, and other game mechanics.
 
 import random
 
+import config
 import controls
 import ledwall
 from bullet import Bullet
@@ -32,17 +33,19 @@ def spawnBullet(x, y, xdir, shooter_index, bullet_sprite):
 
 def spawnBeerPowerup(beer_sprite):
     """Spawn a beer powerup at a random empty location."""
-    # Find a random empty spot on the map
-    attempts = 0
-    while attempts < 100:  # Prevent infinite loop
-        x = random.randint(0, game_state.level.getWidth() - 1)
-        y = random.randint(0, game_state.level.getHeight() - 1)
-
-        if game_state.level.getTile(x, y) == ' ':  # Empty space
+    # Nur wenn Alkohol aktiviert ist
+    if not config.ALCOHOL_ENABLED:
+        return
+        
+    for attempt in range(50):  # Versuche maximal 50 mal einen freien Platz zu finden
+        x = random.randint(1, 14)  # Avoid edges
+        y = random.randint(1, 14)
+        
+        # Check if position is empty
+        if game_state.level.getTile(x, y) == ' ':
             beer_powerup = BeerPowerup(x * TILE_WIDTH, y * TILE_HEIGHT, beer_sprite)
             game_state.gameScreen.addObject(beer_powerup)
-            #print(f"Bier gespawnt bei Position ({x}, {y})")  # Debug-Ausgabe
-            break
+            return
 def spawnHealthPowerup(health_sprite):
     """Spawn a health powerup at a random empty location."""
     # Find a random empty spot on the map
@@ -143,6 +146,10 @@ def checkWeaponPickup():
 
 def checkBeerPickup():
     """Check if players pick up beer powerups."""
+    # Nur wenn Alkohol aktiviert ist
+    if not config.ALCOHOL_ENABLED:
+        return
+        
     for beer in game_state.gameScreen.objects[:]:
         if isinstance(beer, BeerPowerup):
             for player in game_state.gameScreen.players:

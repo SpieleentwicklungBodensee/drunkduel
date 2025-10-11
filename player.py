@@ -157,7 +157,9 @@ class Player(Object):
 
     def drink_alcohol(self, amount=0.3):
         """Spieler trinkt Alkohol und wird betrunkener."""
-        self.alcohol_level = min(self.max_alcohol, self.alcohol_level + amount)
+        # Nur wenn Alkohol aktiviert ist
+        if config.ALCOHOL_ENABLED:
+            self.alcohol_level = min(self.max_alcohol, self.alcohol_level + amount)
 
     def get_drunk_level(self):
         """Gibt den Betrunkenheitsgrad zurück (0-4)."""
@@ -174,6 +176,10 @@ class Player(Object):
 
     def get_drunk_speed_modifier(self):
         """Berechnet Geschwindigkeitsmodifikator basierend auf Alkohol-Level."""
+        # Wenn Alkohol deaktiviert ist, immer normale Geschwindigkeit
+        if not config.ALCOHOL_ENABLED:
+            return 1.0
+            
         drunk_level = self.get_drunk_level()
         if drunk_level == 0:
             return 1.0  # Normale Geschwindigkeit
@@ -188,6 +194,10 @@ class Player(Object):
 
     def get_drunk_accuracy_modifier(self):
         """Berechnet Zielgenauigkeits-Modifier."""
+        # Wenn Alkohol deaktiviert ist, immer normale Genauigkeit
+        if not config.ALCOHOL_ENABLED:
+            return 1.0
+            
         drunk_level = self.get_drunk_level()
         if drunk_level <= 1:
             return 1.0
@@ -348,6 +358,10 @@ class Player(Object):
 
     def update_alcohol_system(self):
         """Aktualisiert das Alkohol-System jeden Frame."""
+        # Nur wenn Alkohol aktiviert ist
+        if not config.ALCOHOL_ENABLED:
+            return
+            
         # Alkohol-Abbau über Zeit
         if self.alcohol_level > 0:
             self.alcohol_level = max(0, self.alcohol_level - self.alcohol_decay_rate)
