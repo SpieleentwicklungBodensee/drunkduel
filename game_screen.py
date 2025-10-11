@@ -24,7 +24,7 @@ class GameScreen(Screen):
         self.objects = []
         self.weapon_drop_timer = 0  # Timer for spawning weapon drops
         self.winner = None  # Track game winner
-        
+
         # Cactus respawn system
         self.destroyed_cacti = []  # List of (destruction_time, respawn_time) tuples
 
@@ -65,6 +65,9 @@ class GameScreen(Screen):
         ledwall.drawText(f'AMMO: {self.players[1].ammo}', x=20, y=game_state.level.getHeight() * 2 + 1, color=ammo2_color)
 
     def event(self, e):
+        if game_state.message:      # pause if message is displayed
+            return
+
         if e.type == pygame.KEYDOWN:
             for i, keys in enumerate([controls.PLAYER_1_KEYS, controls.PLAYER_2_KEYS]):
                 if e.key == keys[controls.DIR_LEFT]:
@@ -94,6 +97,9 @@ class GameScreen(Screen):
                     self.players[i].stopShooting()
 
     def update(self):
+        if game_state.message:      # pause if message is displayed
+            return
+
         for player in self.players:
             player.update()
 
@@ -143,7 +149,7 @@ class GameScreen(Screen):
     def _handle_cactus_respawn(self):
         """Check if any cacti are ready to respawn and spawn them."""
         current_time = game_state.tick
-        
+
         # Check all scheduled respawns
         for respawn_time in self.destroyed_cacti[:]:  # Use slice to avoid modification during iteration
             if current_time >= respawn_time:
@@ -159,13 +165,13 @@ class GameScreen(Screen):
             y = random.randint(0, game_state.level.getHeight() - 1)
 
             tile = game_state.level.getTile(x, y)
-            
+
             # Check if the location is empty and suitable for a cactus
             if tile == ' ':
                 # Also check if there are no players or objects too close
                 tile_center_x = x * TILE_WIDTH + TILE_WIDTH // 2
                 tile_center_y = y * TILE_HEIGHT + TILE_HEIGHT // 2
-                
+
                 # Ensure cactus doesn't spawn too close to players
                 too_close = False
                 for player in self.players:
@@ -175,10 +181,10 @@ class GameScreen(Screen):
                     if distance_sq < (TILE_WIDTH * 3) ** 2:  # At least 3 tiles away
                         too_close = True
                         break
-                
+
                 if not too_close:
                     # Spawn the cactus
                     game_state.level.setTile(x, y, 'Y')
                     break
-            
+
             attempts += 1

@@ -112,6 +112,8 @@ def _handle_player_hit(bullet, hit_player_index):
 
     # Switch controls
     randomizeControls(bullet.shooter_index)
+    for player in game_state.gameScreen.players:
+        player.stopMoving()
 
 
 def randomizeControls(playerid):

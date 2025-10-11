@@ -73,6 +73,11 @@ class Player(Object):
         if self.ydir > 0:
             self.ydir = 0
 
+    def stopMoving(self):
+        self.xdir = 0
+        self.ydir = 0
+        self.sprite.stop()
+
     def shoot(self, player_index):
         if self.ammo <= 0:
             return  # Can't shoot without ammo
@@ -95,7 +100,7 @@ class Player(Object):
             # Fallback: load directly
             from sprite import Sprite
             bullet_sprite = Sprite('gfx/bullet.png')
-        
+
         spawnBullet(self.xpos, self.ypos, bulletxdir, player_index, bullet_sprite)
         SFX_GUNSHOT.play(loops=0)
 
@@ -105,7 +110,7 @@ class Player(Object):
     def update(self):
         import game_state
         from game_state import TILE_WIDTH, TILE_HEIGHT
-        
+
         new_xpos = self.xpos
         new_ypos = self.ypos
 

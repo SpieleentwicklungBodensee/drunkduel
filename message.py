@@ -17,7 +17,7 @@ class Message(Object):
                 ledwall.drawText(line.upper(), self.xpos, self.ypos + i, self.color)
 
     def isDue(self):
-        if (game_state.tick - self.initTime) // 32 > len(self.lines) + 2:
+        if (game_state.tick - self.initTime) // 32 > len(self.lines) + 1:
             return True
 
         return False
