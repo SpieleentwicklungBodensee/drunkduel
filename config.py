@@ -111,25 +111,9 @@ def load_graphics():
 
 
 def get_level_map_data():
-    """Get the default level map data."""
-    return [
-        '       ||       ',
-        '       ||   Y   ',
-        '    Y  ||     o ',
-        '       ||       ',
-        '       || Y     ',
-        '   o   ||       ',
-        '      Y||  o    ',
-        '       ||    Y  ',
-        '  Y    ||       ',
-        '   o   ||       ',
-        '       ||       ',
-        '       ||     o ',
-        '     Y ||       ',
-        '  o    ||  Y    ',
-        '       ||       ',
-        '#######||#######',
-    ]
+    """Get the current level map data from the level loader."""
+    from level_loader import get_current_level_data
+    return get_current_level_data()
 
 
 def print_startup_info(render_mode, num_joysticks):

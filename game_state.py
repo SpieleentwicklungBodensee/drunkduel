@@ -14,6 +14,7 @@ gameScreen = None
 initScreen = None
 titleScreen = None
 gameOverScreen = None
+levelSelectionScreen = None
 level = None
 output = None
 message = None
@@ -25,13 +26,14 @@ TILE_HEIGHT = 16
 
 def switchState(state):
     """Switch between game states."""
-    global currentScreen, gameScreen, initScreen, titleScreen, gameOverScreen
+    global currentScreen, gameScreen, initScreen, titleScreen, gameOverScreen, levelSelectionScreen
 
     # Import screens here to avoid circular imports
     from init_screen import InitScreen
     from title_screen import TitleScreen
     from game_screen import GameScreen
     from game_over_screen import GameOverScreen
+    from level_selection_screen import LevelSelectionScreen
 
     if state == 'init':
         if initScreen is None:
@@ -41,6 +43,10 @@ def switchState(state):
         if titleScreen is None:
             titleScreen = TitleScreen()
         currentScreen = titleScreen
+    elif state == 'levels':
+        if levelSelectionScreen is None:
+            levelSelectionScreen = LevelSelectionScreen()
+        currentScreen = levelSelectionScreen
     elif state == 'game':
         if gameScreen is None:
             gameScreen = GameScreen()

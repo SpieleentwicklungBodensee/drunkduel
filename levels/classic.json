@@ -1,0 +1,27 @@
+{
+  "name": "Classic Arena",
+  "mapdata": [
+    "       ||       ",
+    "       ||   Y   ",
+    "    Y  ||     o ",
+    "       ||       ",
+    "       || Y     ",
+    "   o   ||       ",
+    "      Y||  o    ",
+    "       ||    Y  ",
+    "  Y    ||       ",
+    "   o   ||       ",
+    "       ||       ",
+    "       ||     o ",
+    "     Y ||       ",
+    "  o    ||  Y    ",
+    "       ||       ",
+    "#######||#######"
+  ],
+  "metadata": {
+    "description": "The classic Drunk Duel arena with central river",
+    "author": "SpieleentwicklungBodensee",
+    "difficulty": "Normal",
+    "version": "1.0"
+  }
+}

@@ -120,12 +120,26 @@ class GameScreen(Screen):
                 ledwall.drawText('KOTZT', x=2, y=game_state.level.getHeight() * 2 + 4, color=(0, 255, 0))
             if self.players[1].is_vomiting:
                 ledwall.drawText('KOTZT', x=20, y=game_state.level.getHeight() * 2 + 4, color=(0, 255, 0))
+        
+        # Draw level info and hotkeys
+        self._draw_level_info()
 
     def event(self, e):
         if game_state.message:  # do not handle input while message is shown
             return
 
         if e.type == pygame.KEYDOWN:
+            # Level navigation hotkeys
+            if e.key == pygame.K_F3:  # Previous level
+                self._switch_to_previous_level()
+                return
+            elif e.key == pygame.K_F4:  # Next level
+                self._switch_to_next_level()
+                return
+            elif e.key == pygame.K_F5:  # Open level selection
+                game_state.switchState('levels')
+                return
+                
             for i, keys in enumerate([controls.PLAYER_1_KEYS, controls.PLAYER_2_KEYS]):
                 if e.key == keys[controls.DIR_LEFT]:
                     self.players[i].moveLeft()
@@ -292,6 +306,75 @@ class GameScreen(Screen):
                     break
 
             attempts += 1
+            
+    def _switch_to_next_level(self):
+        """Switch to the next level."""
+        from level_loader import get_level_loader
+        level_loader = get_level_loader()
+        next_level = level_loader.next_level()
+        self._reload_level_with_data(next_level)
+        
+    def _switch_to_previous_level(self):
+        """Switch to the previous level."""
+        from level_loader import get_level_loader
+        level_loader = get_level_loader()
+        prev_level = level_loader.previous_level()
+        self._reload_level_with_data(prev_level)
+        
+    def _reload_level_with_data(self, level_data):
+        """Reload the game with new level data."""
+        try:
+            from level import Level
+            
+            # Create new level with the new data
+            game_state.level = Level(level_data.mapdata, game_state.level.tiles)
+            
+            # Reset player positions
+            from config import PLAYER_1_STARTX, PLAYER_1_STARTY, PLAYER_2_STARTX, PLAYER_2_STARTY
+            self.players[0].xpos = PLAYER_1_STARTX * TILE_WIDTH
+            self.players[0].ypos = PLAYER_1_STARTY * TILE_HEIGHT
+            self.players[1].xpos = PLAYER_2_STARTX * TILE_WIDTH
+            self.players[1].ypos = PLAYER_2_STARTY * TILE_HEIGHT
+            
+            # Reset other game state
+            self.objects.clear()
+            
+            # Reset timers
+            self.weapon_drop_timer = 0
+            self.beer_spawn_timer = 0
+            self.health_spawn_timer = 0
+            self.initial_spawn_done = False
+            
+            # Show level change message
+            import game_state
+            from message import Message
+            game_state.message = Message(f"Level: {level_data.name}", 60)
+            
+            print(f"Switched to level: {level_data.name}")
+            
+        except Exception as e:
+            print(f"Error switching level: {e}")
+            
+    def _draw_level_info(self):
+        """Draw level information and hotkeys."""
+        from level_loader import get_level_loader
+        level_loader = get_level_loader()
+        current_level = level_loader.get_current_level()
+        level_count = level_loader.get_level_count()
+        current_index = level_loader.current_level_index
+        
+        # Draw level name in top right corner
+        level_text = f"{current_level.name} ({current_index + 1}/{level_count})"
+        text_width = len(level_text) * 8  # Assume 8-pixel wide font
+        screen_width = game_state.output.get_width()
+        ledwall.drawText(level_text, x=screen_width - text_width - 5, y=2, color=(200, 200, 200))
+        
+        # Draw hotkey help (smaller, fade in/out)
+        if game_state.tick % 300 < 150:  # Show for 2.5 seconds, hide for 2.5 seconds
+            help_text = "F3/F4: Prev/Next Level  F5: Level Select"
+            help_width = len(help_text) * 6  # Smaller font
+            ledwall.drawText(help_text, x=screen_width - help_width - 5, y=10, 
+                           color=(128, 128, 128), fontsize=1)
 
     def _spawn_initial_beer_powerups(self):
         """Spawnt 1-2 Bier-Powerups beim Spielstart."""
