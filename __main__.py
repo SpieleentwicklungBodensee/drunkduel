@@ -4,6 +4,8 @@ import argparse
 import ledwall
 print = ledwall.print
 
+import controls
+
 
 # Initialize Mixer for sound
 pygame.mixer.init()
@@ -46,26 +48,6 @@ if DEFAULT_BRIGHTNESS is None:
 
 
 BRIGHTNESS = DEFAULT_BRIGHTNESS
-
-DIR_LEFT = 3
-DIR_RIGHT = 2
-DIR_UP = 1
-DIR_DOWN = 0
-FIRE = 5
-
-PLAYER_2_KEYS = {DIR_LEFT: pygame.K_LEFT,
-                 DIR_RIGHT: pygame.K_RIGHT,
-                 DIR_UP: pygame.K_UP,
-                 DIR_DOWN: pygame.K_DOWN,
-                 FIRE: pygame.K_RCTRL,
-                 }
-
-PLAYER_1_KEYS = {DIR_LEFT: pygame.K_a,
-                 DIR_RIGHT: pygame.K_d,
-                 DIR_UP: pygame.K_w,
-                 DIR_DOWN: pygame.K_s,
-                 FIRE: pygame.K_TAB,
-                 }
 
 
 # global ----------------------
@@ -217,7 +199,7 @@ class Player(Object):
         self.ydir = 0
         self.speed = 1.5
 
-        self.facedir = DIR_DOWN
+        self.facedir = controls.DIR_DOWN
 
         self.score = 0
         self.ammo = 4
@@ -226,22 +208,22 @@ class Player(Object):
     def moveLeft(self):
         self.xdir = -1
         self.ydir = 0
-        self.facedir = DIR_LEFT
+        self.facedir = controls.DIR_LEFT
 
     def moveRight(self):
         self.xdir = 1
         self.ydir = 0
-        self.facedir = DIR_RIGHT
+        self.facedir = controls.DIR_RIGHT
 
     def moveUp(self):
         self.xdir = 0
         self.ydir = -1
-        self.facedir = DIR_UP
+        self.facedir = controls.DIR_UP
 
     def moveDown(self):
         self.xdir = 0
         self.ydir = 1
-        self.facedir = DIR_DOWN
+        self.facedir = controls.DIR_DOWN
 
     def stopLeft(self):
         if self.xdir < 0:
@@ -265,10 +247,10 @@ class Player(Object):
 
         if self.xpos < 128:
             bulletxdir = 1
-            self.facedir = DIR_RIGHT
+            self.facedir = controls.DIR_RIGHT
         else:
             bulletxdir = -1
-            self.facedir = DIR_LEFT
+            self.facedir = controls.DIR_LEFT
 
         spawnBullet(self.xpos, self.ypos, bulletxdir)
         SFX_GUNSHOT.play(loops=0)
@@ -456,31 +438,31 @@ class GameScreen(Screen):
 
     def event(self, e):
         if e.type == pygame.KEYDOWN:
-            for i, keys in enumerate([PLAYER_1_KEYS, PLAYER_2_KEYS]):
-                if e.key == keys[DIR_LEFT]:
+            for i, keys in enumerate([controls.PLAYER_1_KEYS, controls.PLAYER_2_KEYS]):
+                if e.key == keys[controls.DIR_LEFT]:
                     self.players[i].moveLeft()
-                elif e.key == keys[DIR_RIGHT]:
+                elif e.key == keys[controls.DIR_RIGHT]:
                     self.players[i].moveRight()
-                elif e.key == keys[DIR_UP]:
+                elif e.key == keys[controls.DIR_UP]:
                     self.players[i].moveUp()
-                elif e.key == keys[DIR_DOWN]:
+                elif e.key == keys[controls.DIR_DOWN]:
                     self.players[i].moveDown()
 
-                elif e.key == keys[FIRE]:
+                elif e.key == keys[controls.FIRE]:
                     self.players[i].shoot()
 
         elif e.type == pygame.KEYUP:
-            for i, keys in enumerate([PLAYER_1_KEYS, PLAYER_2_KEYS]):
-                if e.key == keys[DIR_LEFT]:
+            for i, keys in enumerate([controls.PLAYER_1_KEYS, controls.PLAYER_2_KEYS]):
+                if e.key == keys[controls.DIR_LEFT]:
                     self.players[i].stopLeft()
-                elif e.key == keys[DIR_RIGHT]:
+                elif e.key == keys[controls.DIR_RIGHT]:
                     self.players[i].stopRight()
-                elif e.key == keys[DIR_UP]:
+                elif e.key == keys[controls.DIR_UP]:
                     self.players[i].stopUp()
-                elif e.key == keys[DIR_DOWN]:
+                elif e.key == keys[controls.DIR_DOWN]:
                     self.players[i].stopDown()
 
-                elif e.key == keys[FIRE]:
+                elif e.key == keys[controls.FIRE]:
                     self.players[i].stopShooting()
 
     def update(self):
