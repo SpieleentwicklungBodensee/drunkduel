@@ -3,6 +3,7 @@ import ledwall
 import config
 from base import Screen
 from game_state import switchState, tick
+from sound_manager import SFX_BORING
 
 class TitleScreen(Screen):
     def __init__(self):
@@ -71,4 +72,6 @@ class TitleScreen(Screen):
     def _start_game(self):
         """Startet das Spiel mit der gewählten Alkohol-Einstellung."""
         config.ALCOHOL_ENABLED = (self.selected_option == 0)
+        if not config.ALCOHOL_ENABLED:
+            SFX_BORING.play()
         switchState('game')
