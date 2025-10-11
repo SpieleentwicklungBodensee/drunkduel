@@ -622,7 +622,7 @@ class GameOverScreen(Screen):
 
         if tick % 48 < 24:
             ledwall.centerText('PRESS BUTTON', y=25, color=(255, 255, 0), align=False)
-            ledwall.centerText('TO RESTART', y=27, color=(255, 255, 0), align=False)
+            ledwall.centerText('TO RESTART', y=28, color=(255, 255, 0), align=False)
 
     def event(self, e):
         if e.type == pygame.KEYDOWN or e.type == pygame.JOYBUTTONDOWN:
