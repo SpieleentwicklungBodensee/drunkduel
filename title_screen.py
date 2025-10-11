@@ -6,6 +6,7 @@ import random
 from base import Screen
 import game_state
 from sound_manager import SFX_BORING
+from player import load_player_sprites
 
 # Override print function
 import ledwall
@@ -17,8 +18,29 @@ class TitleScreen(Screen):
         self.selected_option = 0  # 0 = Mit Alkohol, 1 = Alkoholfrei, 2 = Level Auswahl
         self.show_menu = False
         self.blink_timer = 0
+        
+        # Load player sprites for menu decoration
+        self.player1_sprite, self.player2_sprite = load_player_sprites()
+        
+        # Set up left player (facing right, walking animation)
+        self.left_player_x = 8   # Left side of screen
+        self.left_player_y = 140  # Middle height
+        self.player1_sprite.select(controls.DIR_RIGHT)  # Face right
+        self.player1_sprite.speed = 15  # Slower animation
+        self.player1_sprite.start()
+        
+        # Set up right player (facing left, walking animation)  
+        self.right_player_x = ledwall.SCR_W - 24  # Right side of screen
+        self.right_player_y = 140  # Middle height
+        self.player2_sprite.select(controls.DIR_LEFT)  # Face left
+        self.player2_sprite.speed = 15  # Slower animation
+        self.player2_sprite.start()
 
     def draw(self):
+        # Draw animated players on sides of screen
+        self.player1_sprite.draw(game_state.output, self.left_player_x, self.left_player_y)
+        self.player2_sprite.draw(game_state.output, self.right_player_x, self.right_player_y)
+        
         ledwall.centerText('DRUNK', y=2, color=(0, 255, 0), fontsize=3, align=False)
         ledwall.centerText('DUEL', y=3, color=(0, 255, 0), fontsize=3, align=False)
 
@@ -134,3 +156,72 @@ class TitleScreen(Screen):
         if not config.ALCOHOL_ENABLED:
             SFX_BORING.play()
         game_state.switchState('game')
+    
+    def update(self):
+        """Update the title screen animations."""
+        if not self.show_menu:
+            return
+            
+        # Change player behavior based on selected option
+        if self.selected_option == 0:  # MIT ALKOHOL selected
+            # Make players "drunk" - wobble and occasional puke
+            wobble_x = random.randint(-1, 1)
+            wobble_y = random.randint(-1, 1)
+            
+            # Apply wobble but keep players on screen
+            self.left_player_x = max(0, min(8 + wobble_x, 20))
+            self.left_player_y = max(100, min(140 + wobble_y, 180))
+            
+            self.right_player_x = max(ledwall.SCR_W - 44, min(ledwall.SCR_W - 24 + wobble_x, ledwall.SCR_W - 16))
+            self.right_player_y = max(100, min(140 + wobble_y, 180))
+            
+            # Occasionally make players "throw up" when alcohol is selected
+            if random.randint(1, 180) == 1:  # About once every 3 seconds at 60fps
+                from puke_effect import PukeEffect
+                # Left player puke (facing right, so puke goes right)
+                PukeEffect.draw_at_position(game_state.output, self.left_player_x + 16, self.left_player_y + 8, particle_count=4)
+                # Right player puke (facing left, so puke goes left)
+                PukeEffect.draw_at_position(game_state.output, self.right_player_x - 8, self.right_player_y + 8, particle_count=4)
+                
+        elif self.selected_option == 1:  # ALKOHOLFREI selected
+            # Players walk normally but without any drunk effects
+            self.left_player_x = 8
+            self.left_player_y = 140
+            self.right_player_x = ledwall.SCR_W - 24
+            self.right_player_y = 140
+            
+            # Keep walking animations running (but steady, no wobble)
+            if not self.player1_sprite.running:
+                self.player1_sprite.select(controls.DIR_RIGHT)
+                self.player1_sprite.start()
+            if not self.player2_sprite.running:
+                self.player2_sprite.select(controls.DIR_LEFT)
+                self.player2_sprite.start()
+            
+        elif self.selected_option == 2:  # LEVEL WAEHLEN selected
+            # Players look around (change facing direction occasionally)
+            if random.randint(1, 120) == 1:  # Change direction every 2 seconds
+                # Left player looks around
+                new_dir = random.choice([controls.DIR_UP, controls.DIR_DOWN, controls.DIR_RIGHT])
+                self.player1_sprite.select(new_dir)
+                self.player1_sprite.start()
+                
+                # Right player looks around  
+                new_dir = random.choice([controls.DIR_UP, controls.DIR_DOWN, controls.DIR_LEFT])
+                self.player2_sprite.select(new_dir)
+                self.player2_sprite.start()
+            
+            # Reset to normal positions
+            self.left_player_x = 8
+            self.left_player_y = 140
+            self.right_player_x = ledwall.SCR_W - 24
+            self.right_player_y = 140
+        
+        # Default case: reset animations if they were stopped
+        if self.selected_option != 1:  # Not alkoholfrei
+            if not self.player1_sprite.running:
+                self.player1_sprite.select(controls.DIR_RIGHT)
+                self.player1_sprite.start()
+            if not self.player2_sprite.running:
+                self.player2_sprite.select(controls.DIR_LEFT)
+                self.player2_sprite.start()
