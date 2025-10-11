@@ -96,6 +96,8 @@ def load_graphics():
     tiles = {
         'Y': Sprite('gfx/desert3.png'),
         '|': createAnimatedSprite('gfx/water1.png'),
+        '<': createAnimatedSprite('gfx/water_left.png'),   # Left water tile
+        '>': createAnimatedSprite('gfx/water_right.png'),  # Right water tile
         '#': Sprite('gfx/fence1.png'),
         'o': Sprite('gfx/stone1.png'),
         'F': None,  # Invisible wall
@@ -110,6 +112,12 @@ def load_graphics():
     # Animate water
     tiles['|'].speed = 12
     tiles['|'].start()
+    
+    # Animate left and right water
+    tiles['<'].speed = 12
+    tiles['<'].start()
+    tiles['>'].speed = 12
+    tiles['>'].start()
 
     return tiles, bullet_sprite, munition_sprite, beer_sprite, medkit_sprite
 
