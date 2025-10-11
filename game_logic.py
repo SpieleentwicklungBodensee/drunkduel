@@ -13,7 +13,7 @@ from message import Message
 from weapon_drop import WeaponDrop
 from beer_powerup import BeerPowerup
 from health_powerup import HealthPowerup
-from sound_manager import SFX_FOOTSTEP, SFX_PLAYER_HIT, SFX_BEER_PICKUP
+from sound_manager import SFX_FOOTSTEP, SFX_LAUGHING, SFX_PLAYER_HIT
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
 
@@ -101,9 +101,6 @@ def checkHealthPickup():
 
                     # Remove the beer powerup
                     game_state.gameScreen.removeObject(beer)
-
-                    # Play pickup sound (reuse footstep for now)
-                    SFX_FOOTSTEP.play()
                     break
 
 
@@ -165,8 +162,9 @@ def checkBeerPickup():
                     # Remove the beer powerup
                     game_state.gameScreen.removeObject(beer)
 
-                    # Play beer pickup sound
-                    SFX_BEER_PICKUP.play()
+                    # Play random laughing sound
+                    random.choice(SFX_LAUGHING).play()
+                    
                     break
 
 

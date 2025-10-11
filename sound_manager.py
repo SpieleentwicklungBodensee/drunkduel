@@ -4,7 +4,7 @@ Centralizes all sound loading and playback functionality.
 """
 
 import pygame
-
+import os
 
 # Sound effects
 SFX_GUNSHOT = None
@@ -14,6 +14,9 @@ SFX_PLAYER_HIT = None
 SFX_EXPLOSION = None
 SFX_BEER_PICKUP = None  # Neuer Sound für Bier-Pickup
 SFX_VOMIT = None  # Neuer Sound für Kotzen
+
+# Laughing sounds for beer drinking
+SFX_LAUGHING = []  # List of laughing sounds
 
 # Footstep timing
 lastPlayedFootstep = 0
@@ -33,6 +36,13 @@ def load_sounds():
     SFX_BEER_PICKUP = SFX_FOOTSTEP
     # Für Kotzen verwenden wir erstmal einen existierenden Sound
     SFX_VOMIT = SFX_PLAYER_HIT  # Könnte später durch echten Kotz-Sound ersetzt werden
+
+    # Load multiple laughing sounds
+    # Find all laughing sound files by parsing filenames
+    for filename in os.listdir("sfx"):
+        if filename.startswith("laughing") and filename.endswith(".wav"):
+            sound = pygame.mixer.Sound(os.path.join("sfx", filename))
+            SFX_LAUGHING.append(sound)
 
 
 def playFootstepSound():
