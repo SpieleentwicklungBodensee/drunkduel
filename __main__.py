@@ -94,6 +94,9 @@ def spawnBullet(x, y, xdir):
 
     gameScreen.addObject(bullet)
 
+def removeBullet(bullet):
+    gameScreen.removeObject(bullet)
+
 
 # sprites and objects ---------
 
@@ -189,6 +192,9 @@ class Bullet(Object):
 
     def update(self):
         self.xpos += self.xdir * self.speed
+
+        if self.xpos < -TILE_WIDTH or self.xpos > ledwall.SCR_W:
+            removeBullet(self)
 
 
 class Player(Object):
@@ -370,6 +376,9 @@ class GameScreen(Screen):
 
     def addObject(self, obj):
         self.objects.append(obj)
+
+    def removeObject(self, obj):
+        self.objects.remove(obj)
 
 
 # init ------------------------
