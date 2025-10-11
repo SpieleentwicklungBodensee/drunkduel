@@ -5,8 +5,8 @@ import ledwall
 print = ledwall.print
 
 import controls
-
-
+import random
+import math
 # Initialize Mixer for sound
 pygame.mixer.init()
 
@@ -86,6 +86,41 @@ def spawnBullet(x, y, xdir, shooter_index):
 def removeBullet(bullet):
     gameScreen.removeObject(bullet)
 
+def spawnWeaponDrop():
+    import random
+    # Find a random empty spot on the map
+    attempts = 0
+    while attempts < 100:  # Prevent infinite loop
+        x = random.randint(0, level.getWidth() - 1)
+        y = random.randint(0, level.getHeight() - 1)
+        
+        if level.getTile(x, y) == ' ':  # Empty space
+            weapon_drop = WeaponDrop(x * TILE_WIDTH, y * TILE_HEIGHT)
+            gameScreen.addObject(weapon_drop)
+            break
+        attempts += 1
+
+def checkWeaponPickup():
+    # Check if players pick up weapon drops
+    for weapon_drop in gameScreen.objects[:]:
+        if isinstance(weapon_drop, WeaponDrop):
+            for player in gameScreen.players:
+                # Check collision with player
+                if (weapon_drop.xpos < player.xpos + TILE_WIDTH and
+                    weapon_drop.xpos + TILE_WIDTH > player.xpos and
+                    weapon_drop.ypos < player.ypos + TILE_HEIGHT and
+                    weapon_drop.ypos + TILE_HEIGHT > player.ypos):
+                    
+                    # Player picks up ammo
+                    player.ammo = min(player.ammo + weapon_drop.ammo_amount, 10)  # Max 10 ammo
+                    
+                    # Remove the weapon drop
+                    gameScreen.removeObject(weapon_drop)
+                    
+                    # Play pickup sound (reuse footstep for now)
+                    SFX_FOOTSTEP.play()
+                    break
+
 def checkCollisions():
     # Check bullet-player collisions
     for bullet in gameScreen.objects[:]:  # Use slice to avoid modification during iteration
@@ -110,8 +145,8 @@ def checkCollisions():
 
                     # Remove bullet and play sound effect
                     removeBullet(bullet)
-                    SFX_RICOCHET.play()
-
+                    SFX_PLAYER_HIT.play()
+                    
                     # Reset hit player position
                     if i == 0:  # Player 1 hit
                         player.xpos = 2 * TILE_WIDTH
@@ -280,6 +315,23 @@ class Explosion(Object):
                     pygame.draw.circle(output, color, (x, y), 2)
 
 
+class WeaponDrop(Object):
+    def __init__(self, xpos, ypos):
+        super().__init__(xpos, ypos, MUNITION_SPRITE)
+        self.ammo_amount = 3  # How much ammo this drop gives
+        self.bob_offset = 0   # For floating animation
+        
+    def update(self):
+        # Floating animation
+        self.bob_offset += 0.1
+        # The sprite will bob up and down slightly
+        
+    def draw(self, output):
+        # Draw with slight vertical bobbing animation
+        bob_y = self.ypos + math.sin(self.bob_offset) * 2
+        self.sprite.draw(output, self.xpos, int(bob_y))
+
+
 class Bullet(Object):
     def __init__(self, xpos, ypos):
         super().__init__(xpos, ypos, BULLET_SPRITE)
@@ -307,6 +359,11 @@ class Bullet(Object):
 
                 # Play explosion sound
                 SFX_EXPLOSION.play()
+                
+                # 30% chance to spawn a weapon drop where the cactus was
+                if random.random() < 0.3:
+                    weapon_drop = WeaponDrop(tile_x * TILE_WIDTH, tile_y * TILE_HEIGHT)
+                    gameScreen.addObject(weapon_drop)
 
                 # Remove the bullet
                 removeBullet(self)
@@ -575,7 +632,8 @@ class GameOverScreen(Screen):
             gameScreen.players[0].ypos = 2 * TILE_HEIGHT
             gameScreen.players[1].xpos = 13 * TILE_WIDTH
             gameScreen.players[1].ypos = 13 * TILE_HEIGHT
-            gameScreen.objects.clear()  # Remove all bullets
+            gameScreen.objects.clear()  # Remove all bullets and weapon drops
+            gameScreen.weapon_drop_timer = 0  # Reset weapon drop timer
             if hasattr(gameScreen, 'winner'):
                 delattr(gameScreen, 'winner')
             switchState('game')
@@ -587,6 +645,7 @@ class GameScreen(Screen):
 
         self.players = []
         self.objects = []
+        self.weapon_drop_timer = 0  # Timer for spawning weapon drops
 
         player1 = Player(2 * TILE_WIDTH, 2 * TILE_HEIGHT, PLAYER_1_SPRITE)
         player2 = Player(13 * TILE_WIDTH, 13 * TILE_HEIGHT, PLAYER_2_SPRITE)
@@ -652,6 +711,20 @@ class GameScreen(Screen):
 
         # Check for collisions
         checkCollisions()
+        
+        # Check for weapon pickups
+        checkWeaponPickup()
+        
+        # Spawn weapon drops periodically
+        self.weapon_drop_timer += 1
+        if self.weapon_drop_timer >= 300:  # Spawn every 5 seconds (300 frames at 60 FPS)
+            import random
+            # Only spawn if there aren't too many weapon drops already
+            weapon_drops = [obj for obj in self.objects if isinstance(obj, WeaponDrop)]
+            if len(weapon_drops) < 3:  # Max 3 weapon drops on map
+                if random.random() < 0.7:  # 70% chance to spawn
+                    spawnWeaponDrop()
+            self.weapon_drop_timer = 0
 
     def addObject(self, obj):
         self.objects.append(obj)
@@ -698,12 +771,14 @@ PLAYER_1_SPRITE = createAnimatedSprite('gfx/player1.png')
 PLAYER_2_SPRITE = createAnimatedSprite('gfx/player2.png')
 
 BULLET_SPRITE = Sprite('gfx/bullet.png')
+MUNITION_SPRITE = Sprite('gfx/munition.png')
 
 print('loading sfx...')
 SFX_GUNSHOT = pygame.mixer.Sound("sfx/Gunshot.wav")
 SFX_FOOTSTEP = pygame.mixer.Sound("sfx/Footstep.wav")
 SFX_RICOCHET = pygame.mixer.Sound("sfx/Ricochet.wav")
-SFX_EXPLOSION = pygame.mixer.Sound("sfx/Wilhelm_Scream.wav")
+SFX_PLAYER_HIT = pygame.mixer.Sound("sfx/Wilhelm_Scream.wav")
+SFX_EXPLOSION = pygame.mixer.Sound("sfx/Explosion.wav")
 
 print('\n\n')
 
