@@ -1,6 +1,7 @@
 import pygame
 import ledwall
 import config
+import controls
 from base import Screen
 import game_state
 from sound_manager import SFX_BORING
@@ -58,9 +59,10 @@ class TitleScreen(Screen):
                     self._start_game()
             elif e.type == pygame.JOYBUTTONDOWN:
                 # Joystick Button wechselt zwischen Optionen oder startet
-                if e.button == 0:  # A-Button oder ähnlich
-                    self._start_game()
-                else:
+                self._start_game()
+            elif e.type == pygame.JOYAXISMOTION:
+                action = controls.handleJoyEvent(e)
+                if action == 'moveup' or action == 'movedown':
                     self.selected_option = 1 - self.selected_option  # Toggle zwischen 0 und 1
             elif e.type == pygame.JOYHATMOTION:
                 # D-Pad Navigation
