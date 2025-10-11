@@ -156,28 +156,20 @@ def _handle_player_hit(bullet, hit_player_index):
 
     # Reset hit player position
     player = game_state.gameScreen.players[hit_player_index]
-    if hit_player_index == 0:  # Player 1 hit
-        player.xpos = config.PLAYER_1_STARTX * TILE_WIDTH
-        player.ypos = config.PLAYER_1_STARTY * TILE_HEIGHT
-    else:  # Player 2 hit
-        player.xpos = config.PLAYER_2_STARTX * TILE_WIDTH
-        player.ypos = config.PLAYER_2_STARTY * TILE_HEIGHT
-
-    # Reset ammo for hit player
-    player.ammo = config.INITIAL_AMMO
-
-    # Reset alcohol level for hit player (teilweise)
-    player.alcohol_level = max(0, player.alcohol_level - 0.3)  # Schock nüchtert etwas auf
-
-    # Check for victory condition (first to 5 points wins)
-    if game_state.gameScreen.players[other_player_index].score >= 5:
-        game_state.gameScreen.winner = other_player_index + 1
-        switchState('gameover')
+    player.die()
 
     # Switch controls
     randomizeControls(bullet.shooter_index)
     for player in game_state.gameScreen.players:
         player.stopMoving()
+
+
+def checkVictory():
+    # Check for victory condition (first to 5 points wins)
+    for player in game_state.gameScreen.players:
+        if player.score >= 5:
+            game_state.gameScreen.winner = game_state.gameScreen.players.index(player)
+            switchState('gameover')
 
 
 def randomizeControls(playerid):

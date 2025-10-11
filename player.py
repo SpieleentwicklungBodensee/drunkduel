@@ -11,6 +11,7 @@ from object import Object
 from sprite import createAnimatedSprite
 from game_logic import spawnBullet
 from sound_manager import playFootstepSound, SFX_GUNSHOT
+from game_state import TILE_WIDTH, TILE_HEIGHT
 
 # Load player sprites
 PLAYER_1_SPRITE = None
@@ -39,6 +40,9 @@ class Player(Object):
         self.score = 0
         self.ammo = config.INITIAL_AMMO
         self.showGun = False
+
+        self.dying = False
+        self.dyingTime = 0
 
         # Alkohol-System
         self.alcohol_level = 0.0  # 0.0 = nüchtern, 1.0 = sehr betrunken
@@ -129,6 +133,16 @@ class Player(Object):
     def stopShooting(self):
         self.showGun = False
 
+    def die(self):
+        import game_state
+        self.dying = True
+        self.dyingTime = game_state.tick
+
+        # set sprite animation
+        self.sprite.select(8 + (1 if self.facedir == controls.DIR_LEFT else 0))
+        self.sprite.speed = 12
+        self.sprite.start(True)
+
     def drink_alcohol(self, amount=0.3):
         """Spieler trinkt Alkohol und wird betrunkener."""
         self.alcohol_level = min(self.max_alcohol, self.alcohol_level + amount)
@@ -211,9 +225,35 @@ class Player(Object):
                 # Hier könnte ein Hickser-Sound gespielt werden
                 self.last_hiccup_time = game_state.tick
 
+    def respawn(self):
+        import game_state
+        hit_player_index = game_state.gameScreen.players.index(self)
+
+        if hit_player_index == 0:  # Player 1 hit
+            self.xpos = config.PLAYER_1_STARTX * TILE_WIDTH
+            self.ypos = config.PLAYER_1_STARTY * TILE_HEIGHT
+        else:  # Player 2 hit
+            self.xpos = config.PLAYER_2_STARTX * TILE_WIDTH
+            self.ypos = config.PLAYER_2_STARTY * TILE_HEIGHT
+
+        # Reset ammo for hit player
+        self.ammo = config.INITIAL_AMMO
+        self.dying = False
+        self.sprite.speed = 6
+
+        # Reset alcohol level for hit player (teilweise)
+        self.alcohol_level = max(0, self.alcohol_level - 0.3)  # Schock nüchtert etwas auf
+
     def update(self):
         import game_state
-        from game_state import TILE_WIDTH, TILE_HEIGHT
+        import game_logic
+
+        if self.dying:
+            if self.sprite.lastPhase == 3:
+                self.sprite.stop(False)
+            if not game_state.message:
+                self.respawn()
+            return
 
         # Alkohol-System aktualisieren
         self.update_alcohol_system()
