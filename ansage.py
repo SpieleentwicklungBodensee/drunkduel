@@ -10,6 +10,11 @@ import pygame
 import time
 import sys
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 pygame.mixer.init()
 
 # Predefined playlist (name -> file path)

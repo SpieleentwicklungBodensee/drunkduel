@@ -1,6 +1,11 @@
 import pygame
 import random
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 DIR_LEFT = 3
 DIR_RIGHT = 2
 DIR_UP = 1

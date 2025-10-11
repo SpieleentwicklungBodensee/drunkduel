@@ -5,6 +5,12 @@ from base import Screen
 import controls
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
+
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 class GameOverScreen(Screen):
     def draw(self):
         ledwall.centerText('GAME OVER', y=4, color=(255, 0, 0), fontsize=2, align=False)

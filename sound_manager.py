@@ -6,6 +6,12 @@ Centralizes all sound loading and playback functionality.
 import pygame
 import os
 
+# Override print function
+import ledwall
+print = ledwall.print
+
+
+
 # Sound effects
 SFX_GUNSHOT = None
 SFX_FOOTSTEP = None
@@ -25,7 +31,7 @@ lastPlayedFootstep = 0
 def load_sounds():
     """Load all game sound effects."""
     global SFX_GUNSHOT, SFX_FOOTSTEP, SFX_RICOCHET, SFX_PLAYER_HIT, SFX_EXPLOSION, SFX_BEER_PICKUP, SFX_VOMIT, SFX_LAUGHING, SFX_BORING
-    
+
     print('loading sfx...')
     SFX_GUNSHOT = pygame.mixer.Sound("sfx/Gunshot.wav")
     SFX_FOOTSTEP = pygame.mixer.Sound("sfx/Footstep.wav")
@@ -50,7 +56,7 @@ def playFootstepSound():
     """Play footstep sound with timing control."""
     global lastPlayedFootstep
     from game_state import tick
-    
+
     if tick != lastPlayedFootstep:
         SFX_FOOTSTEP.play()
         lastPlayedFootstep = tick

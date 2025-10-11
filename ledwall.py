@@ -1,6 +1,7 @@
 import pygame
 from bitmapfont import BitmapFont
 
+
 SCR_W = 256
 SCR_H = 320
 

@@ -1,6 +1,12 @@
 import pygame
 from base import Screen
 from game_state import switchState
+
+# Override print function
+import ledwall
+print = ledwall.print
+
+
 class InitScreen(Screen):
     def draw(self):
         pass

@@ -8,10 +8,14 @@ import pygame
 import ledwall
 from object import Object
 
+# Override print function
+import ledwall
+print = ledwall.print
+
 
 class Explosion(Object):
     """A particle-based explosion effect."""
-    
+
     def __init__(self, xpos, ypos):
         # Create a simple explosion sprite (we'll draw particles)
         explosion_surface = pygame.Surface((16, 16), flags=pygame.SRCALPHA)

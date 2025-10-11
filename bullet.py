@@ -14,9 +14,13 @@ from game_state import TILE_WIDTH, TILE_HEIGHT
 from explosion import Explosion
 from weapon_drop import WeaponDrop
 
+# Override print function
+import ledwall
+print = ledwall.print
+
 class Bullet(Object):
     """A bullet fired by a player."""
-    
+
     def __init__(self, xpos, ypos, bullet_sprite):
         super().__init__(xpos, ypos, bullet_sprite)
 
@@ -25,7 +29,7 @@ class Bullet(Object):
         self.shooter_index = -1  # Will be set when spawned
         self.damage = 25  # Base damage, will be modified by drunk level
         self.drunk_damage_modifier = 1.0  # Will be set when spawned
-        
+
     def get_total_damage(self):
         """Berechnet den Gesamtschaden der Kugel."""
         if config.ALCOHOL_ENABLED:
@@ -37,8 +41,8 @@ class Bullet(Object):
 
     def update(self):
         """Update bullet position and check for collisions."""
-        
-        
+
+
         self.xpos += self.xdir * self.speed
 
         # Check for collision with tiles
@@ -61,7 +65,7 @@ class Bullet(Object):
     def _explode_cactus(self, tile_x, tile_y):
         """Handle cactus explosion logic."""
 
-        
+
         # Create explosion effect
         explosion = Explosion(tile_x * TILE_WIDTH, tile_y * TILE_HEIGHT)
         game_state.gameScreen.addObject(explosion)
