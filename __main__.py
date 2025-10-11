@@ -7,6 +7,7 @@ import pygame
 
 import ledwall
 import game_state
+import controls
 from config import (
     parse_arguments, load_settings, validate_render_mode,
     get_default_brightness, initialize_joysticks, load_graphics,
@@ -57,6 +58,7 @@ def initialize_game():
 
     # Initialize joysticks
     joysticks, num_joysticks = initialize_joysticks()
+    controls.JOYSTICKS += joysticks
 
     # Load graphics and sounds
     tiles, bullet_sprite, munition_sprite, beer_sprite, medkit_sprite = load_graphics()

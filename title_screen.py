@@ -1,8 +1,9 @@
 import pygame
 import ledwall
 import config
+import controls
 from base import Screen
-from game_state import switchState, tick
+import game_state
 from sound_manager import SFX_BORING
 
 class TitleScreen(Screen):
@@ -20,7 +21,7 @@ class TitleScreen(Screen):
         ledwall.centerText('2025', align=False)
 
         if not self.show_menu:
-            if tick % 48 < 24:
+            if game_state.tick % 48 < 24:
                 ledwall.centerText('PRESS BUTTON', y=25, color=(255, 255, 0), align=False)
         else:
             # Zeige Menü-Optionen
@@ -28,21 +29,21 @@ class TitleScreen(Screen):
             
             # Option 1: Mit Alkohol
             color1 = (255, 255, 0) if self.selected_option == 0 else (128, 128, 128)
-            if self.selected_option == 0 and tick % 30 < 15:
+            if self.selected_option == 0 and game_state.tick % 30 < 15:
                 ledwall.centerText('> MIT ALKOHOL <', y=22, color=color1, align=False)
             else:
                 ledwall.centerText('MIT ALKOHOL', y=22, color=color1, align=False)
                 
             # Option 2: Alkoholfrei  
             color2 = (255, 255, 0) if self.selected_option == 1 else (128, 128, 128)
-            if self.selected_option == 1 and tick % 30 < 15:
+            if self.selected_option == 1 and game_state.tick % 30 < 15:
                 ledwall.centerText('> ALKOHOLFREI <', y=24, color=color2, align=False)
             else:
                 ledwall.centerText('ALKOHOLFREI', y=24, color=color2, align=False)
             
             # Option 3: Level Auswahl
             color3 = (255, 255, 0) if self.selected_option == 2 else (128, 128, 128)
-            if self.selected_option == 2 and tick % 30 < 15:
+            if self.selected_option == 2 and game_state.tick % 30 < 15:
                 ledwall.centerText('> LEVEL WAEHLEN <', y=26, color=color3, align=False)
             else:
                 ledwall.centerText('LEVEL WAEHLEN', y=26, color=color3, align=False)
@@ -69,6 +70,12 @@ class TitleScreen(Screen):
                     self._handle_selection()
                 else:
                     self.selected_option = (self.selected_option + 1) % 3  # Cycle through options
+            elif e.type == pygame.JOYAXISMOTION:
+                action = controls.handleJoyEvent(e)
+                if action == 'moveup':
+                    self.selected_option = max(0, self.selected_option - 1)
+                elif action == 'movedown':
+                    self.selected_option = min(2, self.selected_option + 1)
             elif e.type == pygame.JOYHATMOTION:
                 # D-Pad Navigation
                 if e.value[1] == 1:  # Hoch
@@ -81,19 +88,19 @@ class TitleScreen(Screen):
         if self.selected_option == 0:
             # Mit Alkohol spielen
             config.ALCOHOL_ENABLED = True
-            switchState('game')
+            game_state.switchState('game')
         elif self.selected_option == 1:
             # Alkoholfrei spielen
             config.ALCOHOL_ENABLED = False
             SFX_BORING.play()
-            switchState('game')
+            game_state.switchState('game')
         elif self.selected_option == 2:
             # Level-Auswahl öffnen
-            switchState('levels')
+            game_state.switchState('levels')
     
     def _start_game(self):
         """Startet das Spiel mit der gewählten Alkohol-Einstellung (Legacy-Methode)."""
         config.ALCOHOL_ENABLED = (self.selected_option == 0)
         if not config.ALCOHOL_ENABLED:
             SFX_BORING.play()
-        switchState('game')
+        game_state.switchState('game')
