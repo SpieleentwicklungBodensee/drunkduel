@@ -242,6 +242,57 @@ class Object:
         self.sprite.draw(output, self.xpos, self.ypos)
 
 
+class Explosion(Object):
+    def __init__(self, xpos, ypos):
+        # Create a simple explosion sprite (we'll draw particles)
+        explosion_surface = pygame.Surface((TILE_WIDTH, TILE_HEIGHT), flags=pygame.SRCALPHA)
+        super().__init__(xpos, ypos, Sprite(explosion_surface))
+        
+        self.particles = []
+        self.lifetime = 30  # frames
+        self.age = 0
+        
+        # Create particles
+        import random
+        for i in range(8):
+            particle = {
+                'x': xpos + TILE_WIDTH // 2,
+                'y': ypos + TILE_HEIGHT // 2,
+                'vx': random.uniform(-3, 3),
+                'vy': random.uniform(-3, 3),
+                'life': random.randint(15, 25)
+            }
+            self.particles.append(particle)
+    
+    def update(self):
+        self.age += 1
+        
+        # Update particles
+        for particle in self.particles[:]:
+            particle['x'] += particle['vx']
+            particle['y'] += particle['vy']
+            particle['vy'] += 0.1  # gravity
+            particle['life'] -= 1
+            
+            if particle['life'] <= 0:
+                self.particles.remove(particle)
+        
+        # Remove explosion when done
+        if self.age >= self.lifetime or len(self.particles) == 0:
+            gameScreen.removeObject(self)
+    
+    def draw(self, output):
+        # Draw particles as colored pixels
+        for particle in self.particles:
+            if particle['life'] > 0:
+                # Color fades from yellow to red
+                life_ratio = particle['life'] / 25.0
+                color = (255, int(255 * life_ratio), 0)
+                x, y = int(particle['x']), int(particle['y'])
+                if 0 <= x < ledwall.SCR_W and 0 <= y < ledwall.SCR_H:
+                    pygame.draw.circle(output, color, (x, y), 2)
+
+
 class Bullet(Object):
     def __init__(self, xpos, ypos):
         super().__init__(xpos, ypos, BULLET_SPRITE)
@@ -252,6 +303,34 @@ class Bullet(Object):
 
     def update(self):
         self.xpos += self.xdir * self.speed
+        
+        # Check for collision with tiles
+        tile_x = int(self.xpos // TILE_WIDTH)
+        tile_y = int(self.ypos // TILE_HEIGHT)
+        
+        if 0 <= tile_x < level.getWidth() and 0 <= tile_y < level.getHeight():
+            tile = level.getTile(tile_x, tile_y)
+            if tile == 'Y':  # Hit a cactus - explode it
+                # Create explosion effect
+                explosion = Explosion(tile_x * TILE_WIDTH, tile_y * TILE_HEIGHT)
+                gameScreen.addObject(explosion)
+                
+                # Remove the cactus from the map
+                level.setTile(tile_x, tile_y, ' ')
+                
+                # Play explosion sound
+                SFX_EXPLOSION.play()
+                
+                # Remove the bullet
+                removeBullet(self)
+                return
+            elif tile in ['#', 'o']:  # Hit fence or stone - just bounce/disappear
+                # Play ricochet sound
+                SFX_RICOCHET.play()
+                
+                # Remove the bullet
+                removeBullet(self)
+                return
 
         if self.xpos < -TILE_WIDTH or self.xpos > ledwall.SCR_W:
             removeBullet(self)
@@ -637,6 +716,7 @@ print('loading sfx...')
 SFX_GUNSHOT = pygame.mixer.Sound("sfx/Gunshot.wav")
 SFX_FOOTSTEP = pygame.mixer.Sound("sfx/Footstep.wav")
 SFX_RICOCHET = pygame.mixer.Sound("sfx/Ricochet.wav")
+SFX_EXPLOSION = pygame.mixer.Sound("sfx/Wilhelm_Scream.wav")
 
 print('\n\n')
 
