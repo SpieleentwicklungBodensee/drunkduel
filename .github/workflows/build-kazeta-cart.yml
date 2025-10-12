@@ -1,0 +1,171 @@
+name: Build Kazeta Cart Image
+
+on:
+  push:
+    branches: [ main, cartridge ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-cart:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          e2fsprogs \
+          dosfstools \
+          mtools \
+          parted \
+          kpartx \
+          qemu-utils
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Verify static files exist
+      run: |
+        # Check that required static files are present in the repository
+        if [ ! -f "drunk_duel.kzi" ]; then
+          echo "ERROR: drunk_duel.kzi not found in repository"
+          exit 1
+        fi
+        if [ ! -f "python_runtime" ]; then
+          echo "ERROR: python_runtime not found in repository"
+          exit 1
+        fi
+        if [ ! -f "cart_icon.png" ]; then
+          echo "ERROR: cart_icon.png not found in repository"
+          exit 1
+        fi
+        echo "✓ All required static files found"
+        
+        # Make python_runtime executable
+        chmod +x python_runtime
+
+    - name: Create cart image
+      run: |
+        # Create a disk image for the cart
+        CART_SIZE_MB=512
+        IMG_FILE="drunk_duel_cart.img"
+        
+        # Create empty image file
+        dd if=/dev/zero of="$IMG_FILE" bs=1M count=$CART_SIZE_MB
+        
+        # Create ext4 filesystem with casefold off
+        mkfs.ext4 -F -L "DRUNKDUEL" "$IMG_FILE"
+        
+        # Mount the image
+        MOUNT_DIR=$(mktemp -d)
+        sudo mount -o loop "$IMG_FILE" "$MOUNT_DIR"
+        
+        # Create content directory
+        sudo mkdir -p "$MOUNT_DIR/content"
+        
+        # Copy game files to content directory
+        sudo cp -r . "$MOUNT_DIR/content/"
+        
+        # Remove .git directory and other unnecessary files
+        sudo rm -rf "$MOUNT_DIR/content/.git"
+        sudo rm -rf "$MOUNT_DIR/content/.github"
+        sudo rm -rf "$MOUNT_DIR/content/__pycache__"
+        sudo rm -rf "$MOUNT_DIR/content/env"
+        sudo rm -f "$MOUNT_DIR/content/"*.img
+        sudo rm -f "$MOUNT_DIR/content/"*.kzi
+        sudo rm -f "$MOUNT_DIR/content/python_runtime"
+        # cart_icon.png stays in content as a game asset
+        
+        # Copy runtime and kzi file to root
+        sudo cp python_runtime "$MOUNT_DIR/"
+        sudo cp drunk_duel.kzi "$MOUNT_DIR/"
+        sudo cp cart_icon.png "$MOUNT_DIR/"
+        
+        # Set proper permissions
+        sudo chmod +x "$MOUNT_DIR/python_runtime"
+        sudo chmod -R 755 "$MOUNT_DIR/content"
+        
+        # Unmount
+        sudo umount "$MOUNT_DIR"
+        rmdir "$MOUNT_DIR"
+        
+        echo "Cart image created: $IMG_FILE"
+        ls -lh "$IMG_FILE"
+
+    - name: Compress cart image
+      run: |
+        # Compress the cart image for distribution
+        gzip -9 drunk_duel_cart.img
+        echo "Compressed cart image created: drunk_duel_cart.img.gz"
+        ls -lh drunk_duel_cart.img.gz
+
+    - name: Generate checksums
+      run: |
+        sha256sum drunk_duel_cart.img.gz > drunk_duel_cart.img.gz.sha256
+        md5sum drunk_duel_cart.img.gz > drunk_duel_cart.img.gz.md5
+
+    - name: Upload cart artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: drunk-duel-kazeta-cart
+        path: |
+          drunk_duel_cart.img.gz
+          drunk_duel_cart.img.gz.sha256
+          drunk_duel_cart.img.gz.md5
+          drunk_duel.kzi
+          cart_icon.png
+          python_runtime
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          drunk_duel_cart.img.gz
+          drunk_duel_cart.img.gz.sha256
+          drunk_duel_cart.img.gz.md5
+          drunk_duel.kzi
+          cart_icon.png
+        body: |
+          # Drunk Duel Kazeta Cart Release
+          
+          This release contains a flashable Kazeta cart image for the Drunk Duel game.
+          
+          ## Files included:
+          - `drunk_duel_cart.img.gz` - Compressed cart image (flash this to SD card)
+          - `drunk_duel_cart.img.gz.sha256` - SHA256 checksum
+          - `drunk_duel_cart.img.gz.md5` - MD5 checksum
+          - `drunk_duel.kzi` - Kazeta info file
+          - `cart_icon.png` - Cart icon (64x64)
+          
+          ## How to use:
+          1. Download `drunk_duel_cart.img.gz`
+          2. Verify the checksum (optional but recommended)
+          3. Decompress: `gunzip drunk_duel_cart.img.gz`
+          4. Flash to SD card: `sudo dd if=drunk_duel_cart.img of=/dev/sdX bs=4M status=progress` (replace /dev/sdX with your SD card device)
+          5. Insert the SD card into your Kazeta device
+          
+          ## Game Info:
+          - **Players:** 1-2
+          - **Genre:** Action/Arcade
+          - **Controls:** Keyboard or gamepad supported
+          - **Features:** Dynamic control swapping, alcohol effects, multiple game modes
+          
+          Created during Bodensee GameJam 2025 by Spieleentwicklung Bodensee.
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

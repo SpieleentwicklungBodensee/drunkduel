@@ -1,0 +1,47 @@
+{
+  "name": "Drunk Duel",
+  "description": "An out-of-control wild west shootout game where controls change after each hit. Created during Bodensee GameJam 2025.",
+  "author": "Spieleentwicklung Bodensee",
+  "version": "1.0.0",
+  "year": "2025",
+  "genre": "Action",
+  "players": "1-2",
+  "rating": "T",
+  "executable": "python_runtime",
+  "arguments": ["-m", "__main__"],
+  "working_directory": "content",
+  "icon": "cart_icon.png",
+  "tags": ["action", "multiplayer", "retro", "western", "arcade"],
+  "requirements": {
+    "python": ">=3.8",
+    "packages": ["pygame==2.6.1"]
+  },
+  "controls": {
+    "keyboard": {
+      "player1": {
+        "move": "WASD",
+        "fire": "Tab"
+      },
+      "player2": {
+        "move": "Arrow Keys",
+        "fire": "Right Ctrl"
+      },
+      "system": {
+        "brightness_down": "F1",
+        "brightness_up": "F2",
+        "fullscreen": "F11",
+        "exit": "Escape"
+      }
+    },
+    "gamepad": "Supported"
+  },
+  "features": [
+    "Dynamic control swapping",
+    "Alcohol system with visual effects",
+    "Multiple game modes",
+    "Duck Hunt mode",
+    "LED wall display support",
+    "Level editor",
+    "Sound effects and music"
+  ]
+}
