@@ -1,5 +1,4 @@
 To Do Liste
-- Helligkeit einstellen
 - Wide Screen - Modus
 - Munition spawned schnell wenn Waffe leer
 - am oberen Bildrand werden keine bullets angezeigt
