@@ -48,6 +48,16 @@ class LevelData:
         """Get the level difficulty."""
         return self.metadata.get('difficulty', 'Normal')
 
+    @property
+    def duck_hunt_mode(self) -> bool:
+        """Check if Duck Hunt mode is enabled for this level."""
+        return self.metadata.get('duck_hunt_mode', False)
+
+    @property
+    def music(self) -> str:
+        """Get the music file for this level."""
+        return self.metadata.get('music', None)
+
 
 class LevelLoader:
     """Manages loading and access to game levels."""

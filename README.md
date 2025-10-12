@@ -20,3 +20,7 @@ If you want to locally merge "main" into your branch:
 ```
 git merge origin main
 ```
+
+
+## File taken from other people and credits
+See [credits.md](credits.md) for details.

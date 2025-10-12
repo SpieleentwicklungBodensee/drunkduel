@@ -31,6 +31,9 @@ SFX_BIRD_LAUNCH = None
 # Sound words
 SOUND_WORDS = {}
 
+# Music
+CURRENT_MUSIC = None
+
 # Laughing sounds for beer drinking
 SFX_LAUGHING = []  # List of laughing sounds
 
@@ -105,3 +108,40 @@ def playFootstepSound():
     if tick != lastPlayedFootstep:
         SFX_FOOTSTEP.play()
         lastPlayedFootstep = tick
+
+
+def play_music(music_file):
+    """Play background music from the music directory."""
+    global CURRENT_MUSIC
+    try:
+        if CURRENT_MUSIC != music_file:
+            pygame.mixer.music.stop()
+            music_path = os.path.join("music", music_file)
+            if os.path.exists(music_path):
+                pygame.mixer.music.load(music_path)
+                pygame.mixer.music.play(-1)  # Loop indefinitely
+                CURRENT_MUSIC = music_file
+                print(f"Playing music: {music_file}")
+            else:
+                print(f"Music file not found: {music_path}")
+    except Exception as e:
+        print(f"Error playing music {music_file}: {e}")
+
+
+def stop_music():
+    """Stop background music."""
+    global CURRENT_MUSIC
+    try:
+        pygame.mixer.music.stop()
+        CURRENT_MUSIC = None
+        print("Music stopped")
+    except Exception as e:
+        print(f"Error stopping music: {e}")
+
+
+def set_music_volume(volume):
+    """Set music volume (0.0 to 1.0)."""
+    try:
+        pygame.mixer.music.set_volume(volume)
+    except Exception as e:
+        print(f"Error setting music volume: {e}")

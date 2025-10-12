@@ -1,0 +1,29 @@
+{
+  "name": "Classic Arena",
+  "mapdata": [
+    "################",
+    "#           Y  #",
+    "#   Y         o#",
+    "#              #",
+    "#         Y    #",
+    "#  o           #",
+    "#     Y    o   #",
+    "#            Y #",
+    "# Y            #",
+    "#  o           #",
+    "#              #",
+    "#             o#",
+    "#    Y         #",
+    "# o        Y   #",
+    "#              #",
+    "################"
+  ],
+  "metadata": {
+    "description": "The classic Drunk Duel arena with central river",
+    "author": "ZeHa?",
+    "difficulty": "Normal",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}

@@ -24,11 +24,12 @@ import ledwall
 print = ledwall.print
 
 
-def spawnBullet(x, y, xdir, shooter_index, bullet_sprite):
+def spawnBullet(x, y, xdir, shooter_index, bullet_sprite, ydir=0):
     """Spawn a bullet at the given position."""
 
     bullet = Bullet(x, y, bullet_sprite)
     bullet.xdir = xdir
+    bullet.ydir = ydir  # Add vertical direction support
     bullet.shooter_index = shooter_index
 
     # Set damage modifier based on shooter's alcohol level
@@ -274,6 +275,7 @@ def checkCollisions():
                             # Bird got hit!
                             bird.get_shot()
                             game_state.gameScreen.removeObject(bullet)
+                            _handle_bird_hit()
                             bullet_hit = True
                             break
                     elif isinstance(bird, FenceBird) and bird.state in ["sitting", "scared_flying"]:
@@ -288,8 +290,16 @@ def checkCollisions():
                             # Fence bird got hit!
                             bird.get_shot()
                             game_state.gameScreen.removeObject(bullet)
+                            _handle_bird_hit()
                             bullet_hit = True
                             break
+
+
+def _handle_bird_hit():
+    """Handle when a bird gets hit by a bullet in single-player mode."""
+    if getattr(config, 'SINGLEPLAYER_MODE', False):
+        # Award points for hitting birds in single-player mode
+        game_state.gameScreen.bird_score += 1
 
 
 def _handle_player_hit(bullet, hit_player_index):
@@ -346,11 +356,18 @@ def checkVictory():
             if player.sprite.lastPhase < 3:
                 return
 
-    # Check for victory condition (first to 5 points wins)
-    for player in game_state.gameScreen.players:
-        if player.score >= config.WIN_SCORE:
-            game_state.gameScreen.winner = game_state.gameScreen.players.index(player)
+    # Check for victory condition
+    if getattr(config, 'SINGLEPLAYER_MODE', False):
+        # Single-player mode: check bird score
+        if game_state.gameScreen.bird_score >= game_state.gameScreen.target_bird_score:
+            game_state.gameScreen.winner = 0  # Player 1 wins in single-player
             switchState('gameover')
+    else:
+        # Multiplayer mode: check player scores (first to 5 points wins)
+        for player in game_state.gameScreen.players:
+            if player.score >= config.WIN_SCORE:
+                game_state.gameScreen.winner = game_state.gameScreen.players.index(player)
+                switchState('gameover')
 
 
 def randomizeControls(playerid):

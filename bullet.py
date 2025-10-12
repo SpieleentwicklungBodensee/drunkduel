@@ -25,6 +25,7 @@ class Bullet(Object):
         super().__init__(xpos, ypos, bullet_sprite)
 
         self.xdir = 0
+        self.ydir = 0  # Add vertical direction support
         self.speed = 4
         self.shooter_index = -1  # Will be set when spawned
         self.damage = 25  # Base damage, will be modified by drunk level
@@ -42,8 +43,8 @@ class Bullet(Object):
     def update(self):
         """Update bullet position and check for collisions."""
 
-
         self.xpos += self.xdir * self.speed
+        self.ypos += self.ydir * self.speed
 
         # Check for collision with tiles
         tile_x = int(self.xpos // TILE_WIDTH)
@@ -59,7 +60,8 @@ class Bullet(Object):
                 return
 
         # Remove bullet if it goes off screen
-        if self.xpos < -TILE_WIDTH or self.xpos > ledwall.SCR_W:
+        if (self.xpos < -TILE_WIDTH or self.xpos > ledwall.SCR_W or
+            self.ypos < -TILE_HEIGHT or self.ypos > ledwall.SCR_H):
             self._remove_bullet()
 
     def _explode_cactus(self, tile_x, tile_y):

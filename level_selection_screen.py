@@ -213,8 +213,22 @@ class LevelSelectionScreen:
             current_level_data = self.level_loader.get_current_level()
             game_state.level = Level(current_level_data.mapdata, tiles)
 
+            # Set Duck Hunt mode based on level metadata
+            config.DUCK_HUNT_MODE = current_level_data.duck_hunt_mode
+
+            # Load level music if specified
+            from sound_manager import play_music, stop_music
+            if current_level_data.music:
+                play_music(current_level_data.music)
+            else:
+                stop_music()
+
             if config.DEBUG_MODE:
                 print(f"Loaded level: {current_level_data.name}")
+                if current_level_data.duck_hunt_mode:
+                    print("Duck Hunt mode enabled for this level")
+                if current_level_data.music:
+                    print(f"Level music: {current_level_data.music}")
 
         except Exception as e:
             print(f"Error reloading level: {e}")

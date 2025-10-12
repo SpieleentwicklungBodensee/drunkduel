@@ -30,6 +30,10 @@ ACCURATE_INTONATION = False # wenn True, klingen die saetze langweiliger
 ALCOHOL_ENABLED = True  # Wird durch den Startbildschirm gesetzt
 PLAY_BORING_SOUND = False
 
+# Spielmodus-Einstellungen
+SINGLEPLAYER_MODE = False  # Wird durch den Startbildschirm gesetzt
+DUCK_HUNT_MODE = False     # Erlaubt nur Schüsse nach oben (Duck Hunt Stil)
+
 
 def parse_arguments():
     """Parse command line arguments."""
