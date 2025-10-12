@@ -448,7 +448,7 @@ class GameScreen(Screen):
             # Spawn from right edge, flying left
             x = game_state.output.get_width()
         
-        # Create and add the bird
+        # Create the bird - it will adjust its own Y position if it has a landing target
         bird = Bird(x, y, flying_right)
         self.addObject(bird)
     
@@ -522,19 +522,3 @@ class GameScreen(Screen):
             x, y, tile_type = random.choice(empty_perches)
             fence_bird = FenceBird(x * TILE_WIDTH, y * TILE_HEIGHT - 4, x, y, tile_type)
             self.addObject(fence_bird)
-
-    def _create_birds_from_level(self):
-        """Create bird objects for all 'b' tiles in the level and replace them with empty spaces."""
-        if not hasattr(game_state, 'level') or not game_state.level:
-            return
-            
-        # Scan the level for 'b' tiles and create bird objects
-        for y in range(game_state.level.getHeight()):
-            for x in range(game_state.level.getWidth()):
-                if game_state.level.getTile(x, y) == 'b':
-                    # Create a bird object at this position
-                    bird = Bird(x * TILE_WIDTH, y * TILE_HEIGHT)
-                    self.addObject(bird)
-                    
-                    # Replace the tile with empty space so it doesn't also draw the tile sprite
-                    game_state.level.setTile(x, y, ' ')

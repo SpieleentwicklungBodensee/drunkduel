@@ -199,7 +199,7 @@ def checkCollisions():
             # Check bullet-bird collisions (only if bullet didn't hit a player)
             if not bullet_hit:
                 for bird in game_state.gameScreen.objects[:]:
-                    if isinstance(bird, Bird) and bird.state == "flying":
+                    if isinstance(bird, Bird) and bird.state in ["flying", "landing"]:
                         bird_bounds = bird.get_bounds()
                         
                         # Simple bounding box collision detection
