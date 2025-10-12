@@ -1,4 +1,5 @@
 To Do Liste
+- Bei End-Screen steht z.B. Spieler 1 gewinnt aber Sprache ist "Spieler 2 gewinnt"
 - Wide Screen - Modus
 - Munition spawned schnell wenn Waffe leer
 - am oberen Bildrand werden keine bullets angezeigt
