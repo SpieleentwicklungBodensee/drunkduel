@@ -54,19 +54,19 @@ if [ ! -f "cart_icon.png" ]; then
     echo "ERROR: cart_icon.png not found. Please ensure the icon file is present."
     exit 1
 fi
-echo "✓ Using existing cart_icon.png"
+echo "Using existing cart_icon.png"
 
 if [ ! -f "drunk_duel.kzi" ]; then
     echo "ERROR: drunk_duel.kzi not found. Please ensure the Kazeta info file is present."
     exit 1
 fi
-echo "✓ Using existing drunk_duel.kzi"
+echo "Using existing drunk_duel.kzi"
 
 if [ ! -f "python_runtime" ]; then
     echo "ERROR: python_runtime not found. Please ensure the runtime script is present."
     exit 1
 fi
-echo "✓ Using existing python_runtime"
+echo "Using existing python_runtime"
 
 # Make python_runtime executable
 chmod +x python_runtime
