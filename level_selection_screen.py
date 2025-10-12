@@ -290,6 +290,21 @@ class LevelSelectionScreen:
             elif event.value[1] == -1:  # Down
                 self.selected_index = min(self.level_loader.get_level_count() - 1,
                                         self.selected_index + 1)
+        elif event.type == pygame.JOYAXISMOTION:
+            # Analog stick navigation
+            if event.axis == 1:  # Vertical axis (usually left stick Y-axis)
+                # Use a deadzone to prevent accidental movement
+                deadzone = 0.5
+                if event.value < -deadzone:  # Up
+                    # Add a simple debounce mechanism
+                    if not hasattr(self, '_last_axis_move') or game_state.tick - self._last_axis_move > 10:
+                        self.selected_index = max(0, self.selected_index - 1)
+                        self._last_axis_move = game_state.tick
+                elif event.value > deadzone:  # Down
+                    if not hasattr(self, '_last_axis_move') or game_state.tick - self._last_axis_move > 10:
+                        self.selected_index = min(self.level_loader.get_level_count() - 1,
+                                                self.selected_index + 1)
+                        self._last_axis_move = game_state.tick
 
     def _reload_current_level(self):
         """Reload the game level with the newly selected level data."""
