@@ -103,6 +103,7 @@ def reset_game_state():
         gameScreen.weapon_drop_timer = 0  # Reset weapon drop timer
         gameScreen.destroyed_cacti.clear()  # Reset cactus respawn timers
 
+        global message
         message = None
 
         controls.restore(0)
