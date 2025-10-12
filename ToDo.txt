@@ -13,6 +13,6 @@ To Do Liste
 - Level "open field" ist nicht "open"
 - Level "Steingarten" Schuß muß in Richtung des Gegners gehen
 - Munition explodiert wenn Sie getroffen wird
-- Einzelspielermodus Vögel abschießem
+- ✓ Einzelspielermodus Vögel abschießem
 - Einzelspielermodus Bier trinken
 - Hitbox (Stein)

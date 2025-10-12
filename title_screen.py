@@ -15,6 +15,7 @@ print = ledwall.print
 MODE_NORMAL = 0
 MODE_ALCOHOL = 1
 MODE_LEVELSELECT = 2
+MODE_SINGLEPLAYER = 3
 
 class TitleScreen(Screen):
     def __init__(self):
@@ -111,7 +112,14 @@ class TitleScreen(Screen):
             else:
                 ledwall.centerText('LEVEL WAEHLEN', y=26, color=color3, align=False)
 
-            ledwall.centerText('ENTER ZUM STARTEN', y=29, color=(0, 255, 0), align=False)
+            # Option 4: Einzelspieler
+            color4 = (255, 255, 0) if self.selected_option == MODE_SINGLEPLAYER else (128, 128, 128)
+            if self.selected_option == MODE_SINGLEPLAYER and game_state.tick % 30 < 15:
+                ledwall.centerText('> VOEGEL SCHIESSEN <', y=28, color=color4, align=False)
+            else:
+                ledwall.centerText('VOEGEL SCHIESSEN', y=28, color=color4, align=False)
+
+            ledwall.centerText('ENTER ZUM STARTEN', y=31, color=(0, 255, 0), align=False)
 
     def event(self, e):
         if not self.show_menu:
@@ -124,7 +132,7 @@ class TitleScreen(Screen):
                 if e.key == pygame.K_UP or e.key == pygame.K_w:
                     self.selected_option = max(0, self.selected_option - 1)
                 elif e.key == pygame.K_DOWN or e.key == pygame.K_s:
-                    self.selected_option = min(2, self.selected_option + 1)
+                    self.selected_option = min(3, self.selected_option + 1)
                 elif e.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_RCTRL):
                     self._handle_selection()
             elif e.type == pygame.JOYBUTTONDOWN:
@@ -132,14 +140,14 @@ class TitleScreen(Screen):
                 if e.button == 0:  # A-Button oder ähnlich
                     self._handle_selection()
                 else:
-                    self.selected_option = (self.selected_option + 1) % 3  # Cycle through options
+                    self.selected_option = (self.selected_option + 1) % 4  # Cycle through options
             elif e.type in (pygame.JOYAXISMOTION, pygame.JOYHATMOTION):
                 actions = controls.handleJoyEvent(e)
                 for action in actions:
                     if action == 'moveup':
                         self.selected_option = max(0, self.selected_option - 1)
                     elif action == 'movedown':
-                        self.selected_option = min(2, self.selected_option + 1)
+                        self.selected_option = min(3, self.selected_option + 1)
 
     def _handle_selection(self):
         """Behandelt die Auswahl im Menü."""
@@ -156,6 +164,52 @@ class TitleScreen(Screen):
         elif self.selected_option == MODE_LEVELSELECT:
             # Level-Auswahl öffnen
             game_state.switchState('levels')
+        elif self.selected_option == MODE_SINGLEPLAYER:
+            # Einzelspieler Vogel-Schießen
+            config.ALCOHOL_ENABLED = False  # No alcohol in single player mode
+            config.SINGLEPLAYER_MODE = True
+            
+            # Load Duck Hunt level 1 for single-player mode
+            from level_loader import LevelLoader
+            duckhunt_loader = LevelLoader("levels/duckhunt")
+            duckhunt_loader.load_all_levels()
+            
+            if duckhunt_loader.get_level_count() > 0:
+                # Set the first Duck Hunt level as current
+                duckhunt_loader.set_current_level(0)
+                
+                # Update game state with new level
+                from level import Level
+                from config import load_graphics
+                try:
+                    tiles, _, _, _, _ = load_graphics()
+                    current_level_data = duckhunt_loader.get_current_level()
+                    game_state.level = Level(current_level_data.mapdata, tiles)
+                    config.DUCK_HUNT_MODE = current_level_data.duck_hunt_mode
+                    
+                    # Load level music if specified
+                    from sound_manager import play_music, stop_music
+                    if current_level_data.music:
+                        play_music(current_level_data.music)
+                    else:
+                        stop_music()
+                    
+                    # Replace the global level loader with duckhunt loader
+                    import level_loader
+                    level_loader.level_loader = duckhunt_loader
+                    
+                    if config.DEBUG_MODE:
+                        print(f"Loaded Duck Hunt level: {current_level_data.name}")
+                        print(f"Duck Hunt mode: {config.DUCK_HUNT_MODE}")
+                        if current_level_data.music:
+                            print(f"Level music: {current_level_data.music}")
+                        
+                except Exception as e:
+                    print(f"Error loading Duck Hunt level: {e}")
+            else:
+                print("No Duck Hunt levels found!")
+                
+            game_state.switchState('game')
 
     def _start_game(self):
         """Startet das Spiel mit der gewählten Alkohol-Einstellung (Legacy-Methode)."""

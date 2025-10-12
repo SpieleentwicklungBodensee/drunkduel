@@ -70,8 +70,10 @@ class Bird(Object):
         self.landing_progress = 0.0
         self.landing_duration = 30  # frames to complete landing
         
-        # Determine if this bird should have a landing target
-        self._maybe_choose_landing_target()
+        # Determine if this bird should have a landing target (not in Duck Hunt mode)
+        import config
+        if not getattr(config, 'DUCK_HUNT_MODE', False):
+            self._maybe_choose_landing_target()
         
     def update(self):
         """Update the bird's position and state."""
@@ -91,8 +93,10 @@ class Bird(Object):
                 if self.xpos < -16:  # -16 because sprite is 16px wide
                     self.active = False
             
-            # Check if bird should start landing
-            self._check_for_landing()
+            # Check if bird should start landing (not in Duck Hunt mode)
+            import config
+            if not getattr(config, 'DUCK_HUNT_MODE', False):
+                self._check_for_landing()
             
         elif self.state == "landing":
             # Bird is smoothly moving to landing position

@@ -83,11 +83,17 @@ class Player(Object):
         self.facedir = controls.DIR_RIGHT
 
     def moveUp(self):
+        # Prevent vertical movement in Duck Hunt mode
+        if getattr(config, 'DUCK_HUNT_MODE', False):
+            return
         self.xdir = 0
         self.ydir = -1
         self.facedir = controls.DIR_UP
 
     def moveDown(self):
+        # Prevent vertical movement in Duck Hunt mode
+        if getattr(config, 'DUCK_HUNT_MODE', False):
+            return
         self.xdir = 0
         self.ydir = 1
         self.facedir = controls.DIR_DOWN
@@ -114,45 +120,57 @@ class Player(Object):
         self.ydir = 0
 
     def shoot(self, player_index, other_player_x=None):
-        if self.ammo <= 0:
-            SFX_NOAMMO.play()
-            return  # Can't shoot without ammo
+        # In Duck Hunt mode, player has unlimited ammo
+        if not getattr(config, 'DUCK_HUNT_MODE', False):
+            if self.ammo <= 0:
+                SFX_NOAMMO.play()
+                return  # Can't shoot without ammo
+            self.ammo -= 1
 
         self.showGun = True
-        self.ammo -= 1
 
         # Alkohol beeinflusst die Schussrichtung
         accuracy_modifier = self.get_drunk_accuracy_modifier()
 
-        # Determine shooting direction based on other player's position
-        if other_player_x is not None:
-            # Shoot towards the other player
-            if self.xpos < other_player_x:
-                bulletxdir = 1  # Shoot right
-                self.facedir = controls.DIR_RIGHT
-            elif self.xpos > other_player_x:
-                bulletxdir = -1  # Shoot left
-                self.facedir = controls.DIR_LEFT
-            else:
-                # Players are at same x position, use fallback direction
-                # Favor right direction as default
-                bulletxdir = 1
-                self.facedir = controls.DIR_RIGHT
+        # Check if Duck Hunt mode is enabled
+        if getattr(config, 'DUCK_HUNT_MODE', False):
+            # Duck Hunt mode: only shoot upward
+            bulletxdir = 0
+            bulletydir = -1  # Shoot upward
+            self.facedir = controls.DIR_UP
         else:
-            # Fallback: use old logic (position-based)
-            if self.xpos < 128:
-                bulletxdir = 1
-                self.facedir = controls.DIR_RIGHT
+            # Normal shooting mode
+            bulletydir = 0
+            
+            # Determine shooting direction based on other player's position
+            if other_player_x is not None:
+                # Shoot towards the other player
+                if self.xpos < other_player_x:
+                    bulletxdir = 1  # Shoot right
+                    self.facedir = controls.DIR_RIGHT
+                elif self.xpos > other_player_x:
+                    bulletxdir = -1  # Shoot left
+                    self.facedir = controls.DIR_LEFT
+                else:
+                    # Players are at same x position, use fallback direction
+                    # Favor right direction as default
+                    bulletxdir = 1
+                    self.facedir = controls.DIR_RIGHT
             else:
-                bulletxdir = -1
-                self.facedir = controls.DIR_LEFT
+                # Fallback: use old logic (position-based)
+                if self.xpos < 128:
+                    bulletxdir = 1
+                    self.facedir = controls.DIR_RIGHT
+                else:
+                    bulletxdir = -1
+                    self.facedir = controls.DIR_LEFT
 
-        # Bei Betrunkenheit: zufällige Abweichung der Schussrichtung
-        if accuracy_modifier < 1.0:
-            if random.random() > accuracy_modifier:
-                # Schuss geht in zufällige Richtung
-                directions = [-1, 1]
-                bulletxdir = random.choice(directions)
+            # Bei Betrunkenheit: zufällige Abweichung der Schussrichtung (only in normal mode)
+            if accuracy_modifier < 1.0:
+                if random.random() > accuracy_modifier:
+                    # Schuss geht in zufällige Richtung
+                    directions = [-1, 1]
+                    bulletxdir = random.choice(directions)
 
         # Get bullet sprite from game state
         import game_state
@@ -163,7 +181,7 @@ class Player(Object):
             from sprite import Sprite
             bullet_sprite = Sprite('gfx/bullet.png')
 
-        spawnBullet(self.xpos, self.ypos, bulletxdir, player_index, bullet_sprite)
+        spawnBullet(self.xpos, self.ypos, bulletxdir, player_index, bullet_sprite, bulletydir)
         SFX_GUNSHOT.play(loops=0)
 
     def stopShooting(self):
@@ -192,6 +210,12 @@ class Player(Object):
         self.sprite.select(8 + (1 if self.facedir == controls.DIR_LEFT else 0))
         self.sprite.speed = 12
         self.sprite.start(True)
+        
+        # In Duck Hunt mode, player death means game over
+        if getattr(config, 'DUCK_HUNT_MODE', False):
+            game_state.gameScreen.winner = -1  # No winner, just game over
+            from game_state import switchState
+            switchState('gameover')
 
     def drink_alcohol(self, amount=0.3):
         """Spieler trinkt Alkohol und wird betrunkener."""
@@ -481,6 +505,12 @@ class Player(Object):
 
         if new_ypos > (game_state.level.getHeight() -1) * TILE_HEIGHT:
             new_ypos = (game_state.level.getHeight() -1) * TILE_HEIGHT
+            new_ydir = 0
+
+        # Duck Hunt mode: lock player to bottom Y position
+        if getattr(config, 'DUCK_HUNT_MODE', False):
+            duck_hunt_y = (game_state.level.getHeight() - 2) * TILE_HEIGHT  # Same as spawn position
+            new_ypos = duck_hunt_y
             new_ydir = 0
 
         # collision with tiles:

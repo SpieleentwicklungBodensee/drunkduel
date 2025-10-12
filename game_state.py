@@ -50,6 +50,12 @@ def switchState(state):
             initScreen = InitScreen()
         currentScreen = initScreen
     elif state == 'title':
+        # Reset single-player mode and Duck Hunt mode when returning to title
+        config.SINGLEPLAYER_MODE = False
+        config.DUCK_HUNT_MODE = False
+        # Stop any playing music
+        from sound_manager import stop_music
+        stop_music()
         if titleScreen is None:
             titleScreen = TitleScreen()
         else:
@@ -89,17 +95,25 @@ def initialize_game_state():
 
 def reset_game_state():
     if gameScreen:
+        # Reset single-player mode variables
+        if hasattr(gameScreen, 'bird_score'):
+            gameScreen.bird_score = 0
+            
+        # Only reset second player if not in single-player mode
+        if not getattr(config, 'SINGLEPLAYER_MODE', False):
+            if len(gameScreen.players) > 1:
+                gameScreen.players[1].score = 0
+                gameScreen.players[1].ammo = config.INITIAL_AMMO
+                gameScreen.players[1].xpos = config.PLAYER_2_STARTX * TILE_WIDTH
+                gameScreen.players[1].ypos = config.PLAYER_2_STARTY * TILE_HEIGHT
+                gameScreen.players[1].sprite.speed = 6
+        
+        # Always reset first player
         gameScreen.players[0].score = 0
-        gameScreen.players[1].score = 0
         gameScreen.players[0].ammo = config.INITIAL_AMMO
-        gameScreen.players[1].ammo = config.INITIAL_AMMO
         gameScreen.players[0].xpos = config.PLAYER_1_STARTX * TILE_WIDTH
         gameScreen.players[0].ypos = config.PLAYER_1_STARTY * TILE_HEIGHT
-        gameScreen.players[1].xpos = config.PLAYER_2_STARTX * TILE_WIDTH
-        gameScreen.players[1].ypos = config.PLAYER_2_STARTY * TILE_HEIGHT
-
         gameScreen.players[0].sprite.speed = 6
-        gameScreen.players[1].sprite.speed = 6
 
         gameScreen.objects.clear()  # Remove all bullets and weapon drops
         gameScreen.weapon_drop_timer = 0  # Reset weapon drop timer

@@ -8,6 +8,7 @@ import pygame
 import ledwall
 import game_state
 import controls
+import config
 from config import (
     parse_arguments, load_settings, validate_render_mode,
     get_default_brightness, initialize_joysticks, load_graphics,
@@ -76,6 +77,12 @@ def initialize_game():
     # Create level
     mapdata = get_level_map_data()
     game_state.level = Level(mapdata, tiles)
+
+    # Set Duck Hunt mode based on initial level
+    from level_loader import get_level_loader
+    level_loader = get_level_loader()
+    current_level = level_loader.get_current_level()
+    config.DUCK_HUNT_MODE = current_level.duck_hunt_mode
 
     # Print startup info
     print_startup_info(render_mode, num_joysticks)
