@@ -14,12 +14,15 @@ WORD_DURATION = 35
 
 
 class Message(Object):
-    def __init__(self, xpos, ypos, lines, color):
+    def __init__(self, xpos, ypos, lines, color, tick=None):
         super().__init__(xpos, ypos, None)
         self.lines = lines
         self.color = color
 
-        self.initTime = game_state.tick
+        if tick is None:
+            tick = game_state.tick
+
+        self.initTime = tick
 
     def draw(self, output):
         for i, line in enumerate(self.lines):
