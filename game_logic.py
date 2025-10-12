@@ -259,7 +259,10 @@ def _handle_player_hit(bullet, hit_player_index):
         player.die()
 
         # Switch controls only on death
-        randomizeControls(bullet.shooter_index)
+        # and only if not victory yet (HACK)
+        if game_state.gameScreen.players[bullet.shooter_index].score < config.WIN_SCORE:
+            randomizeControls(bullet.shooter_index)
+
         for player in game_state.gameScreen.players:
             player.stopMoving()
 
@@ -284,7 +287,7 @@ def checkVictory():
 
     # Check for victory condition (first to 5 points wins)
     for player in game_state.gameScreen.players:
-        if player.score >= 5:
+        if player.score >= config.WIN_SCORE:
             game_state.gameScreen.winner = game_state.gameScreen.players.index(player)
             switchState('gameover')
 
@@ -306,6 +309,5 @@ def randomizeControls(playerid):
 
     y = 8
 
-    #message = Message(x, y, ['', message1, '', *message2], color)
     message = Message(x, y, ['', 'spieler', ['eins', 'zwei'][playerid], '', *message2], color)
     game_state.message = message

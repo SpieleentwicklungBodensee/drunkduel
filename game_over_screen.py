@@ -2,10 +2,17 @@ import pygame
 import ledwall
 import config
 from base import Screen
+from message import Message
 import controls
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
 class GameOverScreen(Screen):
+    def __init__(self):
+        super().__init__()
+
+        # won't be displayed, only for voice
+        self.speechMessage = Message(0, 0, ['', '', 'spieler', ['eins', 'zwei'][game_state.gameScreen.winner], 'wins'], (0, 0, 0), 0)
+
     def draw(self):
         ledwall.centerText('GAME OVER', y=4, color=(255, 0, 0), fontsize=2, align=False)
 
@@ -28,3 +35,6 @@ class GameOverScreen(Screen):
 
         if e.type == pygame.KEYDOWN or e.type == pygame.JOYBUTTONDOWN:
             switchState('title')
+
+    def update(self):
+        self.speechMessage.update()
