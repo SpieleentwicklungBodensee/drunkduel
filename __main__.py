@@ -102,7 +102,18 @@ def handle_global_events(event, render_mode):
         return False
     elif event.type == pygame.KEYDOWN:
         if event.key == pygame.K_ESCAPE:
-            return False
+            # Only allow ESC to exit the game from certain screens (title, init)
+            # During gameplay, let the game screen handle ESC to return to menu
+            current_state = getattr(game_state, 'currentScreen', None)
+            if current_state and hasattr(current_state, '__class__'):
+                screen_name = current_state.__class__.__name__
+                # Allow ESC to quit from title screen, init screen, or level selection
+                if screen_name in ['TitleScreen', 'InitScreen', 'LevelSelectionScreen']:
+                    return False
+                # For other screens (like GameScreen), let them handle ESC themselves
+            else:
+                # If we can't determine the screen, default to quitting
+                return False
         elif event.key == pygame.K_F1:
             BRIGHTNESS -= 1
             game_state.BRIGHTNESS = BRIGHTNESS
