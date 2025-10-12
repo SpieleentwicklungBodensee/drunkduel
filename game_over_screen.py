@@ -6,6 +6,7 @@ from message import Message
 import controls
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
+from sound_manager import SFX_GAME_OVER_GUITAR
 class GameOverScreen(Screen):
     def __init__(self):
         super().__init__()
@@ -19,7 +20,8 @@ class GameOverScreen(Screen):
                 self.speechMessage = Message(0, 0, ['', '', 'mission', 'complete'], (0, 0, 0), 0)
         else:
             self.speechMessage = Message(0, 0, ['', '', 'spieler', ['eins', 'zwei'][game_state.gameScreen.winner], 'wins'], (0, 0, 0), 0)
-
+        
+        SFX_GAME_OVER_GUITAR.play()
     def draw(self):
         if getattr(config, 'SINGLEPLAYER_MODE', False):
             # Check if this is Duck Hunt mode death or normal single-player victory
