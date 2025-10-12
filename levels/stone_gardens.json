@@ -19,9 +19,11 @@
     "FFFoooFFFFFoooFFF"
   ],
   "metadata": {
-    "description": "Stone formation",
+    "description": "Stone garden arena",
     "author": "miathedev", 
     "difficulty": "Normal",
-    "version": "1.0"
+    "version": "1.0",
+    "allow_up_down_shoot": true,
+    "music": "X_Musician_88_X_-_Dungeon.mp3"
   }
 }

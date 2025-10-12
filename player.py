@@ -119,7 +119,7 @@ class Player(Object):
         self.xdir = 0
         self.ydir = 0
 
-    def shoot(self, player_index, other_player_x=None):
+    def shoot(self, player_index, other_player_x=None, other_player_y=None):
         # In Duck Hunt mode, player has unlimited ammo
         if not getattr(config, 'DUCK_HUNT_MODE', False):
             if self.ammo <= 0:
@@ -139,12 +139,48 @@ class Player(Object):
             bulletydir = -1  # Shoot upward
             self.facedir = controls.DIR_UP
         else:
+            # Check if up/down shooting is enabled for this level
+            from level_loader import get_level_loader
+            level_loader = get_level_loader()
+            current_level = level_loader.get_current_level()
+            allow_up_down_shoot = current_level.allow_up_down_shoot
+            
             # Normal shooting mode
             bulletydir = 0
+            bulletxdir = 0
             
             # Determine shooting direction based on other player's position
-            if other_player_x is not None:
-                # Shoot towards the other player
+            if other_player_x is not None and other_player_y is not None and allow_up_down_shoot:
+                # Quadrant-based shooting: determine direction based on position relative to other player
+                dx = other_player_x - self.xpos
+                dy = other_player_y - self.ypos
+                
+                # Calculate which quadrant the other player is in relative to this player
+                # Use absolute values to determine primary direction
+                abs_dx = abs(dx)
+                abs_dy = abs(dy)
+                
+                if abs_dx > abs_dy:
+                    # Horizontal direction is primary
+                    if dx > 0:
+                        bulletxdir = 1  # Shoot right
+                        self.facedir = controls.DIR_RIGHT
+                    else:
+                        bulletxdir = -1  # Shoot left
+                        self.facedir = controls.DIR_LEFT
+                    bulletydir = 0
+                else:
+                    # Vertical direction is primary
+                    if dy > 0:
+                        bulletydir = 1  # Shoot down
+                        self.facedir = controls.DIR_DOWN
+                    else:
+                        bulletydir = -1  # Shoot up
+                        self.facedir = controls.DIR_UP
+                    bulletxdir = 0
+                    
+            elif other_player_x is not None:
+                # Fallback to horizontal-only shooting (original behavior)
                 if self.xpos < other_player_x:
                     bulletxdir = 1  # Shoot right
                     self.facedir = controls.DIR_RIGHT
@@ -169,8 +205,17 @@ class Player(Object):
             if accuracy_modifier < 1.0:
                 if random.random() > accuracy_modifier:
                     # Schuss geht in zufällige Richtung
-                    directions = [-1, 1]
-                    bulletxdir = random.choice(directions)
+                    if allow_up_down_shoot:
+                        # Allow random directions in all 4 directions
+                        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # left, right, up, down
+                        random_dir = random.choice(directions)
+                        bulletxdir = random_dir[0]
+                        bulletydir = random_dir[1]
+                    else:
+                        # Only horizontal directions
+                        directions = [-1, 1]
+                        bulletxdir = random.choice(directions)
+                        bulletydir = 0
 
         # Get bullet sprite from game state
         import game_state
