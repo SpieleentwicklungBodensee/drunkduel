@@ -20,6 +20,7 @@ SFX_PLAYER_HIT = None
 SFX_EXPLOSION = None
 SFX_BEER_PICKUP = None  # Neuer Sound für Bier-Pickup
 SFX_VOMIT = None  # Neuer Sound für Kotzen
+SFX_RELOAD = None
 
 # Sound words
 SOUND_WORDS = {}
@@ -33,7 +34,7 @@ lastPlayedFootstep = 0
 
 def load_sounds():
     """Load all game sound effects."""
-    global SFX_GUNSHOT, SFX_FOOTSTEP, SFX_RICOCHET, SFX_PLAYER_HIT, SFX_EXPLOSION, SFX_BEER_PICKUP, SFX_VOMIT, SFX_LAUGHING, SFX_BORING
+    global SFX_GUNSHOT, SFX_FOOTSTEP, SFX_RICOCHET, SFX_PLAYER_HIT, SFX_EXPLOSION, SFX_BEER_PICKUP, SFX_VOMIT, SFX_LAUGHING, SFX_BORING, SFX_RELOAD
 
     print('loading sfx...')
     SFX_GUNSHOT = pygame.mixer.Sound("sfx/Gunshot.wav")
@@ -46,6 +47,7 @@ def load_sounds():
     # Für Kotzen verwenden wir erstmal einen existierenden Sound
     SFX_VOMIT = pygame.mixer.Sound("sfx/Kotz.wav")
     SFX_BORING = pygame.mixer.Sound("sfx/Boring.wav")
+    SFX_RELOAD = pygame.mixer.Sound("sfx/Reload.wav")
 
     # Load multiple laughing sounds
     # Find all laughing sound files by parsing filenames

@@ -14,7 +14,7 @@ from weapon_drop import WeaponDrop
 from beer_powerup import BeerPowerup
 from health_powerup import HealthPowerup
 from bird import Bird, FenceBird
-from sound_manager import SFX_FOOTSTEP, SFX_LAUGHING, SFX_PLAYER_HIT
+from sound_manager import SFX_FOOTSTEP, SFX_LAUGHING, SFX_PLAYER_HIT, SFX_RELOAD
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
 
@@ -143,7 +143,7 @@ def checkWeaponPickup():
                     game_state.gameScreen.removeObject(weapon_drop)
 
                     # Play pickup sound (reuse footstep for now)
-                    SFX_FOOTSTEP.play()
+                    SFX_RELOAD.play()
                     break
 
 
@@ -179,7 +179,7 @@ def checkCollisions():
     for bullet in game_state.gameScreen.objects[:]:  # Use slice to avoid modification during iteration
         if isinstance(bullet, Bullet):
             bullet_hit = False
-            
+
             # Check bullet-player collisions
             for i, player in enumerate(game_state.gameScreen.players):
                 # Skip collision check with the player who shot the bullet
@@ -195,19 +195,19 @@ def checkCollisions():
                     _handle_player_hit(bullet, i)
                     bullet_hit = True
                     break
-            
+
             # Check bullet-bird collisions (only if bullet didn't hit a player)
             if not bullet_hit:
                 for bird in game_state.gameScreen.objects[:]:
                     if isinstance(bird, Bird) and bird.state in ["flying", "landing"]:
                         bird_bounds = bird.get_bounds()
-                        
+
                         # Simple bounding box collision detection
                         if (bullet.xpos < bird_bounds['x'] + bird_bounds['width'] and
                             bullet.xpos + TILE_WIDTH > bird_bounds['x'] and
                             bullet.ypos < bird_bounds['y'] + bird_bounds['height'] and
                             bullet.ypos + TILE_HEIGHT > bird_bounds['y']):
-                            
+
                             # Bird got hit!
                             bird.get_shot()
                             game_state.gameScreen.removeObject(bullet)
@@ -215,13 +215,13 @@ def checkCollisions():
                             break
                     elif isinstance(bird, FenceBird) and bird.state in ["sitting", "scared_flying"]:
                         bird_bounds = bird.get_bounds()
-                        
+
                         # Simple bounding box collision detection
                         if (bullet.xpos < bird_bounds['x'] + bird_bounds['width'] and
                             bullet.xpos + TILE_WIDTH > bird_bounds['x'] and
                             bullet.ypos < bird_bounds['y'] + bird_bounds['height'] and
                             bullet.ypos + TILE_HEIGHT > bird_bounds['y']):
-                            
+
                             # Fence bird got hit!
                             bird.get_shot()
                             game_state.gameScreen.removeObject(bullet)
