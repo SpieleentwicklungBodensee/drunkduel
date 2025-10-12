@@ -183,6 +183,11 @@ class GameScreen(Screen):
             return
 
         if e.type == pygame.KEYDOWN:
+            # ESC key to return to main menu
+            if e.key == pygame.K_ESCAPE:
+                game_state.switchState('title')
+                return
+                
             # Level navigation hotkeys
             if e.key == pygame.K_F3:  # Previous level
                 self._switch_to_previous_level()
@@ -246,6 +251,14 @@ class GameScreen(Screen):
                     self.players[i].stopShooting()
 
         elif e.type in (pygame.JOYAXISMOTION, pygame.JOYHATMOTION, pygame.JOYBUTTONDOWN, pygame.JOYBUTTONUP):
+            # Check for back/start buttons to return to main menu
+            if e.type == pygame.JOYBUTTONDOWN:
+                # Common back/start button mappings across different controllers
+                # Button 6 = Back/Select, Button 7 = Start, Button 8 = Xbox button (varies by controller)
+                if e.button in [6, 7, 8, 9, 10]:  # Cover various start/back/home button mappings
+                    game_state.switchState('title')
+                    return
+            
             actions = controls.handleJoyEvent(e)
             for action in actions:
                 controls.performAction(action, self.players[e.instance_id], e.instance_id)

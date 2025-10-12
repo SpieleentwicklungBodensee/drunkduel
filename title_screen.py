@@ -16,6 +16,7 @@ MODE_NORMAL = 0
 MODE_ALCOHOL = 1
 MODE_LEVELSELECT = 2
 MODE_SINGLEPLAYER = 3
+MODE_EXIT = 4
 
 class TitleScreen(Screen):
     def __init__(self):
@@ -119,7 +120,14 @@ class TitleScreen(Screen):
             else:
                 ledwall.centerText('VOEGEL SCHIESSEN', y=28, color=color4, align=False)
 
-            ledwall.centerText('ENTER ZUM STARTEN', y=31, color=(0, 255, 0), align=False)
+            # Option 5: Exit Game
+            color5 = (255, 255, 0) if self.selected_option == MODE_EXIT else (128, 128, 128)
+            if self.selected_option == MODE_EXIT and game_state.tick % 30 < 15:
+                ledwall.centerText('> SPIEL BEENDEN <', y=30, color=color5, align=False)
+            else:
+                ledwall.centerText('SPIEL BEENDEN', y=30, color=color5, align=False)
+
+            ledwall.centerText('ENTER ZUM STARTEN', y=33, color=(0, 255, 0), align=False)
 
     def event(self, e):
         if not self.show_menu:
@@ -132,7 +140,7 @@ class TitleScreen(Screen):
                 if e.key == pygame.K_UP or e.key == pygame.K_w:
                     self.selected_option = max(0, self.selected_option - 1)
                 elif e.key == pygame.K_DOWN or e.key == pygame.K_s:
-                    self.selected_option = min(3, self.selected_option + 1)
+                    self.selected_option = min(4, self.selected_option + 1)
                 elif e.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_RCTRL):
                     self._handle_selection()
             elif e.type == pygame.JOYBUTTONDOWN:
@@ -140,14 +148,14 @@ class TitleScreen(Screen):
                 if e.button == 0:  # A-Button oder ähnlich
                     self._handle_selection()
                 else:
-                    self.selected_option = (self.selected_option + 1) % 4  # Cycle through options
+                    self.selected_option = (self.selected_option + 1) % 5  # Cycle through options
             elif e.type in (pygame.JOYAXISMOTION, pygame.JOYHATMOTION):
                 actions = controls.handleJoyEvent(e)
                 for action in actions:
                     if action == 'moveup':
                         self.selected_option = max(0, self.selected_option - 1)
                     elif action == 'movedown':
-                        self.selected_option = min(3, self.selected_option + 1)
+                        self.selected_option = min(4, self.selected_option + 1)
 
     def _handle_selection(self):
         """Behandelt die Auswahl im Menü."""
@@ -210,6 +218,11 @@ class TitleScreen(Screen):
                 print("No Duck Hunt levels found!")
                 
             game_state.switchState('game')
+        elif self.selected_option == MODE_EXIT:
+            # Exit the game
+            pygame.quit()
+            import sys
+            sys.exit()
 
     def _start_game(self):
         """Startet das Spiel mit der gewählten Alkohol-Einstellung (Legacy-Methode)."""
