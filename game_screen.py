@@ -161,9 +161,6 @@ class GameScreen(Screen):
             health2_color = get_health_color(self.players[1].health)
             ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=health_y_pos, color=health2_color)
 
-            ledwall.drawText(f'HP: {self.players[0].health}', x=2, y=game_state.level.getHeight() * 2 + 3, color=health1_color)
-            ledwall.drawText(f'HP: {self.players[1].health}', x=20, y=game_state.level.getHeight() * 2 + 3, color=health2_color)
-
             # Draw vomiting status
             if self.players[0].is_vomiting:
                 ledwall.drawText('KOTZT', x=2, y=game_state.level.getHeight() * 2 + 4, color=(0, 255, 0))
