@@ -116,17 +116,96 @@ class LevelSelectionScreen:
                           (150, 150, 150))
 
     def _draw_level_preview(self):
-        """Draw a small preview of the selected level."""
+        """Draw a live preview of the selected level by actually rendering it."""
         try:
             current_level = self.level_loader.get_level_by_index(self.selected_index)
             if not current_level:
                 return
 
             # Preview area - positioned at bottom right
+            preview_width = 120
+            preview_height = 96
+            preview_x = game_state.output.get_width() - preview_width - 10
+            preview_y = game_state.output.get_height() - preview_height - 50
+
+            # Background
+            pygame.draw.rect(game_state.output, (20, 20, 30),
+                           (preview_x, preview_y, preview_width, preview_height))
+            pygame.draw.rect(game_state.output, (100, 100, 100),
+                           (preview_x, preview_y, preview_width, preview_height), 1)
+
+            # Title
+            self.font.drawText(game_state.output, "LIVE PREVIEW", (preview_x + 5) // 8, (preview_y - 12) // 8,
+                          (200, 200, 200))
+
+            # Get level data
+            mapdata = current_level.mapdata
+            if not mapdata:
+                return
+
+            level_width = len(mapdata[0])
+            level_height = len(mapdata)
+
+            # Create a temporary Level object and render it to a surface
+            from level import Level
+            from config import load_graphics
+            from game_state import TILE_WIDTH, TILE_HEIGHT
+            
+            # Get the actual tile sprites
+            if hasattr(game_state, 'level') and hasattr(game_state.level, 'tiles'):
+                tiles = game_state.level.tiles
+            else:
+                # Fallback: load graphics
+                tiles, _, _, _, _ = load_graphics()
+
+            # Create temporary level object
+            temp_level = Level(current_level.mapdata, tiles)
+
+            # Create a surface to render the full level
+            level_surface_width = level_width * TILE_WIDTH
+            level_surface_height = level_height * TILE_HEIGHT
+            level_surface = pygame.Surface((level_surface_width, level_surface_height))
+            level_surface.fill((0, 0, 0))  # Black background
+
+            # Render the level to the temporary surface (just like the game does)
+            temp_level.draw(level_surface)
+
+            # Calculate scale to fit the rendered level in the preview
+            scale_x = (preview_width - 10) / level_surface_width
+            scale_y = (preview_height - 10) / level_surface_height
+            scale = min(scale_x, scale_y)
+
+            # Calculate the scaled size
+            scaled_width = int(level_surface_width * scale)
+            scaled_height = int(level_surface_height * scale)
+
+            # Center the preview
+            preview_offset_x = preview_x + 5 + (preview_width - 10 - scaled_width) // 2
+            preview_offset_y = preview_y + 5 + (preview_height - 10 - scaled_height) // 2
+
+            # Scale the rendered level surface and blit it to the screen
+            if scaled_width > 0 and scaled_height > 0:
+                scaled_level = pygame.transform.scale(level_surface, (scaled_width, scaled_height))
+                game_state.output.blit(scaled_level, (preview_offset_x, preview_offset_y))
+
+        except Exception as e:
+            # If live preview fails, fall back to simple colored preview
+            if hasattr(game_state, 'DEBUG_MODE') and game_state.DEBUG_MODE:
+                print(f"Live preview failed: {e}")
+            self._draw_simple_preview()
+
+    def _draw_simple_preview(self):
+        """Fallback simple colored preview if live preview fails."""
+        try:
+            current_level = self.level_loader.get_level_by_index(self.selected_index)
+            if not current_level:
+                return
+
+            # Preview area - positioned at bottom right  
             preview_width = 100
             preview_height = 80
             preview_x = game_state.output.get_width() - preview_width - 10
-            preview_y = game_state.output.get_height() - preview_height - 40  # Leave space for instructions
+            preview_y = game_state.output.get_height() - preview_height - 40
 
             # Background
             pygame.draw.rect(game_state.output, (30, 30, 50),
@@ -138,31 +217,33 @@ class LevelSelectionScreen:
             self.font.drawText(game_state.output, "PREVIEW", (preview_x + 5) // 8, (preview_y - 12) // 8,
                           (200, 200, 200))
 
-            # Calculate scale to fit level in preview
+            # Simple colored tiles fallback
             mapdata = current_level.mapdata
             if not mapdata:
                 return
 
             level_width = len(mapdata[0])
             level_height = len(mapdata)
-
             scale_x = (preview_width - 10) / level_width
             scale_y = (preview_height - 10) / level_height
-            scale = min(scale_x, scale_y, 3)  # Max scale of 3
+            scale = min(scale_x, scale_y, 3)
 
-            # Center the preview
             scaled_width = level_width * scale
             scaled_height = level_height * scale
             offset_x = preview_x + 5 + (preview_width - 10 - scaled_width) // 2
             offset_y = preview_y + 5 + (preview_height - 10 - scaled_height) // 2
 
-            # Draw tiles
+            # Simple tile colors
             tile_colors = {
-                ' ': None,  # Empty space
+                ' ': None,
                 '#': (139, 69, 19),    # Brown for fences
                 '|': (0, 100, 200),    # Blue for water
-                'Y': (255, 255, 0),    # Yellow for desert
+                '<': (0, 80, 180),     # Darker blue for left water
+                '>': (0, 80, 180),     # Darker blue for right water
+                'Y': (255, 255, 0),    # Yellow for cacti
                 'o': (128, 128, 128),  # Gray for stones
+                'F': (200, 0, 0),      # Red for invisible walls
+                'N': (100, 0, 100),    # Purple for no-spawn zones
             }
 
             for y, row in enumerate(mapdata):
@@ -174,8 +255,7 @@ class LevelSelectionScreen:
                                        (int(tile_x), int(tile_y), max(1, int(scale)), max(1, int(scale))))
 
         except Exception as e:
-            # If preview fails, just skip it
-            pass
+            pass  # If even simple preview fails, just skip it
 
     def event(self, event):
         """Handle events for the level selection screen."""
