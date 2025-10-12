@@ -297,7 +297,8 @@ class Player(Object):
         # Spiele Kotz-Sound ab
         SFX_VOMIT.play()
 
-        print(f"Player {id(self)} kotzt! 🤮")  # Debug-Ausgabe
+        if config.DEBUG_MODE:
+            print(f"Player {id(self)} kotzt! 🤮")  # Debug-Ausgabe
 
     def update_vomiting(self):
         """Aktualisiert das Kotz-System."""

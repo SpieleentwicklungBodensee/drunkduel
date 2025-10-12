@@ -8,6 +8,7 @@ import game_state
 import controls
 from bitmapfont import BitmapFont
 from level_loader import get_level_loader
+import config
 
 # Override print function
 import ledwall
@@ -212,7 +213,8 @@ class LevelSelectionScreen:
             current_level_data = self.level_loader.get_current_level()
             game_state.level = Level(current_level_data.mapdata, tiles)
 
-            print(f"Loaded level: {current_level_data.name}")
+            if config.DEBUG_MODE:
+                print(f"Loaded level: {current_level_data.name}")
 
         except Exception as e:
             print(f"Error reloading level: {e}")

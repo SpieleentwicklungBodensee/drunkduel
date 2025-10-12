@@ -7,6 +7,7 @@ import os
 import json
 import glob
 from typing import List, Dict, Tuple, Optional
+import config
 
 # Override print function
 import ledwall
@@ -82,7 +83,8 @@ class LevelLoader:
         if not self.levels:
             self._create_default_level()
 
-        print(f"Loaded {len(self.levels)} levels")
+        if config.DEBUG_MODE:
+            print(f"Loaded {len(self.levels)} levels")
 
     def _load_json_level(self, filepath: str) -> Optional[LevelData]:
         """Load a level from a JSON file."""
@@ -228,7 +230,8 @@ class LevelLoader:
             with open(filepath, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
 
-            print(f"Level saved to {filepath}")
+            if config.DEBUG_MODE:
+                print(f"Level saved to {filepath}")
             return True
 
         except Exception as e:

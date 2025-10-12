@@ -52,7 +52,7 @@ class GameScreen(Screen):
 
         # Flag to spawn initial beer powerups on first update
         self.initial_spawn_done = False
-        
+
         # Spawn initial fence birds
         self._spawn_fence_birds()
 
@@ -379,7 +379,7 @@ class GameScreen(Screen):
             self.health_spawn_timer = 0
             self.bird_spawn_timer = 0
             self.initial_spawn_done = False
-            
+
             # Spawn new fence birds for this level
             self._spawn_fence_birds()
 
@@ -388,7 +388,8 @@ class GameScreen(Screen):
             from message import Message
             game_state.message = Message(f"Level: {level_data.name}", 60)
 
-            print(f"Switched to level: {level_data.name}")
+            if config.DEBUG_MODE:
+                print(f"Switched to level: {level_data.name}")
 
         except Exception as e:
             print(f"Error switching level: {e}")
@@ -421,74 +422,74 @@ class GameScreen(Screen):
     def _handle_bird_spawning(self):
         """Handle random bird spawning across the screen."""
         self.bird_spawn_timer += 1
-        
+
         # Spawn a bird every 180-600 frames (3-10 seconds at 60 FPS)
         spawn_interval = random.randint(180, 600)
-        
+
         if self.bird_spawn_timer >= spawn_interval:
             # Only spawn if there aren't too many birds already
             birds = [obj for obj in self.objects if isinstance(obj, Bird)]
             if len(birds) < 3:  # Max 3 birds on screen at once
                 self._spawn_random_bird()
             self.bird_spawn_timer = 0
-    
+
     def _spawn_random_bird(self):
         """Spawn a bird at a random position flying across the screen."""
         # Random height within the game area (avoid UI area at bottom)
         screen_height = game_state.level.getHeight() * TILE_HEIGHT
         y = random.randint(16, screen_height - 32)  # Leave some margin
-        
+
         # Randomly choose direction
         flying_right = random.choice([True, False])
-        
+
         if flying_right:
             # Spawn from left edge, flying right
             x = -16  # Start just off screen
         else:
             # Spawn from right edge, flying left
             x = game_state.output.get_width()
-        
+
         # Create the bird - it will adjust its own Y position if it has a landing target
         bird = Bird(x, y, flying_right)
         self.addObject(bird)
-    
+
     def _spawn_fence_birds(self):
         """Spawn birds on some fence and cactus tiles at game start."""
         if not hasattr(game_state, 'level') or not game_state.level:
             return
-            
+
         perch_positions = []
-        
+
         # Find all fence and cactus tiles
         for y in range(game_state.level.getHeight()):
             for x in range(game_state.level.getWidth()):
                 tile = game_state.level.getTile(x, y)
                 if tile in ['#', 'Y']:  # Fence or cactus
                     perch_positions.append((x, y, tile))
-        
+
         # Randomly place birds on some perches (about 10-15% chance per tile)
         for x, y, tile_type in perch_positions:
             if random.random() < 0.12:  # 12% chance for a bird on each perch
                 # Place bird on top of the tile
                 fence_bird = FenceBird(x * TILE_WIDTH, y * TILE_HEIGHT - 4, x, y, tile_type)
                 self.addObject(fence_bird)
-    
+
     def _handle_fence_bird_respawn(self):
         """Occasionally respawn fence birds during gameplay."""
         # Only check every 10 seconds (600 frames)
         if game_state.tick % 600 == 0:
             # Count existing fence birds
             fence_birds = [obj for obj in self.objects if isinstance(obj, FenceBird)]
-            
+
             # If we have fewer than 3 fence birds, maybe spawn one
             if len(fence_birds) < 3 and random.random() < 0.3:  # 30% chance
                 self._spawn_single_fence_bird()
-    
+
     def _spawn_single_fence_bird(self):
         """Spawn a single fence bird on a random empty fence or cactus."""
         if not hasattr(game_state, 'level') or not game_state.level:
             return
-            
+
         # Find all fence and cactus positions
         perch_positions = []
         for y in range(game_state.level.getHeight()):
@@ -496,16 +497,16 @@ class GameScreen(Screen):
                 tile = game_state.level.getTile(x, y)
                 if tile in ['#', 'Y']:  # Fence or cactus
                     perch_positions.append((x, y, tile))
-        
+
         if not perch_positions:
             return
-            
+
         # Check which perch positions don't already have birds
         empty_perches = []
         for fx, fy, tile_type in perch_positions:
             perch_x = fx * TILE_WIDTH
             perch_y = fy * TILE_HEIGHT - 4
-            
+
             # Check if there's already a fence bird at this position
             has_bird = False
             for obj in self.objects:
@@ -513,10 +514,10 @@ class GameScreen(Screen):
                     if abs(obj.xpos - perch_x) < 8 and abs(obj.ypos - perch_y) < 8:
                         has_bird = True
                         break
-            
+
             if not has_bird:
                 empty_perches.append((fx, fy, tile_type))
-        
+
         # Spawn on a random empty perch
         if empty_perches:
             x, y, tile_type = random.choice(empty_perches)
