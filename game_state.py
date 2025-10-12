@@ -102,6 +102,12 @@ def reset_game_state():
         gameScreen.objects.clear()  # Remove all bullets and weapon drops
         gameScreen.weapon_drop_timer = 0  # Reset weapon drop timer
         gameScreen.destroyed_cacti.clear()  # Reset cactus respawn timers
+        
+        # Reset bird circling behavior
+        if hasattr(gameScreen, 'birds_circling'):
+            gameScreen.birds_circling = False
+            gameScreen.dead_player_x = 0
+            gameScreen.dead_player_y = 0
 
         message = None
 
