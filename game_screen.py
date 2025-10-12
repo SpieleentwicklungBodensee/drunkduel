@@ -19,6 +19,7 @@ from weapon_drop import WeaponDrop
 from beer_powerup import BeerPowerup
 from health_powerup import HealthPowerup
 from bird import Bird, FenceBird
+from sprite import createAnimatedSprite
 
 # Override print function
 import ledwall
@@ -40,6 +41,11 @@ class GameScreen(Screen):
 
         # Cactus respawn system
         self.destroyed_cacti = []  # List of (destruction_time, respawn_time) tuples
+        
+        # Bird circling behavior
+        self.birds_circling = False  # Track if birds are in circling mode
+        self.dead_player_x = 0  # Position of dead player for circling
+        self.dead_player_y = 0
 
         # Load player sprites and constants
         player1_sprite, player2_sprite = load_player_sprites()
@@ -201,12 +207,26 @@ class GameScreen(Screen):
             player.update_facing_direction(other_player_x)
 
             player.update()
+            
+            # Check if a player just died and trigger bird circling
+            if player.dying and not self.birds_circling:
+                self._start_bird_circling(player.xpos, player.ypos)
+        
+        # Check if both players are no longer dying (respawned) and stop bird circling
+        if self.birds_circling and not any(player.dying for player in self.players):
+            self._stop_bird_circling()
 
         # Check if a player has won
         checkVictory()
 
         if game_state.message:  # do not handle rest of updates while message is shown
             game_state.message.update()
+            
+            # Allow bird updates to continue if they are circling
+            if self.birds_circling:
+                for obj in self.objects:
+                    if isinstance(obj, (Bird, FenceBird)):
+                        obj.update()
             return
 
         for obj in self.objects:
@@ -427,9 +447,14 @@ class GameScreen(Screen):
         spawn_interval = random.randint(180, 600)
 
         if self.bird_spawn_timer >= spawn_interval:
-            # Only spawn if there aren't too many birds already
-            birds = [obj for obj in self.objects if isinstance(obj, Bird)]
-            if len(birds) < 3:  # Max 3 birds on screen at once
+            # Count all birds (both flying and fence birds)
+            flying_birds = [obj for obj in self.objects if isinstance(obj, Bird)]
+            fence_birds = [obj for obj in self.objects if isinstance(obj, FenceBird)]
+            total_birds = len(flying_birds) + len(fence_birds)
+            
+            # Only spawn if there aren't too many birds already (max 10 total)
+            # and birds aren't currently fleeing after a respawn
+            if total_birds < 10 and not self._birds_are_fleeing():
                 self._spawn_random_bird()
             self.bird_spawn_timer = 0
 
@@ -451,6 +476,11 @@ class GameScreen(Screen):
 
         # Create the bird - it will adjust its own Y position if it has a landing target
         bird = Bird(x, y, flying_right)
+        
+        # If birds are circling, make this new bird start circling too
+        if self.birds_circling:
+            bird.start_circling(self.dead_player_x, self.dead_player_y)
+            
         self.addObject(bird)
 
     def _spawn_fence_birds(self):
@@ -523,3 +553,43 @@ class GameScreen(Screen):
             x, y, tile_type = random.choice(empty_perches)
             fence_bird = FenceBird(x * TILE_WIDTH, y * TILE_HEIGHT - 4, x, y, tile_type)
             self.addObject(fence_bird)
+    
+    def _start_bird_circling(self, dead_player_x, dead_player_y):
+        """Start all birds circling around the dead player."""
+        self.birds_circling = True
+        self.dead_player_x = dead_player_x
+        self.dead_player_y = dead_player_y
+        
+        # Make all existing birds start circling
+        for obj in self.objects:
+            if isinstance(obj, (Bird, FenceBird)):
+                obj.start_circling(dead_player_x, dead_player_y)
+    
+    def _stop_bird_circling(self):
+        """Stop bird circling and make all birds leave the map."""
+        self.birds_circling = False
+        
+        # Make all birds fly away off the map
+        for obj in self.objects[:]:  # Use slice to avoid modification during iteration
+            if isinstance(obj, (Bird, FenceBird)):
+                obj.state = "scared_flying"
+                obj.flying_right = random.choice([True, False])
+                obj.flee_speed = random.uniform(2.0, 4.0)  # Faster exit speed
+                
+                # Convert to flying sprite if it's a fence bird
+                if isinstance(obj, FenceBird):
+                    obj.sprite = createAnimatedSprite('gfx/birdfly1.png', 16, 16)
+                    if obj.flying_right:
+                        obj.sprite.select(1)  # Row 1 = flying right
+                    else:
+                        obj.sprite.select(0)  # Row 0 = flying left
+                    obj.sprite.speed = 8
+                    obj.sprite.start()
+    
+    def _birds_are_fleeing(self):
+        """Check if birds are currently fleeing the map."""
+        # Check if any birds are in scared_flying state (fleeing)
+        for obj in self.objects:
+            if isinstance(obj, (Bird, FenceBird)) and obj.state == "scared_flying":
+                return True
+        return False
