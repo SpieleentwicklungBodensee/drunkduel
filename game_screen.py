@@ -389,8 +389,9 @@ class GameScreen(Screen):
 
             tile = game_state.level.getTile(x, y)
 
-            # Check if the location is empty and suitable for a cactus
-            if tile == ' ':
+            # Check if the location is empty and suitable for a cactus (not no-spawn zone)
+            from game_logic import is_tile_spawnable
+            if is_tile_spawnable(x, y):
                 # Also check if there are no players or objects too close
                 tile_center_x = x * TILE_WIDTH + TILE_WIDTH // 2
                 tile_center_y = y * TILE_HEIGHT + TILE_HEIGHT // 2

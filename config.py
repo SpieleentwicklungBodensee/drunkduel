@@ -108,6 +108,7 @@ def load_graphics():
         '>': createAnimatedSprite('gfx/water_right.png'),  # Right water tile
         'o': Sprite('gfx/stone1.png'),
         'F': None,  # Invisible wall
+        'N': None,  # No-spawn zone (invisible, prohibits item/cactus spawning)
         ' ': None,
         # Note: '#' (fence) tiles are handled dynamically by fence_logic.py
     }
