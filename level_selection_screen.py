@@ -56,32 +56,47 @@ class LevelSelectionScreen:
         visible_end = min(level_count, visible_start + self.max_visible_levels)
 
         for i in range(visible_start, visible_end):
-            y_pos = start_y + (i - visible_start) * 12
+            # Calculate positions using consistent integer arithmetic
+            row_index = i - visible_start
+            y_char = (start_y // 8) + row_index * 2  # Use integer spacing - 2 character rows between entries
+            y_pos = y_char * 8  # Convert to pixels for selection rectangle
 
             level_index, level_name, level_description = levels[i]
 
+            # Text positioning - use consistent character coordinates
+            name_x_char = 2  # Start at character position 2 (16 pixels)
+            name_x_pixels = name_x_char * 8
+
             # Highlight selected level
             if i == self.selected_index:
-                # Draw selection background
+                # Draw selection background - align perfectly with text
+                text_width = game_state.output.get_width() - (name_x_pixels * 2)  # Leave margin on both sides
                 pygame.draw.rect(output, (60, 60, 100),
-                               (10, y_pos - 2, game_state.output.get_width() - 20, 12))
+                               (name_x_pixels, y_pos - 1, text_width, 10))
                 text_color = (255, 255, 100)
+                desc_color = (200, 200, 150)
             else:
                 text_color = (255, 255, 255)
+                desc_color = (180, 180, 180)
 
-            # Level name
-            self.font.drawText(output, f"{i+1:2d}. {level_name}", 15 // 8, y_pos // 8, text_color)
+            # Level name with fixed width formatting
+            level_name_part = f"{i+1:2d}. {level_name}"
+            max_name_chars = 20  # Fixed width for level name section
+            if len(level_name_part) > max_name_chars:
+                level_name_part = level_name_part[:max_name_chars-3] + "..."
+            
+            # Draw level name at fixed character position
+            self.font.drawText(output, level_name_part, name_x_char, y_char, text_color)
 
-            # Level description (truncated if too long)
-            desc_x = 15 + len(f"{i+1:2d}. {level_name}") * 8 + 10
-            max_desc_chars = (game_state.output.get_width() - desc_x - 15) // 8
+            # Level description with fixed starting position
+            desc_x_char = name_x_char + max_name_chars + 2  # Add 2 char spacing
+            max_desc_chars = (game_state.output.get_width() // 8) - desc_x_char - 2  # Leave margin
             if len(level_description) > max_desc_chars:
                 truncated_desc = level_description[:max_desc_chars-3] + "..."
             else:
                 truncated_desc = level_description
 
-            desc_color = (180, 180, 180) if i != self.selected_index else (200, 200, 150)
-            self.font.drawText(output, truncated_desc, desc_x // 8, y_pos // 8, desc_color)
+            self.font.drawText(output, truncated_desc, desc_x_char, y_char, desc_color)
 
         # Draw level preview if possible
         self._draw_level_preview()
