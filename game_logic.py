@@ -307,6 +307,24 @@ def checkCollisions():
                             bullet_hit = True
                             break
 
+            # Check bullet-weapon drop collisions (only if bullet didn't hit anything else)
+            if not bullet_hit:
+                for weapon_drop in game_state.gameScreen.objects[:]:
+                    if isinstance(weapon_drop, WeaponDrop):
+                        weapon_bounds = weapon_drop.get_bounds()
+
+                        # Simple bounding box collision detection
+                        if (bullet.xpos < weapon_bounds['x'] + weapon_bounds['width'] and
+                            bullet.xpos + TILE_WIDTH > weapon_bounds['x'] and
+                            bullet.ypos < weapon_bounds['y'] + weapon_bounds['height'] and
+                            bullet.ypos + TILE_HEIGHT > weapon_bounds['y']):
+
+                            # Weapon drop got hit - explode it!
+                            weapon_drop.get_hit()
+                            game_state.gameScreen.removeObject(bullet)
+                            bullet_hit = True
+                            break
+
 
 def _handle_bird_hit():
     """Handle when a bird gets hit by a bullet in single-player mode."""

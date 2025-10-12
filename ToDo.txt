@@ -12,5 +12,4 @@ To Do Liste
 - Menue bei Levelauswahl fixen
 - Level "open field" ist nicht "open"
 - Level "Steingarten" Schuß muß in Richtung des Gegners gehen
-- Munition explodiert wenn Sie getroffen wird
 - Einzelspielermodus Bier trinken
