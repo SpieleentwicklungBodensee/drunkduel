@@ -83,6 +83,7 @@ def initialize_game():
     level_loader = get_level_loader()
     current_level = level_loader.get_current_level()
     config.DUCK_HUNT_MODE = current_level.duck_hunt_mode
+    config.ALLOW_UP_DOWN_SHOOT = current_level.allow_up_down_shoot
 
     # Print startup info
     print_startup_info(render_mode, num_joysticks)

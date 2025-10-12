@@ -77,7 +77,23 @@ def _moveDir(player, playerid, direction):
     elif direction == DIR_DOWN:
         player.moveDown()
     elif direction == FIRE:
-        player.shoot(playerid)
+        # For joystick controls, we need to get other player position
+        import game_state
+        if hasattr(game_state, 'gameScreen') and game_state.gameScreen:
+            players = game_state.gameScreen.players
+            if len(players) > 1 and not getattr(game_state, 'SINGLEPLAYER_MODE', False):
+                # Get other player's position for shooting direction
+                other_player_index = 1 - playerid
+                if other_player_index < len(players):
+                    other_player_x = players[other_player_index].xpos
+                    other_player_y = players[other_player_index].ypos
+                    player.shoot(playerid, other_player_x, other_player_y)
+                else:
+                    player.shoot(playerid)
+            else:
+                player.shoot(playerid)
+        else:
+            player.shoot(playerid)
 
 def _stopDir(player, playerid, direction):
     if direction == DIR_LEFT:

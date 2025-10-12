@@ -212,7 +212,8 @@ class GameScreen(Screen):
                         # In multiplayer mode, pass the other player's position to determine shooting direction
                         other_player_index = 1 - i  # Get the other player (0->1, 1->0)
                         other_player_x = self.players[other_player_index].xpos
-                        self.players[i].shoot(i, other_player_x)
+                        other_player_y = self.players[other_player_index].ypos
+                        self.players[i].shoot(i, other_player_x, other_player_y)
 
         elif e.type == pygame.KEYUP:
             # Handle player key releases
@@ -437,6 +438,9 @@ class GameScreen(Screen):
 
             # Set Duck Hunt mode based on level metadata
             config.DUCK_HUNT_MODE = level_data.duck_hunt_mode
+
+            # Set allow_up_down_shoot mode based on level metadata
+            config.ALLOW_UP_DOWN_SHOOT = level_data.allow_up_down_shoot
 
             # Reset player positions
             from config import PLAYER_1_STARTX, PLAYER_1_STARTY, PLAYER_2_STARTX, PLAYER_2_STARTY

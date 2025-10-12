@@ -58,6 +58,11 @@ class LevelData:
         """Get the music file for this level."""
         return self.metadata.get('music', None)
 
+    @property
+    def allow_up_down_shoot(self) -> bool:
+        """Check if up/down auto-shooting is enabled for this level."""
+        return self.metadata.get('allow_up_down_shoot', False)
+
 
 class LevelLoader:
     """Manages loading and access to game levels."""
