@@ -8,7 +8,7 @@ import game_state
 from object import Object
 from sprite import createAnimatedSprite
 from explosion import Explosion
-from sound_manager import SFX_EXPLOSION
+from sound_manager import SFX_EXPLOSION, SFX_BIRD_HIT, SFX_BIRD_EXPLODING, SFX_BIRD_LAUNCH
 
 # Override print function
 import ledwall
@@ -164,6 +164,8 @@ class Bird(Object):
     def get_shot(self):
         """Called when the bird is hit by a bullet."""
         if self.state in ["flying", "landing", "circling", "scared_flying"]:
+            # Play bird hit sound
+            SFX_BIRD_HIT.play()
             self.state = "falling"
             self.fall_speed = 0.0  # Start falling from rest
     
@@ -187,8 +189,8 @@ class Bird(Object):
         explosion = Explosion(self.xpos, self.ypos)
         game_state.gameScreen.addObject(explosion)
         
-        # Play explosion sound
-        SFX_EXPLOSION.play()
+        # Play bird explosion sound
+        SFX_BIRD_EXPLODING.play()
     
     def is_active(self):
         """Check if the bird is still active (on screen)."""
@@ -441,6 +443,8 @@ class FenceBird(Object):
     def get_shot(self):
         """Called when the fence bird is hit by a bullet."""
         if self.state in ["sitting", "scared_flying", "circling"]:
+            # Play bird hit sound
+            SFX_BIRD_HIT.play()
             self.state = "falling"
             self.fall_speed = 1.0  # Start with some initial downward velocity
     
@@ -487,6 +491,9 @@ class FenceBird(Object):
     
     def _get_scared(self, bullet_dx, bullet_dy):
         """Make the bird fly away when scared by a bullet."""
+        # Play bird launch sound
+        SFX_BIRD_LAUNCH.play()
+        
         self.state = "scared_flying"
         
         # Fly away from the bullet
@@ -517,8 +524,8 @@ class FenceBird(Object):
         explosion = Explosion(self.xpos, self.ypos)
         game_state.gameScreen.addObject(explosion)
         
-        # Play explosion sound
-        SFX_EXPLOSION.play()
+        # Play bird explosion sound
+        SFX_BIRD_EXPLODING.play()
     
     def is_active(self):
         """Check if the bird is still active."""
@@ -544,6 +551,9 @@ class FenceBird(Object):
     
     def _get_scared_by_destruction(self):
         """Make the bird fly away when its tile is destroyed."""
+        # Play bird launch sound
+        SFX_BIRD_LAUNCH.play()
+        
         self.state = "scared_flying"
         
         # Fly in a random direction when scared by destruction
@@ -564,6 +574,9 @@ class FenceBird(Object):
     
     def _fly_away_randomly(self):
         """Make the bird fly away randomly after sitting for a while."""
+        # Play bird launch sound
+        SFX_BIRD_LAUNCH.play()
+        
         self.state = "scared_flying"
         
         # Choose a random direction to fly away

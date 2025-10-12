@@ -20,6 +20,7 @@ from beer_powerup import BeerPowerup
 from health_powerup import HealthPowerup
 from bird import Bird, FenceBird
 from sprite import createAnimatedSprite
+from sound_manager import SFX_BIRD_LAUNCH
 
 # Override print function
 import ledwall
@@ -568,6 +569,9 @@ class GameScreen(Screen):
     def _stop_bird_circling(self):
         """Stop bird circling and make all birds leave the map."""
         self.birds_circling = False
+        
+        # Play bird launch sound for mass exodus
+        SFX_BIRD_LAUNCH.play()
         
         # Make all birds fly away off the map
         for obj in self.objects[:]:  # Use slice to avoid modification during iteration

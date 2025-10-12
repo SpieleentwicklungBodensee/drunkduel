@@ -3,7 +3,6 @@ To Do Liste
 - Wide Screen - Modus
 - Lautstärken (z.B. "ist")
 - Sound leere Waffe
-- Sound Vögel
 - Munition spawned schnell wenn Waffe leer
 - am oberen Bildrand werden keine bullets angezeigt
 - manchmal auch auf dem Spielfeld? oder sie bleiben irgendwo hängen
