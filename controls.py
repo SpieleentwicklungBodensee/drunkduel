@@ -3,6 +3,7 @@ import random
 
 # Override print function
 import ledwall
+import config
 print = ledwall.print
 
 
@@ -110,6 +111,7 @@ def _stopDir(player, playerid, direction):
 def handleJoyEvent(e):
     joyid = e.instance_id
     actions = []
+    #print(f"Joy event: {e}, joyid={joyid}")
 
     if e.type == pygame.JOYAXISMOTION:
         if abs(e.value) < JOY_IGNOREZONE:
@@ -185,15 +187,28 @@ def handleJoyEvent(e):
                 actions.append('stopdown')
 
     elif e.type == pygame.JOYBUTTONDOWN:
-        actions.append('fire')
+        # Only treat specific buttons as fire buttons, not D-pad buttons
+        # Xbox 360 controller: A=0, B=1, X=2, Y=3, LB=4, RB=5, Back=6, Start=7, 
+        # L3=8, R3=9, D-pad buttons are 11,12,13,14 - these should NOT fire
+        if e.button not in [11, 12, 13, 14]:  # Exclude D-pad buttons from firing
+            actions.append('fire')
 
     elif e.type == pygame.JOYBUTTONUP:
-        actions.append('stopfire')
+        # Only treat specific buttons as fire buttons, not D-pad buttons
+        if e.button not in [11, 12, 13, 14]:  # Exclude D-pad buttons from firing
+            actions.append('stopfire')
 
     return actions
 
 def performAction(action, player, playerid):
+    
+    
     mapping = (PLAYER_1_KEYS, PLAYER_2_KEYS)[playerid]
+
+    # In Duck Hunt mode, ignore vertical movement actions
+    if getattr(config, 'DUCK_HUNT_MODE', False):
+        if action in ['moveup', 'movedown', 'stopup', 'stopdown']:
+            return  # Ignore vertical movement in Duck Hunt mode
 
     if action == 'moveleft':
         actualDir = translateDirection((pygame.K_LEFT, pygame.K_a)[1-playerid], mapping)
