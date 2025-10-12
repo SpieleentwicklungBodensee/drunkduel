@@ -5,7 +5,6 @@ To Do Liste
 - Sound leere Waffe
 - Sound Vögel
 - Munition spawned schnell wenn Waffe leer
-- Kontrast der Vögel zum Hintergrund schwach
 - am oberen Bildrand werden keine bullets angezeigt
 - manchmal auch auf dem Spielfeld? oder sie bleiben irgendwo hängen
 - Sound bei Zauntreffer ausschalten
