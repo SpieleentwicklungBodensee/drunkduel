@@ -4,7 +4,7 @@ Handles bullet movement, collision detection, and behavior.
 """
 
 import random
-
+from pixel_collision import check_bullet_tile_collision
 import ledwall
 import game_state
 import config
@@ -46,16 +46,14 @@ class Bullet(Object):
         self.xpos += self.xdir * self.speed
         self.ypos += self.ydir * self.speed
 
-        # Check for collision with tiles
-        tile_x = int(self.xpos // TILE_WIDTH)
-        tile_y = int(self.ypos // TILE_HEIGHT)
-
-        if 0 <= tile_x < game_state.level.getWidth() and 0 <= tile_y < game_state.level.getHeight():
-            tile = game_state.level.getTile(tile_x, tile_y)
-            if tile == 'Y':  # Hit a cactus - explode it
-                self._explode_cactus(tile_x, tile_y)
+        # Use pixel-perfect collision detection
+        collision_detected, hit_tile_x, hit_tile_y, hit_tile_type = check_bullet_tile_collision(self.xpos, self.ypos)
+        
+        if collision_detected:
+            if hit_tile_type == 'Y':  # Hit a cactus - explode it
+                self._explode_cactus(hit_tile_x, hit_tile_y)
                 return
-            elif tile in ['#', 'o', 'F']:  # Hit fence, stone, or invisible wall - just bounce/disappear
+            elif hit_tile_type in ['#', 'o', 'F']:  # Hit fence, stone, or invisible wall - just bounce/disappear
                 self._hit_solid_object()
                 return
 
