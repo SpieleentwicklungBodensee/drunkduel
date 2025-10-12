@@ -1,0 +1,29 @@
+To Do Liste
+- Helligkeit einstellen
+- Wide Screen - Modus
+- Lautstärken (z.B. "ist")
+- Msg Zeile 39 List out of Range
+- Sound leere Waffe
+- Sound Nachladen
+- Sound Vögel
+- Munition spawned schnell wenn Waffe leer
+- Kontrast der Vögel zum Hintergrund schwach
+- am oberen Bildrand werden keine bullets angezeigt
+- manchmal auch auf dem Spielfeld? oder sie bleiben irgendwo hängen
+- Sound bei Zauntreffer ausschalten
+- Sprachausgabe auf Game Over Screen
+- Bier abschießen?
+- Motivationssprüche testen
+- Debugmodus einbauen
+- Treffer bei Betrunkenem Cowboy
+- Menue bei Levelauswahl fixen 
+- Level "open field" ist nicht "open"
+- bei "open field" kann ein spieler aus dem Level laufen
+- Wenn abgeschossener Vogel auf Gegner fällt soll er Schaden machen
+- oder wenn der Vogel einen Spieler trifft macht er Schaden 
+- Anzahl der Vögel
+- Level "Steingarten" Schuß muß in Richtung des Gegners gehen
+- Munition explodiert wenn Sie getroffen wird
+- Einzelspielermodus Vögel abschießem
+- Einzelspielermodus Bier trinken
+- Hitbox (Stein)
