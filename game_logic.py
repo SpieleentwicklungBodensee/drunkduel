@@ -63,7 +63,8 @@ def spawnHealthPowerup(health_sprite):
         if game_state.level.getTile(x, y) == ' ':  # Empty space
             health_powerup = HealthPowerup(x * TILE_WIDTH, y * TILE_HEIGHT, health_sprite)
             game_state.gameScreen.addObject(health_powerup)
-            print(f"Medkit gespawnt bei Position ({x}, {y})")  # Debug-Ausgabe
+            if config.DEBUG_MODE:
+                print(f"Medkit gespawnt bei Position ({x}, {y})")  # Debug-Ausgabe
             break
         attempts += 1
 
@@ -84,7 +85,8 @@ def checkHealthPickup():
                     player.heal(health.get_health_amount())
                     healed_amount = player.health - old_health
 
-                    print(f"Player {game_state.gameScreen.players.index(player) + 1} healed {healed_amount} HP")
+                    if cnnfig.DEBUG_MODE:
+                        print(f"Player {game_state.gameScreen.players.index(player) + 1} healed {healed_amount} HP")
 
                     # Remove the health powerup
                     game_state.gameScreen.removeObject(health)

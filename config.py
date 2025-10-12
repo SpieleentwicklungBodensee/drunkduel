@@ -20,6 +20,8 @@ PLAYER_2_STARTY = 13
 INITIAL_AMMO = 4
 REWARD_AMMO = 0
 
+DEBUG_MODE = False
+
 # Sprachausgabe-Einstellungen
 ACCURATE_INTONATION = False # wenn True, klingen die saetze langweiliger
 
@@ -113,7 +115,7 @@ def load_graphics():
     # Animate water
     tiles['|'].speed = 12
     tiles['|'].start()
-    
+
     # Animate left and right water
     tiles['<'].speed = 12
     tiles['<'].start()
