@@ -12,7 +12,6 @@ To Do Liste
 - Sprachausgabe auf Game Over Screen
 - Bier abschießen?
 - Motivationssprüche testen
-- Debugmodus einbauen
 - Treffer bei Betrunkenem Cowboy
 - Menue bei Levelauswahl fixen
 - Level "open field" ist nicht "open"
