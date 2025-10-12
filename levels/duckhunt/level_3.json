@@ -1,0 +1,29 @@
+{
+  "name": "Stone Maze",
+  "mapdata": [
+    "################",
+    "#o  Y    Y   o #",
+    "#oo   oooo   o #",
+    "#o     oo     o#",
+    "#   o  oo  o   #",
+    "#  oo      oo  #",
+    "#   o   Y   o  #",
+    "#      ooo     #",
+    "#   Y  ooo  Y  #",
+    "#      ooo     #",
+    "#  oo   Y   oo #",
+    "#   o  ooo  o  #",
+    "# o    ooo    o#",
+    "#   Y  ooo  Y  #",
+    "#NNNNNNNNNNNNNN#",
+    "################"
+  ],
+  "metadata": {
+    "description": "Weave through a labyrinth of ancient stones",
+    "author": "Claude Sonnet 4 (AI)",
+    "difficulty": "Hard",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}

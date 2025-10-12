@@ -1,0 +1,29 @@
+{
+  "name": "Oasis Haven",
+  "mapdata": [
+    "################",
+    "#YYY        YYY#",
+    "#YY    ||    YY#",
+    "#Y     ||     Y#",
+    "#      ||      #",
+    "#  oo  ||  oo  #",
+    "# ooo  ||  ooo #",
+    "#oooo  ||  oooo#",
+    "#oooo  ||  oooo#",
+    "# ooo  ||  ooo #",
+    "#  oo  ||  oo  #",
+    "#      ||      #",
+    "#Y     ||     Y#",
+    "#YY    ||    YY#",
+    "#NNNNNNNNNNNNNN#",
+    "################"
+  ],
+  "metadata": {
+    "description": "Find refuge around the life-giving oasis",
+    "author": "Claude Sonnet 4 (AI)",
+    "difficulty": "Easy",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}

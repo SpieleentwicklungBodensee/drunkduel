@@ -1,0 +1,29 @@
+{
+  "name": "Diamond Formation",
+  "mapdata": [
+    "################",
+    "#       o      #",
+    "#      ooo     #",
+    "#     ooooo    #",
+    "#    ooooooo   #",
+    "#     ooooo    #",
+    "#    Y ooo Y   #",
+    "#   YY  o  YY  #",
+    "#   YY  o  YY  #",
+    "#    Y ooo Y   #",
+    "#     ooooo    #",
+    "#    ooooooo   #",
+    "#     ooooo    #",
+    "#      ooo     #",
+    "#NNNNNNNNNNNNNN#",
+    "################"
+  ],
+  "metadata": {
+    "description": "Navigate the diamond-shaped stone formation",
+    "author": "Claude Sonnet 4 (AI)",
+    "difficulty": "Normal",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}
