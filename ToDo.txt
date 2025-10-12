@@ -5,6 +5,5 @@ To Do Liste
 - Bier abschießen?
 - Motivationssprüche testen
 - Treffer bei Betrunkenem Cowboy
-- Menue bei Levelauswahl fixen
 - Level "open field" ist nicht "open"
 - Einzelspielermodus Bier trinken
