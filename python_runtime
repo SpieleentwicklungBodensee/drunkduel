@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Python runtime wrapper for Kazeta carts
+# This script sets up the Python environment and runs the game
+# 
+# NOTE: This is a static source file tracked in git.
+# Do not regenerate - edit this file directly to make changes.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONTENT_DIR="$SCRIPT_DIR/content"
+
+# Change to content directory
+cd "$CONTENT_DIR" || exit 1
+
+# Set PYTHONPATH to include the content directory
+export PYTHONPATH="$CONTENT_DIR:$PYTHONPATH"
+
+# Check if virtual environment exists and activate it
+if [ -d "$CONTENT_DIR/venv" ]; then
+    source "$CONTENT_DIR/venv/bin/activate"
+elif [ -d "$CONTENT_DIR/env" ]; then
+    source "$CONTENT_DIR/env/bin/activate"
+fi
+
+# Install requirements if they don't exist
+if [ -f "requirements.txt" ] && ! python -c "import pygame" 2>/dev/null; then
+    echo "Installing Python dependencies..."
+    pip install --user -r requirements.txt
+fi
+
+# Run the game with passed arguments
+exec python "$@"
