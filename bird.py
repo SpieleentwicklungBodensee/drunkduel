@@ -43,14 +43,27 @@ class Bird(Object):
         self.speed = random.uniform(0.5, 1.5)  # Random speed between 0.5 and 1.5 pixels per frame
         
         # Track bird state
-        self.state = "flying"  # "flying", "falling", "exploded"
+        self.state = "flying"  # "flying", "landing", "falling", "exploded"
         self.active = True
         self.fall_speed = 0.0  # Vertical falling speed
         self.gravity = 0.2  # Gravity acceleration
         
-        # Landing behavior
-        self.landing_chance = 0.005  # Small chance per frame to consider landing (increased from 0.002)
-        self.last_landing_check = 0  # Cooldown for landing checks
+        # Precalculated landing behavior
+        self.has_landing_target = False
+        self.landing_target_tile_x = None
+        self.landing_target_tile_y = None
+        self.landing_target_tile_type = None
+        self.landing_target_pixel_x = None
+        self.landing_target_pixel_y = None
+        
+        # Landing animation variables
+        self.landing_start_x = 0
+        self.landing_start_y = 0
+        self.landing_progress = 0.0
+        self.landing_duration = 30  # frames to complete landing
+        
+        # Determine if this bird should have a landing target
+        self._maybe_choose_landing_target()
         
     def update(self):
         """Update the bird's position and state."""
@@ -70,8 +83,24 @@ class Bird(Object):
                 if self.xpos < -16:  # -16 because sprite is 16px wide
                     self.active = False
             
-            # Check if bird should land on a fence
-            self._check_fence_landing()
+            # Check if bird should start landing
+            self._check_for_landing()
+            
+        elif self.state == "landing":
+            # Bird is smoothly moving to landing position
+            self.landing_progress += 1.0 / self.landing_duration
+            
+            if self.landing_progress >= 1.0:
+                # Landing complete - create fence bird and remove this flying bird
+                self._complete_landing()
+            else:
+                # Interpolate position smoothly
+                t = self.landing_progress
+                # Use easing for more natural movement (ease out)
+                t = 1 - (1 - t) ** 2
+                
+                self.xpos = self.landing_start_x + (self.landing_target_pixel_x - self.landing_start_x) * t
+                self.ypos = self.landing_start_y + (self.landing_target_pixel_y - self.landing_start_y) * t
                     
         elif self.state == "falling":
             # Bird is falling - apply gravity
@@ -88,7 +117,7 @@ class Bird(Object):
     
     def get_shot(self):
         """Called when the bird is hit by a bullet."""
-        if self.state == "flying":
+        if self.state in ["flying", "landing"]:
             self.state = "falling"
             self.fall_speed = 0.0  # Start falling from rest
             
@@ -117,61 +146,113 @@ class Bird(Object):
             'height': 16
         }
     
-    def _check_fence_landing(self):
-        """Check if the bird should land on a nearby fence or cactus."""
-        import game_state
-        
-        # Only check occasionally and with cooldown
-        if (random.random() > self.landing_chance or 
-            game_state.tick - self.last_landing_check < 60):  # 1 second cooldown (reduced from 2)
+    def _maybe_choose_landing_target(self):
+        """Decide if this bird should have a landing target and choose one."""
+        # 30% chance for a flying bird to have a landing target
+        if random.random() > 0.3:
             return
             
-        self.last_landing_check = game_state.tick
+        # Find all available perches
+        available_perches = self._find_available_perches()
+        if not available_perches:
+            return
+            
+        # Choose a perch that makes sense for the bird's flight direction
+        suitable_perches = []
+        for tile_x, tile_y, tile_type in available_perches:
+            tile_pixel_x = tile_x * 16
+            
+            # For right-flying birds, only consider perches ahead (to the right)
+            # For left-flying birds, only consider perches ahead (to the left)
+            if self.flying_right and tile_pixel_x > self.xpos:
+                suitable_perches.append((tile_x, tile_y, tile_type))
+            elif not self.flying_right and tile_pixel_x < self.xpos:
+                suitable_perches.append((tile_x, tile_y, tile_type))
         
-        # Find nearby fence or cactus tiles
-        current_tile_x = int(self.xpos / 16)  # TILE_WIDTH
-        current_tile_y = int(self.ypos / 16)  # TILE_HEIGHT
-        
-        # Check tiles in a small area around the bird
-        for dy in range(-1, 3):  # Check slightly below and above
-            for dx in range(-2, 3):  # Check a few tiles horizontally
-                check_x = current_tile_x + dx
-                check_y = current_tile_y + dy
-                
-                # Make sure we're within level bounds
-                if (0 <= check_x < game_state.level.getWidth() and 
-                    0 <= check_y < game_state.level.getHeight()):
-                    
-                    tile = game_state.level.getTile(check_x, check_y)
-                    
-                    if tile in ['#', 'Y']:  # Found a fence or cactus
-                        # Check if this position is free of other birds
-                        if self._is_fence_position_free(check_x, check_y):
-                            # Land on this fence or cactus!
-                            self._land_on_tile(check_x, check_y, tile)
-                            return
+        if suitable_perches:
+            # Choose a random suitable perch
+            self.landing_target_tile_x, self.landing_target_tile_y, self.landing_target_tile_type = random.choice(suitable_perches)
+            self.landing_target_pixel_x = self.landing_target_tile_x * 16
+            self.landing_target_pixel_y = self.landing_target_tile_y * 16 - 4
+            self.has_landing_target = True
+            
+            # Adjust spawn Y position to be near the landing target (±2 tiles)
+            self._adjust_spawn_y_for_target()
     
-    def _is_fence_position_free(self, fence_x, fence_y):
-        """Check if a fence position is free of other fence birds."""
-        fence_pixel_x = fence_x * 16  # TILE_WIDTH
-        fence_pixel_y = fence_y * 16 - 4  # TILE_HEIGHT, slightly above fence
+    def _find_available_perches(self):
+        """Find all available fence and cactus tiles that don't have birds."""
+        if not hasattr(game_state, 'level') or not game_state.level:
+            return []
+            
+        available_perches = []
+        
+        # Find all fence and cactus tiles
+        for y in range(game_state.level.getHeight()):
+            for x in range(game_state.level.getWidth()):
+                tile = game_state.level.getTile(x, y)
+                if tile in ['#', 'Y']:  # Fence or cactus
+                    # Check if position is free
+                    if self._is_perch_position_free(x, y):
+                        available_perches.append((x, y, tile))
+        
+        return available_perches
+    
+    def _is_perch_position_free(self, tile_x, tile_y):
+        """Check if a perch position is free of other fence birds."""
+        pixel_x = tile_x * 16
+        pixel_y = tile_y * 16 - 4
         
         # Check if there's already a fence bird at this position
         for obj in game_state.gameScreen.objects:
             if isinstance(obj, FenceBird) and obj.state == "sitting":
-                if (abs(obj.xpos - fence_pixel_x) < 12 and 
-                    abs(obj.ypos - fence_pixel_y) < 12):
+                if (abs(obj.xpos - pixel_x) < 12 and 
+                    abs(obj.ypos - pixel_y) < 12):
                     return False
         return True
     
-    def _land_on_tile(self, tile_x, tile_y, tile_type):
-        """Convert this flying bird into a fence bird on the specified tile."""
-        # Calculate tile position
-        tile_pixel_x = tile_x * 16  # TILE_WIDTH  
-        tile_pixel_y = tile_y * 16 - 4  # TILE_HEIGHT, slightly above tile
+    def _check_for_landing(self):
+        """Check if the bird should start landing at its target."""
+        if not self.has_landing_target:
+            return
+            
+        # Check if we're close enough to the target to start landing
+        distance_to_target = abs(self.xpos - self.landing_target_pixel_x)
         
-        # Create a new fence bird at the tile position
-        fence_bird = FenceBird(tile_pixel_x, tile_pixel_y, tile_x, tile_y, tile_type)
+        # Start landing when we're within 32 pixels of the target
+        if distance_to_target <= 32:
+            # Make sure the target is still available
+            if self._is_perch_position_free(self.landing_target_tile_x, self.landing_target_tile_y):
+                self._start_landing()
+            else:
+                # Target is no longer available, continue flying
+                self.has_landing_target = False
+    
+    def _start_landing(self):
+        """Start the landing animation."""
+        self.state = "landing"
+        self.landing_start_x = self.xpos
+        self.landing_start_y = self.ypos
+        self.landing_progress = 0.0
+        
+        # Slow down the bird during landing
+        self.sprite.speed = 4  # Slower animation during landing
+    
+    def _adjust_spawn_y_for_target(self):
+        """Adjust the bird's Y position to be within ±2 tiles of the landing target."""
+        target_y = self.landing_target_pixel_y
+        
+        # Calculate Y range: ±2 tiles (32 pixels) from target
+        min_y = max(16, target_y - 32)  # Don't go above screen top
+        max_y = min(target_y + 32, game_state.level.getHeight() * 16 - 32)  # Don't go below game area
+        
+        # Set bird's Y position randomly within this range
+        self.ypos = random.uniform(min_y, max_y)
+    
+    def _complete_landing(self):
+        """Complete the landing by creating a fence bird and removing this flying bird."""
+        # Create a new fence bird at the target position
+        fence_bird = FenceBird(self.landing_target_pixel_x, self.landing_target_pixel_y, 
+                              self.landing_target_tile_x, self.landing_target_tile_y, self.landing_target_tile_type)
         game_state.gameScreen.addObject(fence_bird)
         
         # Remove this flying bird
@@ -198,10 +279,26 @@ class FenceBird(Object):
         self.fall_speed = 0.0  # Vertical falling speed
         self.gravity = 0.2  # Gravity acceleration
         
+        # Determine if bird should be flipped based on map position
+        # The texture faces left by default, so flip it if on the right half
+        map_width = game_state.level.getWidth() * 16  # Convert to pixels
+        self.should_flip = self.xpos > (map_width / 2)
+        
         # Scare behavior
         self.scare_radius = 64  # 4 tiles * 16 pixels per tile
         self.flying_right = random.choice([True, False])  # Random flee direction
         self.flee_speed = random.uniform(1.0, 2.0)  # Speed when scared and flying
+        
+    def draw(self, output):
+        """Custom draw method to handle sprite flipping based on position."""
+        if self.state == "sitting" and self.should_flip:
+            # Flip the sprite horizontally for birds on the right half
+            import pygame
+            flipped_surface = pygame.transform.flip(self.sprite.surface, True, False)
+            output.blit(flipped_surface, (self.xpos, self.ypos))
+        else:
+            # Use normal sprite drawing
+            self.sprite.draw(output, self.xpos, self.ypos)
         
     def update(self):
         """Update the fence bird's state."""
