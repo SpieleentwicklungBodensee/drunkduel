@@ -13,9 +13,6 @@ To Do Liste
 - Treffer bei Betrunkenem Cowboy
 - Menue bei Levelauswahl fixen
 - Level "open field" ist nicht "open"
-- Wenn abgeschossener Vogel auf Gegner fällt soll er Schaden machen
-- oder wenn der Vogel einen Spieler trifft macht er Schaden
-- Anzahl der Vögel
 - Level "Steingarten" Schuß muß in Richtung des Gegners gehen
 - Munition explodiert wenn Sie getroffen wird
 - Einzelspielermodus Vögel abschießem
