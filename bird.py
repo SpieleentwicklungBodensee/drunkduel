@@ -41,12 +41,20 @@ class Bird(Object):
         
         # Set flying speed (pixels per frame)
         self.speed = random.uniform(0.5, 1.5)  # Random speed between 0.5 and 1.5 pixels per frame
+        self.flee_speed = random.uniform(1.0, 2.0)  # Speed when scared and flying
         
         # Track bird state
-        self.state = "flying"  # "flying", "landing", "falling", "exploded"
+        self.state = "flying"  # "flying", "landing", "falling", "exploded", "circling", "scared_flying"
         self.active = True
         self.fall_speed = 0.0  # Vertical falling speed
         self.gravity = 0.2  # Gravity acceleration
+        
+        # Circling behavior parameters
+        self.circling_target_x = 0
+        self.circling_target_y = 0
+        self.circle_radius = random.uniform(30, 60)  # Radius of circling motion
+        self.circle_angle = random.uniform(0, 6.28)  # Starting angle (0 to 2π)
+        self.circle_speed = random.uniform(0.02, 0.05)  # Angular speed
         
         # Precalculated landing behavior
         self.has_landing_target = False
@@ -114,12 +122,61 @@ class Bird(Object):
             game_height = game_state.level.getHeight() * 16  # TILE_HEIGHT
             if self.ypos >= game_height - 16:  # Hit ground
                 self._explode()
+                
+        elif self.state == "circling":
+            # Bird is circling around a target point
+            import math
+            
+            # Update the angle for circular motion
+            self.circle_angle += self.circle_speed
+            
+            # Calculate new position based on circular motion
+            self.xpos = self.circling_target_x + math.cos(self.circle_angle) * self.circle_radius
+            self.ypos = self.circling_target_y + math.sin(self.circle_angle) * self.circle_radius
+            
+            # Update animation direction based on movement
+            prev_angle = self.circle_angle - self.circle_speed
+            prev_x = self.circling_target_x + math.cos(prev_angle) * self.circle_radius
+            if self.xpos > prev_x:
+                # Moving right
+                if not self.flying_right:
+                    self.flying_right = True
+                    self.sprite.select(1)  # Row 1 = flying right
+            else:
+                # Moving left
+                if self.flying_right:
+                    self.flying_right = False
+                    self.sprite.select(0)  # Row 0 = flying left
+                    
+        elif self.state == "scared_flying":
+            # Bird is flying away after being scared
+            if self.flying_right:
+                self.xpos += self.flee_speed
+                # Remove bird when it flies off the right edge
+                if self.xpos > game_state.output.get_width():
+                    self.active = False
+            else:
+                self.xpos -= self.flee_speed
+                # Remove bird when it flies off the left edge
+                if self.xpos < -16:
+                    self.active = False
     
     def get_shot(self):
         """Called when the bird is hit by a bullet."""
-        if self.state in ["flying", "landing"]:
+        if self.state in ["flying", "landing", "circling", "scared_flying"]:
             self.state = "falling"
             self.fall_speed = 0.0  # Start falling from rest
+    
+    def start_circling(self, target_x, target_y):
+        """Start circling around the specified target position."""
+        self.state = "circling"
+        self.circling_target_x = target_x
+        self.circling_target_y = target_y
+        
+        # Set initial position on the circle
+        import math
+        self.xpos = target_x + math.cos(self.circle_angle) * self.circle_radius
+        self.ypos = target_y + math.sin(self.circle_angle) * self.circle_radius
             
     def _explode(self):
         """Create explosion effect when bird hits ground."""
@@ -274,20 +331,34 @@ class FenceBird(Object):
         self.tile_type = tile_type  # '#' for fence, 'Y' for cactus
         
         # Track bird state
-        self.state = "sitting"  # "sitting", "scared_flying", "falling", "exploded"
+        self.state = "sitting"  # "sitting", "scared_flying", "falling", "exploded", "circling"
         self.active = True
         self.fall_speed = 0.0  # Vertical falling speed
         self.gravity = 0.2  # Gravity acceleration
         
+        # Circling behavior parameters
+        self.circling_target_x = 0
+        self.circling_target_y = 0
+        self.circle_radius = random.uniform(30, 60)  # Radius of circling motion
+        self.circle_angle = random.uniform(0, 6.28)  # Starting angle (0 to 2π)
+        self.circle_speed = random.uniform(0.02, 0.05)  # Angular speed
+        self.flying_right = random.choice([True, False])  # Direction for circling animation
+        
         # Determine if bird should be flipped based on map position
         # The texture faces left by default, so flip it if on the right half
         map_width = game_state.level.getWidth() * 16  # Convert to pixels
-        self.should_flip = self.xpos > (map_width / 2)
+
+        # Determine if bird should be flipped based on map position
+        self.should_flip = not (self.xpos > (map_width / 2))
         
         # Scare behavior
         self.scare_radius = 64  # 4 tiles * 16 pixels per tile
         self.flying_right = random.choice([True, False])  # Random flee direction
         self.flee_speed = random.uniform(1.0, 2.0)  # Speed when scared and flying
+        
+        # Random fly-away behavior
+        self.sitting_timer = 0  # How long the bird has been sitting
+        self.fly_away_time = random.randint(300, 1200)  # 5-20 seconds at 60 FPS
         
     def draw(self, output):
         """Custom draw method to handle sprite flipping based on position."""
@@ -306,6 +377,9 @@ class FenceBird(Object):
             return
         
         if self.state == "sitting":
+            # Increment sitting timer
+            self.sitting_timer += 1
+            
             # Check for nearby bullets that might scare the bird
             self._check_for_scary_bullets()
             
@@ -314,6 +388,13 @@ class FenceBird(Object):
                 if self._check_if_tile_destroyed():
                     # Tile was destroyed, fly away!
                     self._get_scared_by_destruction()
+                    return
+            
+            # Random chance to fly away after sitting for a while
+            if self.sitting_timer >= self.fly_away_time:
+                # 30% chance per frame after the fly_away_time has passed
+                if random.random() < 0.005:  # 0.5% chance per frame = ~30% chance per second
+                    self._fly_away_randomly()
             
         elif self.state == "scared_flying":
             # Bird is flying away after being scared
@@ -337,12 +418,55 @@ class FenceBird(Object):
             game_height = game_state.level.getHeight() * 16  # TILE_HEIGHT
             if self.ypos >= game_height - 16:  # Hit ground
                 self._explode()
+                
+        elif self.state == "circling":
+            # Bird is circling around a target point
+            import math
+            
+            # Update the angle for circular motion
+            self.circle_angle += self.circle_speed
+            
+            # Calculate new position based on circular motion
+            self.xpos = self.circling_target_x + math.cos(self.circle_angle) * self.circle_radius
+            self.ypos = self.circling_target_y + math.sin(self.circle_angle) * self.circle_radius
+            
+            # Update animation direction based on movement
+            prev_angle = self.circle_angle - self.circle_speed
+            prev_x = self.circling_target_x + math.cos(prev_angle) * self.circle_radius
+            if self.xpos > prev_x:
+                self.flying_right = True
+            else:
+                self.flying_right = False
     
     def get_shot(self):
         """Called when the fence bird is hit by a bullet."""
-        if self.state in ["sitting", "scared_flying"]:
+        if self.state in ["sitting", "scared_flying", "circling"]:
             self.state = "falling"
             self.fall_speed = 1.0  # Start with some initial downward velocity
+    
+    def start_circling(self, target_x, target_y):
+        """Start circling around the specified target position."""
+        self.state = "circling"
+        self.circling_target_x = target_x
+        self.circling_target_y = target_y
+        
+        # Convert to flying bird sprite for circling
+        self.sprite = createAnimatedSprite('gfx/birdfly1.png', 16, 16)
+        
+        # Set initial animation direction
+        if self.flying_right:
+            self.sprite.select(1)  # Row 1 = flying right
+        else:
+            self.sprite.select(0)  # Row 0 = flying left
+            
+        # Set animation speed and start
+        self.sprite.speed = 8
+        self.sprite.start()
+        
+        # Set initial position on the circle
+        import math
+        self.xpos = target_x + math.cos(self.circle_angle) * self.circle_radius
+        self.ypos = target_y + math.sin(self.circle_angle) * self.circle_radius
     
     def _check_for_scary_bullets(self):
         """Check if there are any bullets nearby that would scare the bird."""
@@ -426,6 +550,26 @@ class FenceBird(Object):
         self.flying_right = random.choice([True, False])
         
         # Convert to flying bird sprite for the scared flight
+        self.sprite = createAnimatedSprite('gfx/birdfly1.png', 16, 16)
+        
+        # Set animation based on direction
+        if self.flying_right:
+            self.sprite.select(1)  # Row 1 = flying right
+        else:
+            self.sprite.select(0)  # Row 0 = flying left
+            
+        # Set animation speed and start
+        self.sprite.speed = 8
+        self.sprite.start()
+    
+    def _fly_away_randomly(self):
+        """Make the bird fly away randomly after sitting for a while."""
+        self.state = "scared_flying"
+        
+        # Choose a random direction to fly away
+        self.flying_right = random.choice([True, False])
+        
+        # Convert to flying bird sprite
         self.sprite = createAnimatedSprite('gfx/birdfly1.png', 16, 16)
         
         # Set animation based on direction
