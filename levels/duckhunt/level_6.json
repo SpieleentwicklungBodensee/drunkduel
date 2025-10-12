@@ -1,0 +1,29 @@
+{
+  "name": "Spiral Arena",
+  "mapdata": [
+    "################",
+    "#oooooooooooooo#",
+    "#o            o#",
+    "#o  oooooooo  o#",
+    "#o  o      o  o#",
+    "#o  o  YY  o  o#",
+    "#o  o Y  Y o  o#",
+    "#o  o Y  Y o  o#",
+    "#o  o Y  Y o  o#",
+    "#o  o  YY  o  o#",
+    "#o  o      o  o#",
+    "#o  oooooooo  o#",
+    "#o            o#",
+    "#oooooooooooooo#",
+    "#NNNNNNNNNNNNNN#",
+    "################"
+  ],
+  "metadata": {
+    "description": "Fight your way through a spiral of stone and sand",
+    "author": "Claude Sonnet 4 (AI)",
+    "difficulty": "Hard",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}

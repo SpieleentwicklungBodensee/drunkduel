@@ -380,6 +380,57 @@ def removeAllBullets():
         game_state.gameScreen.removeObject(bullet)
 
 
+def _load_next_duckhunt_level():
+    """Load the next duckhunt level and reset game state."""
+    from level_loader import get_level_loader
+    from level import Level
+    from message import Message
+    
+    level_loader = get_level_loader()
+    current_level_data = level_loader.get_current_level()
+    
+    # Create new level with the new data
+    game_state.level = Level(current_level_data.mapdata, game_state.level.tiles)
+    
+    # Set Duck Hunt mode based on level metadata
+    config.DUCK_HUNT_MODE = current_level_data.duck_hunt_mode
+    
+    # Reset game state for new level (but keep accumulated bird score)
+    previous_bird_score = game_state.gameScreen.bird_score
+    game_state.gameScreen.bird_score = previous_bird_score  # Keep total score across levels
+    game_state.gameScreen.target_bird_score = previous_bird_score + 20  # Increase target for next level
+    
+    # Reset player position to bottom center of new map
+    from game_state import TILE_WIDTH, TILE_HEIGHT
+    duck_hunt_x = (game_state.level.getWidth() // 2) * TILE_WIDTH
+    duck_hunt_y = (game_state.level.getHeight() - 2) * TILE_HEIGHT
+    game_state.gameScreen.players[0].xpos = duck_hunt_x
+    game_state.gameScreen.players[0].ypos = duck_hunt_y
+    
+    # Reset player health and state
+    game_state.gameScreen.players[0].health = game_state.gameScreen.players[0].max_health
+    game_state.gameScreen.players[0].dying = False
+    
+    # Clear all objects except player
+    new_objects = [obj for obj in game_state.gameScreen.objects if obj in game_state.gameScreen.players]
+    game_state.gameScreen.objects = new_objects
+    
+    # Load level music if specified
+    from sound_manager import play_music, stop_music
+    if current_level_data.music:
+        play_music(current_level_data.music)
+    else:
+        stop_music()
+    
+    # Show level transition message
+    level_name = current_level_data.name.upper()
+    level_number = level_loader.current_level_index + 1
+    game_state.message = Message(0, 0, ['', 'level', str(level_number), level_name], (255, 255, 0), 90)
+    
+    if config.DEBUG_MODE:
+        print(f"Advanced to Duck Hunt level: {current_level_data.name}")
+
+
 def checkVictory():
     # First check if one of the players is dead:
     for player in game_state.gameScreen.players:
@@ -391,8 +442,28 @@ def checkVictory():
     if getattr(config, 'SINGLEPLAYER_MODE', False):
         # Single-player mode: check bird score
         if game_state.gameScreen.bird_score >= game_state.gameScreen.target_bird_score:
-            game_state.gameScreen.winner = 0  # Player 1 wins in single-player
-            switchState('gameover')
+            # Check if this is Duck Hunt mode
+            if getattr(config, 'DUCK_HUNT_MODE', False):
+                # Duck Hunt mode: advance to next level
+                from level_loader import get_level_loader
+                level_loader = get_level_loader()
+                
+                # Get current level index to check if there are more levels
+                current_index = level_loader.current_level_index
+                total_levels = level_loader.get_level_count()
+                
+                if current_index < total_levels - 1:
+                    # More levels available - advance to next level
+                    level_loader.next_level()
+                    _load_next_duckhunt_level()
+                else:
+                    # No more levels - show victory screen
+                    game_state.gameScreen.winner = 0  # Player 1 wins in single-player
+                    switchState('gameover')
+            else:
+                # Regular single-player mode
+                game_state.gameScreen.winner = 0  # Player 1 wins in single-player
+                switchState('gameover')
     else:
         # Multiplayer mode: check player scores (first to 5 points wins)
         for player in game_state.gameScreen.players:

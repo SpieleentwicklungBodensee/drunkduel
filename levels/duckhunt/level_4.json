@@ -1,0 +1,29 @@
+{
+  "name": "River Crossing",
+  "mapdata": [
+    "################",
+    "#Y           Y #",
+    "#YY    ||   YY #",
+    "#YYY   ||  YYY #",
+    "#YYYY  ||  YYYY#",
+    "#YYYYY || YYYYY#",
+    "#o     ||     o#",
+    "#      ||      #",
+    "#      ||      #",
+    "#o     ||     o#",
+    "#YYYYY || YYYYY#",
+    "#YYYY  ||  YYYY#",
+    "#YYY   ||  YYY #",
+    "#YY    ||   YY #",
+    "#NNNNNNNNNNNNNN#",
+    "################"
+  ],
+  "metadata": {
+    "description": "Cross the rushing river through desert terrain",
+    "author": "Claude Sonnet 4 (AI)",
+    "difficulty": "Easy",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}

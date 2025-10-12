@@ -1,0 +1,29 @@
+{
+  "name": "The Gauntlet",
+  "mapdata": [
+    "################",
+    "#o            o#",
+    "# oo        oo #",
+    "#  oYo    oYo  #",
+    "#   Y      Y   #",
+    "#   Y  YY  Y   #",
+    "#      YY      #",
+    "#      oo      #",
+    "#      oo      #",
+    "#      YY      #",
+    "#   Y  YY  Y   #",
+    "#   Y      Y   #",
+    "#  oYo    oYo  #",
+    "# oo        oo #",
+    "#NNNNNNNNNNNNNN#",
+    "################"
+  ],
+  "metadata": {
+    "description": "Run the gauntlet through this challenging course",
+    "author": "Claude Sonnet 4 (AI)",
+    "difficulty": "Hard",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}

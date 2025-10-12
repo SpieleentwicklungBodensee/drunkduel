@@ -34,6 +34,22 @@ class GameOverScreen(Screen):
                 ledwall.centerText(f'BIRDS SHOT: {game_state.gameScreen.bird_score}', y=20, color=(255, 255, 255), align=False)
                 if hasattr(game_state.gameScreen.players[0], 'score'):
                     ledwall.centerText(f'FINAL SCORE: {game_state.gameScreen.players[0].score}', y=21, color=(255, 255, 255), align=False)
+            elif getattr(config, 'DUCK_HUNT_MODE', False):
+                # Duck Hunt all levels completed
+                ledwall.centerText('ALL LEVELS', y=4, color=(0, 255, 0), fontsize=2, align=False)
+                ledwall.centerText('CLEARED!', y=6, color=(0, 255, 0), fontsize=2, align=False)
+
+                if game_state.tick > 128 or game_state.tick % 32 < 16:
+                    ledwall.centerText('MASTER HUNTER!', y=17, color=(255, 255, 0), align=False)
+
+                # Show total birds shot across all levels
+                ledwall.centerText(f'TOTAL BIRDS: {game_state.gameScreen.bird_score}', y=20, color=(255, 255, 255), align=False)
+                
+                # Show level completed
+                from level_loader import get_level_loader
+                level_loader = get_level_loader()
+                total_levels = level_loader.get_level_count()
+                ledwall.centerText(f'LEVELS: {total_levels}/{total_levels}', y=22, color=(255, 255, 255), align=False)
             else:
                 # Normal single-player victory screen
                 ledwall.centerText('MISSION', y=4, color=(255, 0, 0), fontsize=2, align=False)
