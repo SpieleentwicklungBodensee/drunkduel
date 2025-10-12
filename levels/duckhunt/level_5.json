@@ -1,0 +1,29 @@
+{
+  "name": "Scattered Ruins",
+  "mapdata": [
+    "################",
+    "#   Y  oo  Y   #",
+    "#  YYY    YYY  #",
+    "#   Y      Y   #",
+    "#       oo     #",
+    "#  oo  oooo oo #",
+    "#     oooooo   #",
+    "#Y    oooooo  Y#",
+    "#Y    oooooo  Y#",
+    "#     oooooo   #",
+    "#  oo  oooo oo #",
+    "#       oo     #",
+    "#   Y      Y   #",
+    "#  YYY    YYY  #",
+    "#NNNNNNNNNNNNNN#",
+    "################"
+  ],
+  "metadata": {
+    "description": "Ancient ruins scattered across the battlefield",
+    "author": "Claude Sonnet 4 (AI)",
+    "difficulty": "Normal",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}

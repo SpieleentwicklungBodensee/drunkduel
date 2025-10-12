@@ -99,6 +99,14 @@ class GameScreen(Screen):
         if getattr(config, 'SINGLEPLAYER_MODE', False):
             # Single-player mode: Show bird score
             ledwall.drawText(f'BIRDS: {self.bird_score}/{self.target_bird_score}', x=2, y=game_state.level.getHeight() * 2, color=(255, 255, 0))
+            
+            # Show level indicator in Duck Hunt mode
+            if getattr(config, 'DUCK_HUNT_MODE', False):
+                from level_loader import get_level_loader
+                level_loader = get_level_loader()
+                current_level = level_loader.current_level_index + 1
+                total_levels = level_loader.get_level_count()
+                ledwall.drawText(f'LEVEL: {current_level}/{total_levels}', x=20, y=game_state.level.getHeight() * 2, color=(0, 255, 255))
         else:
             # Multiplayer mode: Show player scores
             ledwall.drawText(f'HITS: {self.players[0].score}', x=2, y=game_state.level.getHeight() * 2, color=(255, 255, 0))

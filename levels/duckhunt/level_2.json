@@ -1,0 +1,29 @@
+{
+  "name": "Desert Canyon",
+  "mapdata": [
+    "################",
+    "#YY         YY #",
+    "#YYY   Y   YYY #",
+    "#YY    Y    YY #",
+    "#Y     Y     Y #",
+    "#    Y Y Y    #",
+    "#     YYY     #",
+    "#      Y      #",
+    "#   Y  Y  Y   #",
+    "#  YY  Y  YY  #",
+    "# YYY     YYY #",
+    "#YYY   o   YYY#",
+    "#YY   ooo   YY#",
+    "#Y   ooooo   Y#",
+    "#NNNNNNNNNNNNNN#",
+    "################"
+  ],
+  "metadata": {
+    "description": "Navigate through sandy dunes and rocky outcrops",
+    "author": "Claude Sonnet 4 (AI)",
+    "difficulty": "Normal",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}

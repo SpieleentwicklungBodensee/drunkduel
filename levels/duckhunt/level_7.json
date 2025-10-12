@@ -1,0 +1,29 @@
+{
+  "name": "Twin Towers",
+  "mapdata": [
+    "################",
+    "#  ooo    ooo  #",
+    "#  oYo    oYo  #",
+    "#  ooo    ooo  #",
+    "#              #",
+    "#      YY      #",
+    "#     YYYY     #",
+    "#      YY      #",
+    "#      YY      #",
+    "#     YYYY     #",
+    "#      YY      #",
+    "#              #",
+    "#  ooo    ooo  #",
+    "#  oYo    oYo  #",
+    "#NNNNNNNNNNNNNN#",
+    "################"
+  ],
+  "metadata": {
+    "description": "Two ancient towers guard a central courtyard",
+    "author": "Claude Sonnet 4 (AI)",
+    "difficulty": "Normal",
+    "duck_hunt_mode": true,
+    "version": "1.0",
+    "music": "PatrickdeArteaga_-_Chiptronical.ogg"
+  }
+}
