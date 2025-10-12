@@ -347,7 +347,9 @@ class FenceBird(Object):
         # Determine if bird should be flipped based on map position
         # The texture faces left by default, so flip it if on the right half
         map_width = game_state.level.getWidth() * 16  # Convert to pixels
-        self.should_flip = self.xpos > (map_width / 2)
+
+        # Determine if bird should be flipped based on map position
+        self.should_flip = not (self.xpos > (map_width / 2))
         
         # Scare behavior
         self.scare_radius = 64  # 4 tiles * 16 pixels per tile
