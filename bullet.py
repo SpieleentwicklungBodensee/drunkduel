@@ -48,13 +48,13 @@ class Bullet(Object):
 
         # Use pixel-perfect collision detection
         collision_detected, hit_tile_x, hit_tile_y, hit_tile_type = check_bullet_tile_collision(self.xpos, self.ypos)
-        
+
         if collision_detected:
             if hit_tile_type == 'Y':  # Hit a cactus - explode it
                 self._explode_cactus(hit_tile_x, hit_tile_y)
                 return
             elif hit_tile_type in ['#', 'o', 'F']:  # Hit fence, stone, or invisible wall - just bounce/disappear
-                self._hit_solid_object()
+                self._hit_solid_object(hit_tile_type)
                 return
 
         # Remove bullet if it goes off screen
@@ -88,9 +88,10 @@ class Bullet(Object):
         # Remove the bullet
         self._remove_bullet()
 
-    def _hit_solid_object(self):
+    def _hit_solid_object(self, tile):
         """Handle collision with solid objects."""
-        SFX_RICOCHET.play()
+        if tile != '#':
+            SFX_RICOCHET.play()
         self._remove_bullet()
 
     def _remove_bullet(self):
