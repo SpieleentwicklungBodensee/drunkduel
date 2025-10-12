@@ -23,11 +23,13 @@ NAMES = {DIR_LEFT: 'links',
          FIRE: 'feuer',
          }
 
+button_fire_player_2 = pygame.K_RCTRL
+
 PLAYER_2_KEYS_ORIGINAL = {DIR_LEFT: pygame.K_LEFT,
                           DIR_RIGHT: pygame.K_RIGHT,
                           DIR_UP: pygame.K_UP,
                           DIR_DOWN: pygame.K_DOWN,
-                          FIRE: pygame.K_RCTRL,
+                          FIRE: button_fire_player_2,
                           }
 
 PLAYER_1_KEYS_ORIGINAL = {DIR_LEFT: pygame.K_a,
@@ -204,10 +206,10 @@ def performAction(action, player, playerid):
         _stopDir(player, playerid, actualDir)
 
     if action == 'fire':
-        actualDir = translateDirection((pygame.K_TAB, pygame.K_RCTRL)[playerid], mapping)
+        actualDir = translateDirection((pygame.K_TAB, button_fire_player_2)[playerid], mapping)
         _moveDir(player, playerid, actualDir)
     elif action == 'stopfire':
-        actualDir = translateDirection((pygame.K_TAB, pygame.K_RCTRL)[playerid], mapping)
+        actualDir = translateDirection((pygame.K_TAB, button_fire_player_2)[playerid], mapping)
         _stopDir(player, playerid, actualDir)
 
 def restore(playerid):
