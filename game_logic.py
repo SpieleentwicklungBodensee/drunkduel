@@ -85,7 +85,7 @@ def checkHealthPickup():
                     player.heal(health.get_health_amount())
                     healed_amount = player.health - old_health
 
-                    if cnnfig.DEBUG_MODE:
+                    if config.DEBUG_MODE:
                         print(f"Player {game_state.gameScreen.players.index(player) + 1} healed {healed_amount} HP")
 
                     # Remove the health powerup
