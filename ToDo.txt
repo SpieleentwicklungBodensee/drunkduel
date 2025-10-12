@@ -2,7 +2,6 @@ To Do Liste
 - Helligkeit einstellen
 - Wide Screen - Modus
 - Lautstärken (z.B. "ist")
-- Msg Zeile 39 List out of Range
 - Sound leere Waffe
 - Sound Nachladen
 - Sound Vögel
