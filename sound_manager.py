@@ -21,6 +21,7 @@ SFX_EXPLOSION = None
 SFX_BEER_PICKUP = None  # Neuer Sound für Bier-Pickup
 SFX_VOMIT = None  # Neuer Sound für Kotzen
 SFX_RELOAD = None
+SFX_NOAMMO = None
 
 # Bird sound effects
 SFX_BIRD_HIT = None
@@ -39,7 +40,7 @@ lastPlayedFootstep = 0
 
 def load_sounds():
     """Load all game sound effects."""
-    global SFX_GUNSHOT, SFX_FOOTSTEP, SFX_RICOCHET, SFX_PLAYER_HIT, SFX_EXPLOSION, SFX_BEER_PICKUP, SFX_VOMIT, SFX_LAUGHING, SFX_BORING, SFX_RELOAD
+    global SFX_GUNSHOT, SFX_FOOTSTEP, SFX_RICOCHET, SFX_PLAYER_HIT, SFX_EXPLOSION, SFX_BEER_PICKUP, SFX_VOMIT, SFX_LAUGHING, SFX_BORING, SFX_RELOAD, SFX_NOAMMO
     global SFX_BIRD_HIT, SFX_BIRD_EXPLODING, SFX_BIRD_LAUNCH
 
     print('loading sfx...')
@@ -54,11 +55,14 @@ def load_sounds():
     SFX_VOMIT = pygame.mixer.Sound("sfx/Kotz.wav")
     SFX_BORING = pygame.mixer.Sound("sfx/Boring.wav")
     SFX_RELOAD = pygame.mixer.Sound("sfx/Reload.wav")
-    
+
     # Load bird sound effects
     SFX_BIRD_HIT = pygame.mixer.Sound("sfx/Bird_getting_hit.wav")
     SFX_BIRD_EXPLODING = pygame.mixer.Sound("sfx/Bird_exploding.wav")
     SFX_BIRD_LAUNCH = pygame.mixer.Sound("sfx/Bird_launch.wav")
+    
+    # Ammo sounds
+    SFX_NOAMMO = pygame.mixer.Sound("sfx/No_Ammo.wav")
 
     # Load multiple laughing sounds
     # Find all laughing sound files by parsing filenames
