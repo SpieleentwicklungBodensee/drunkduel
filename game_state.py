@@ -52,6 +52,8 @@ def switchState(state):
     elif state == 'title':
         if titleScreen is None:
             titleScreen = TitleScreen()
+        else:
+            titleScreen.init()
         currentScreen = titleScreen
     elif state == 'levels':
         if levelSelectionScreen is None:
@@ -102,7 +104,7 @@ def reset_game_state():
         gameScreen.objects.clear()  # Remove all bullets and weapon drops
         gameScreen.weapon_drop_timer = 0  # Reset weapon drop timer
         gameScreen.destroyed_cacti.clear()  # Reset cactus respawn timers
-        
+
         # Reset bird circling behavior
         if hasattr(gameScreen, 'birds_circling'):
             gameScreen.birds_circling = False

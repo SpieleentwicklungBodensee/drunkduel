@@ -18,6 +18,9 @@ MODE_LEVELSELECT = 2
 
 class TitleScreen(Screen):
     def __init__(self):
+        self.init()
+
+    def init(self):
         self.selected_option = MODE_NORMAL
         self.show_menu = False
         self.blink_timer = 0
@@ -62,8 +65,8 @@ class TitleScreen(Screen):
             color1 = (255, 255, 0) if self.selected_option == MODE_ALCOHOL else (128, 128, 128)
             if self.selected_option == MODE_ALCOHOL and game_state.tick % 30 < 15:
                 # Add shake effect for "MIT ALKOHOL" when selected
-                shake_x = random.randint(-1, 1)
-                shake_y = random.randint(-1, 1)
+                shake_x = random.randint(-1, 1) * 0.2
+                shake_y = random.randint(-1, 1) * 0.1
 
                 # Calculate center position manually and add shake offset
                 text = '> MIT ALKOHOL <'
@@ -80,8 +83,8 @@ class TitleScreen(Screen):
                 text = 'MIT ALKOHOL' if self.selected_option != MODE_ALCOHOL else '> MIT ALKOHOL <'
                 if self.selected_option == MODE_ALCOHOL:
                     # Still shake even when not blinking
-                    shake_x = random.randint(-1, 1)
-                    shake_y = random.randint(-1, 1)
+                    shake_x = random.randint(-1, 1) * 0.2
+                    shake_y = random.randint(-1, 1) * 0.1
                     screen_chars_width = ledwall.SCR_W // 8
                     center_x = (screen_chars_width - len(text)) // 2 + shake_x
 
