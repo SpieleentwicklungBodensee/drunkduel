@@ -6,6 +6,8 @@ Contains global game state variables and state switching logic.
 import controls
 import config
 import sound_manager
+from level_loader import LevelLoader
+import level_loader
 
 # Override print function
 import ledwall
@@ -57,6 +59,36 @@ def switchState(state):
         # Stop any playing music
         from sound_manager import stop_music
         stop_music()
+        
+        # Reset the game screen to force recreation with correct settings
+        global gameScreen
+        gameScreen = None
+        
+        # Restore original level loader if we were in duck hunt mode
+        if hasattr(level_loader.level_loader, 'levels_directory') and 'duckhunt' in level_loader.level_loader.levels_directory:
+            # We were using the duck hunt loader, restore the main one
+            main_loader = LevelLoader("levels")
+            main_loader.load_all_levels()
+            if main_loader.get_level_count() > 0:
+                main_loader.set_current_level(0)  # Set to first level
+                level_loader.level_loader = main_loader
+                
+                # Update the current level in game state
+                global level
+                if level:
+                    from level import Level
+                    from config import load_graphics
+                    try:
+                        tiles = level.tiles if hasattr(level, 'tiles') else load_graphics()[0]
+                        current_level_data = main_loader.get_current_level()
+                        level = Level(current_level_data.mapdata, tiles)
+                        # Explicitly disable duck hunt mode when restoring main levels
+                        config.DUCK_HUNT_MODE = False
+                        config.ALLOW_UP_DOWN_SHOOT = current_level_data.allow_up_down_shoot
+                    except Exception as e:
+                        if config.DEBUG_MODE:
+                            print(f"Error restoring main level: {e}")
+        
         if titleScreen is None:
             titleScreen = TitleScreen()
         else:
