@@ -17,6 +17,8 @@ class Sprite:
             self.surface = filenameOrSurface
 
     def draw(self, output, x, y):
+        # TODO super cheap brightness
+        self.surface.set_alpha(ledwall.gamma(255))
         output.blit(self.surface, (x, y))
 
 class AnimSprite:
