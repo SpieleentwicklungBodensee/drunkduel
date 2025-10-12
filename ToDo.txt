@@ -1,11 +1,9 @@
 To Do Liste
-- Helligkeit einstellen
 - Wide Screen - Modus
 - Munition spawned schnell wenn Waffe leer
 - am oberen Bildrand werden keine bullets angezeigt
 - Bier abschießen?
 - Motivationssprüche testen
 - Treffer bei Betrunkenem Cowboy
-- Menue bei Levelauswahl fixen
 - Level "open field" ist nicht "open"
 - Einzelspielermodus Bier trinken
