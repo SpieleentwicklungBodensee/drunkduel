@@ -81,8 +81,8 @@ class Bullet(Object):
         # Play explosion sound
         SFX_EXPLOSION.play()
 
-        # 30% chance to spawn a weapon drop where the cactus was
-        if random.random() < 0.3:
+        # 30% chance to spawn a weapon drop where the cactus was (but not in duck hunt mode)
+        if not getattr(config, 'DUCK_HUNT_MODE', False) and random.random() < 0.3:
             if hasattr(game_state, 'munition_sprite'):
                 weapon_drop = WeaponDrop(tile_x * TILE_WIDTH, tile_y * TILE_HEIGHT, game_state.munition_sprite)
                 game_state.gameScreen.addObject(weapon_drop)
