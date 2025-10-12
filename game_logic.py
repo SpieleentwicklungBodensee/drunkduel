@@ -14,6 +14,7 @@ from weapon_drop import WeaponDrop
 from beer_powerup import BeerPowerup
 from health_powerup import HealthPowerup
 from bird import Bird, FenceBird
+from explosion import Explosion
 from sound_manager import SFX_FOOTSTEP, SFX_LAUGHING, SFX_PLAYER_HIT, SFX_RELOAD
 import game_state
 from game_state import TILE_WIDTH, TILE_HEIGHT, switchState
@@ -176,8 +177,68 @@ def checkBeerPickup():
                     break
 
 
+def checkFallingBirdCollisions():
+    """Check if falling birds hit players and cause damage."""
+    for bird in game_state.gameScreen.objects[:]:  # Use slice to avoid modification during iteration
+        if ((isinstance(bird, Bird) and bird.state == "falling") or 
+            (isinstance(bird, FenceBird) and bird.state == "falling")):
+            
+            bird_bounds = bird.get_bounds()
+            
+            # Check collision with each player
+            for i, player in enumerate(game_state.gameScreen.players):
+                if player.dying:
+                    continue
+                    
+                # Simple bounding box collision detection
+                if (bird_bounds['x'] < player.xpos + TILE_WIDTH and
+                    bird_bounds['x'] + bird_bounds['width'] > player.xpos and
+                    bird_bounds['y'] < player.ypos + TILE_HEIGHT and
+                    bird_bounds['y'] + bird_bounds['height'] > player.ypos):
+
+                    # Bird hit player!
+                    _handle_falling_bird_hit(bird, i)
+                    break  # Bird can only hit one player
+
+
+def _handle_falling_bird_hit(bird, hit_player_index):
+    """Handle when a falling bird hits a player."""
+    hit_player = game_state.gameScreen.players[hit_player_index]
+
+    if hit_player.dying:
+        return
+
+    # Bird damage (less than bullet damage)
+    bird_damage = 15  # Fixed damage for bird hits
+    is_dead = hit_player.take_damage(bird_damage)
+
+    # Remove bird immediately to prevent further collisions
+    bird.active = False
+    game_state.gameScreen.removeObject(bird)
+    
+    # Play sound effect
+    SFX_PLAYER_HIT.play()
+
+    # Create explosion at bird's position
+    explosion = Explosion(bird.xpos, bird.ypos)
+    game_state.gameScreen.addObject(explosion)
+
+    # Only kill player if they actually died from the damage
+    if is_dead:
+        # Reset hit player position
+        player = game_state.gameScreen.players[hit_player_index]
+        player.die()
+
+        # Make player stop moving
+        for player in game_state.gameScreen.players:
+            player.stopMoving()
+
+
 def checkCollisions():
     """Check bullet-player and bullet-bird collisions and handle hits."""
+    # Check for falling bird-player collisions
+    checkFallingBirdCollisions()
+    
     for bullet in game_state.gameScreen.objects[:]:  # Use slice to avoid modification during iteration
         if isinstance(bullet, Bullet):
             bullet_hit = False
