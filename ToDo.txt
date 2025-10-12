@@ -1,7 +1,6 @@
 To Do Liste
 - Helligkeit einstellen
 - Wide Screen - Modus
-- Lautstärken (z.B. "ist")
 - Munition spawned schnell wenn Waffe leer
 - am oberen Bildrand werden keine bullets angezeigt
 - manchmal auch auf dem Spielfeld? oder sie bleiben irgendwo hängen
