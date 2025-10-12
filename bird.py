@@ -289,6 +289,10 @@ class FenceBird(Object):
         self.flying_right = random.choice([True, False])  # Random flee direction
         self.flee_speed = random.uniform(1.0, 2.0)  # Speed when scared and flying
         
+        # Random fly-away behavior
+        self.sitting_timer = 0  # How long the bird has been sitting
+        self.fly_away_time = random.randint(300, 1200)  # 5-20 seconds at 60 FPS
+        
     def draw(self, output):
         """Custom draw method to handle sprite flipping based on position."""
         if self.state == "sitting" and self.should_flip:
@@ -306,6 +310,9 @@ class FenceBird(Object):
             return
         
         if self.state == "sitting":
+            # Increment sitting timer
+            self.sitting_timer += 1
+            
             # Check for nearby bullets that might scare the bird
             self._check_for_scary_bullets()
             
@@ -314,6 +321,13 @@ class FenceBird(Object):
                 if self._check_if_tile_destroyed():
                     # Tile was destroyed, fly away!
                     self._get_scared_by_destruction()
+                    return
+            
+            # Random chance to fly away after sitting for a while
+            if self.sitting_timer >= self.fly_away_time:
+                # 30% chance per frame after the fly_away_time has passed
+                if random.random() < 0.005:  # 0.5% chance per frame = ~30% chance per second
+                    self._fly_away_randomly()
             
         elif self.state == "scared_flying":
             # Bird is flying away after being scared
@@ -426,6 +440,26 @@ class FenceBird(Object):
         self.flying_right = random.choice([True, False])
         
         # Convert to flying bird sprite for the scared flight
+        self.sprite = createAnimatedSprite('gfx/birdfly1.png', 16, 16)
+        
+        # Set animation based on direction
+        if self.flying_right:
+            self.sprite.select(1)  # Row 1 = flying right
+        else:
+            self.sprite.select(0)  # Row 0 = flying left
+            
+        # Set animation speed and start
+        self.sprite.speed = 8
+        self.sprite.start()
+    
+    def _fly_away_randomly(self):
+        """Make the bird fly away randomly after sitting for a while."""
+        self.state = "scared_flying"
+        
+        # Choose a random direction to fly away
+        self.flying_right = random.choice([True, False])
+        
+        # Convert to flying bird sprite
         self.sprite = createAnimatedSprite('gfx/birdfly1.png', 16, 16)
         
         # Set animation based on direction

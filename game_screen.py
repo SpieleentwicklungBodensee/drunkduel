@@ -426,9 +426,13 @@ class GameScreen(Screen):
         spawn_interval = random.randint(180, 600)
         
         if self.bird_spawn_timer >= spawn_interval:
-            # Only spawn if there aren't too many birds already
-            birds = [obj for obj in self.objects if isinstance(obj, Bird)]
-            if len(birds) < 3:  # Max 3 birds on screen at once
+            # Count all birds (both flying and fence birds)
+            flying_birds = [obj for obj in self.objects if isinstance(obj, Bird)]
+            fence_birds = [obj for obj in self.objects if isinstance(obj, FenceBird)]
+            total_birds = len(flying_birds) + len(fence_birds)
+            
+            # Only spawn if there aren't too many birds already (max 10 total)
+            if total_birds < 10:
                 self._spawn_random_bird()
             self.bird_spawn_timer = 0
     
