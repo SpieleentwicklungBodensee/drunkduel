@@ -61,13 +61,14 @@ def load_sounds():
     SFX_VOMIT = pygame.mixer.Sound("sfx/Kotz.wav")
     SFX_BORING = pygame.mixer.Sound("sfx/Boring.wav")
     SFX_RELOAD = pygame.mixer.Sound("sfx/Reload.wav")
+
     SFX_GAME_OVER_GUITAR = pygame.mixer.Sound("sfx/Game_Over_Guitar.wav")
 
     # Load bird sound effects
     SFX_BIRD_HIT = pygame.mixer.Sound("sfx/Bird_getting_hit.wav")
     SFX_BIRD_EXPLODING = pygame.mixer.Sound("sfx/Bird_exploding.wav")
     SFX_BIRD_LAUNCH = pygame.mixer.Sound("sfx/Bird_launch.wav")
-    
+
     # Ammo sounds
     SFX_NOAMMO = pygame.mixer.Sound("sfx/No_Ammo.wav")
 

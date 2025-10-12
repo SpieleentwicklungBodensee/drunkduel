@@ -5,6 +5,7 @@ Contains global game state variables and state switching logic.
 
 import controls
 import config
+import sound_manager
 
 # Override print function
 import ledwall
@@ -74,6 +75,7 @@ def switchState(state):
         if gameOverScreen is None:
             gameOverScreen = GameOverScreen()
         currentScreen = gameOverScreen
+        sound_manager.SFX_GAME_OVER_GUITAR.play()
     elif state == 'confirm':
         if confirmScreen is None:
             confirmScreen = ConfirmScreen()
@@ -98,7 +100,7 @@ def reset_game_state():
         # Reset single-player mode variables
         if hasattr(gameScreen, 'bird_score'):
             gameScreen.bird_score = 0
-            
+
         # Only reset second player if not in single-player mode
         if not getattr(config, 'SINGLEPLAYER_MODE', False):
             if len(gameScreen.players) > 1:
@@ -107,7 +109,7 @@ def reset_game_state():
                 gameScreen.players[1].xpos = config.PLAYER_2_STARTX * TILE_WIDTH
                 gameScreen.players[1].ypos = config.PLAYER_2_STARTY * TILE_HEIGHT
                 gameScreen.players[1].sprite.speed = 6
-        
+
         # Always reset first player
         gameScreen.players[0].score = 0
         gameScreen.players[0].ammo = config.INITIAL_AMMO
