@@ -1,7 +1,7 @@
 import pygame
 import ledwall
 from base import Screen
-from game_state import switchState
+import game_state
 
 from level_loader import get_level_loader
 
@@ -36,4 +36,5 @@ class ConfirmScreen(Screen):
 
     def event(self, e):
         if e.type == pygame.KEYDOWN or e.type == pygame.JOYBUTTONDOWN:
-            switchState('title')
+            game_state.switchState('title')
+            game_state.titleScreen.show_menu = True
