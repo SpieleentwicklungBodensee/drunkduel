@@ -12,7 +12,7 @@ import game_state
 from object import Object
 from sprite import createAnimatedSprite
 from game_logic import spawnBullet
-from sound_manager import playFootstepSound, SFX_GUNSHOT, SFX_VOMIT
+from sound_manager import playFootstepSound, SFX_GUNSHOT, SFX_VOMIT, SFX_NOAMMO
 from game_state import TILE_WIDTH, TILE_HEIGHT
 
 # Override print function
@@ -115,6 +115,7 @@ class Player(Object):
 
     def shoot(self, player_index, other_player_x=None):
         if self.ammo <= 0:
+            SFX_NOAMMO.play()
             return  # Can't shoot without ammo
 
         self.showGun = True
