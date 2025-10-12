@@ -530,10 +530,10 @@ class Player(Object):
         t3 = game_state.level.getTile(x1, y2)
         t4 = game_state.level.getTile(x2, y2)
 
-        t1blocked = t1 != ' '
-        t2blocked = t2 != ' '
-        t3blocked = t3 != ' '
-        t4blocked = t4 != ' '
+        t1blocked = t1 not in [' ', 'N']  # Allow movement through empty space and no-spawn zones
+        t2blocked = t2 not in [' ', 'N']  # Allow movement through empty space and no-spawn zones
+        t3blocked = t3 not in [' ', 'N']  # Allow movement through empty space and no-spawn zones
+        t4blocked = t4 not in [' ', 'N']  # Allow movement through empty space and no-spawn zones
 
         if new_xdir < 0:   # going left
             if t1blocked and t3blocked:

@@ -24,6 +24,19 @@ import ledwall
 print = ledwall.print
 
 
+def is_tile_spawnable(x, y):
+    """Check if a tile position is suitable for spawning items, cacti, etc."""
+    if not game_state.level:
+        return False
+    
+    if x < 0 or x >= game_state.level.getWidth() or y < 0 or y >= game_state.level.getHeight():
+        return False
+    
+    tile = game_state.level.getTile(x, y)
+    # Only allow spawning on empty space, not on no-spawn zones (N) or other tiles
+    return tile == ' '
+
+
 def spawnBullet(x, y, xdir, shooter_index, bullet_sprite, ydir=0):
     """Spawn a bullet at the given position."""
 
@@ -49,8 +62,8 @@ def spawnBeerPowerup(beer_sprite):
         x = random.randint(1, 14)  # Avoid edges
         y = random.randint(1, 14)
 
-        # Check if position is empty
-        if game_state.level.getTile(x, y) == ' ':
+        # Check if position is empty and not a no-spawn zone
+        if is_tile_spawnable(x, y):
             beer_powerup = BeerPowerup(x * TILE_WIDTH, y * TILE_HEIGHT, beer_sprite)
             game_state.gameScreen.addObject(beer_powerup)
             return
@@ -62,7 +75,7 @@ def spawnHealthPowerup(health_sprite):
         x = random.randint(0, game_state.level.getWidth() - 1)
         y = random.randint(0, game_state.level.getHeight() - 1)
 
-        if game_state.level.getTile(x, y) == ' ':  # Empty space
+        if is_tile_spawnable(x, y):  # Empty space (not no-spawn zone)
             health_powerup = HealthPowerup(x * TILE_WIDTH, y * TILE_HEIGHT, health_sprite)
             game_state.gameScreen.addObject(health_powerup)
             if config.DEBUG_MODE:
@@ -122,7 +135,7 @@ def spawnWeaponDrop(munition_sprite):
         x = random.randint(0, game_state.level.getWidth() - 1)
         y = random.randint(0, game_state.level.getHeight() - 1)
 
-        if game_state.level.getTile(x, y) == ' ':  # Empty space
+        if is_tile_spawnable(x, y):  # Empty space (not no-spawn zone)
             weapon_drop = WeaponDrop(x * TILE_WIDTH, y * TILE_HEIGHT, munition_sprite)
             game_state.gameScreen.addObject(weapon_drop)
             break

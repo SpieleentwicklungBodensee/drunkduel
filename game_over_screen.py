@@ -41,8 +41,8 @@ class GameOverScreen(Screen):
                 ledwall.centerText('COMPLETE!', y=6, color=(255, 0, 0), fontsize=2, align=False)
 
                 if game_state.tick > 128 or game_state.tick % 32 < 16:
-                    ledwall.centerText('ALL BIRDS', y=12, color=(0, 255, 0), align=False)
-                    ledwall.centerText('ELIMINATED!', y=13, color=(0, 255, 0), align=False)
+                    ledwall.centerText('ALL BIRDS', y=17, color=(0, 255, 0), align=False)
+                    ledwall.centerText('ELIMINATED!', y=18, color=(0, 255, 0), align=False)
 
                 ledwall.centerText(f'BIRDS SHOT: {game_state.gameScreen.bird_score}', y=20, color=(255, 255, 255), align=False)
         else:
