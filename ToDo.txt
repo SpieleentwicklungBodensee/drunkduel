@@ -3,7 +3,6 @@ To Do Liste
 - Wide Screen - Modus
 - Lautstärken (z.B. "ist")
 - Sound leere Waffe
-- Sound Nachladen
 - Sound Vögel
 - Munition spawned schnell wenn Waffe leer
 - Kontrast der Vögel zum Hintergrund schwach
