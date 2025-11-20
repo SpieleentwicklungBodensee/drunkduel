@@ -114,7 +114,7 @@ def handleJoyEvent(e):
     #print(f"Joy event: {e}, joyid={joyid}")
 
     if e.type == pygame.JOYAXISMOTION:
-        if abs(e.value) < JOY_IGNOREZONE:
+        if abs(e.value) < JOY_IGNOREZONE and abs(e.value) != 0.0:
             return []
 
         if e.axis == 0: # x axis
@@ -188,7 +188,7 @@ def handleJoyEvent(e):
 
     elif e.type == pygame.JOYBUTTONDOWN:
         # Only treat specific buttons as fire buttons, not D-pad buttons
-        # Xbox 360 controller: A=0, B=1, X=2, Y=3, LB=4, RB=5, Back=6, Start=7, 
+        # Xbox 360 controller: A=0, B=1, X=2, Y=3, LB=4, RB=5, Back=6, Start=7,
         # L3=8, R3=9, D-pad buttons are 11,12,13,14 - these should NOT fire
         if e.button not in [11, 12, 13, 14]:  # Exclude D-pad buttons from firing
             actions.append('fire')
@@ -201,8 +201,6 @@ def handleJoyEvent(e):
     return actions
 
 def performAction(action, player, playerid):
-    
-    
     mapping = (PLAYER_1_KEYS, PLAYER_2_KEYS)[playerid]
 
     # In Duck Hunt mode, ignore vertical movement actions
